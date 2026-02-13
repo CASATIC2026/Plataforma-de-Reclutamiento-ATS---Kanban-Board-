@@ -1,8 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ResumeAnalyzer"
+    "\\RecruitmentAPI",
+    "\\RecruitmentAPI\\src",
+    "\\RecruitmentAPI\\src\\RecruitmentAPI",
+    "\\RecruitmentAPI\\src\\RecruitmentAPI\\Data",
+    "\\RecruitmentAPI\\src\\RecruitmentAPI\\Data\\Configurations"
   ],
-  "SelectedNode": "\\ResumeAnalyzer\\Program.cs",
+  "SelectedNode": "\\RecruitmentAPI\\src\\RecruitmentAPI\\Data\\Configurations\\ApplicationConfiguration.cs",
   "PreviewInSolutionExplorer": false
 }
