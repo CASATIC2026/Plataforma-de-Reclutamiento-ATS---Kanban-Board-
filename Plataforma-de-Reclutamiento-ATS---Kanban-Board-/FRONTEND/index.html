@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bolsa de Trabajo - Recursos Humanos</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">Recursos <span>Humanos</span></div>
+        <nav class="main-nav">
+            <a href="#">Inicio</a>
+            <a href="#">Vacantes</a>
+            <a href="#">Contacto</a>
+        </nav>
+    </header>
+
+    <main class="main-layout">
+        <section class="hero">
+            <h1>Oportunidades Profesionales</h1>
+            <p>Selecciona el puesto que mejor se adapte a tu perfil y aplica en línea.</p>
+        </section>
+
+        <section class="jobs-section">
+            <h2>Puestos Disponibles</h2>
+            <div class="jobs-grid">
+                <article class="job-card" data-position="Doctor en Medicina">
+                    <h3>Doctor en Medicina</h3>
+                    <p>
+                        Atención integral de pacientes, elaboración de diagnósticos,
+                        coordinación con equipos multidisciplinarios y seguimiento clínico.
+                    </p>
+                    <ul>
+                        <li>Título universitario en Medicina</li>
+                        <li>Colegiado y con licencia vigente</li>
+                        <li>Experiencia mínima de 3 años</li>
+                    </ul>
+                    <button class="btn-outline select-position">Ver detalles y aplicar</button>
+                </article>
+
+                <article class="job-card" data-position="Ingeniería Informática">
+                    <h3>Ing. Informático</h3>
+                    <p>
+                        Diseño, desarrollo y mantenimiento de sistemas de información,
+                        soporte a usuarios y mejora continua de procesos tecnológicos.
+                    </p>
+                    <ul>
+                        <li>Grado en Ingeniería Informática o similar</li>
+                        <li>Conocimientos en desarrollo web y bases de datos</li>
+                        <li>Capacidad de trabajo en equipo</li>
+                    </ul>
+                    <button class="btn-outline select-position">Ver detalles y aplicar</button>
+                </article>
+
+                <article class="job-card" data-position="Profesorado">
+                    <h3>Profesorado</h3>
+                    <p>
+                        Impartición de clases, preparación de material didáctico y evaluación
+                        de estudiantes en diferentes niveles educativos.
+                    </p>
+                    <ul>
+                        <li>Título de Profesorado o Licenciatura afín</li>
+                        <li>Vocación por la enseñanza</li>
+                        <li>Excelentes habilidades comunicativas</li>
+                    </ul>
+                    <button class="btn-outline select-position">Ver detalles y aplicar</button>
+                </article>
+            </div>
+        </section>
+
+        <section class="application-section" id="applicationSection">
+            <h2>Aplica aquí</h2>
+            <p class="application-subtitle">
+                Completa el siguiente formulario para enviar tu candidatura.
+            </p>
+            <form id="applicationForm" class="application-form">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="position">Puesto al que aplicas</label>
+                        <select id="position" name="position" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="Doctor en Medicina">Doctor en Medicina</option>
+                            <option value="Ingeniería Informática">Ing. Informático</option>
+                            <option value="Profesorado">Profesorado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="name">Nombre completo</label>
+                        <input type="text" id="name" name="name" placeholder="Nombre y apellidos" required />
+                    </div>
+                    <div class="form-field">
+                        <label for="age">Edad</label>
+                        <input type="number" id="age" name="age" min="18" max="90" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="cvFile">Subir CV (PDF)</label>
+                        <input type="file" id="cvFile" name="cvFile" accept="application/pdf" required />
+                        <small>Formato permitido: PDF.</small>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Enviar aplicación</button>
+                </div>
+            </form>
+            <p class="success-message" id="successMessage" hidden>
+                Tu aplicación ha sido enviada correctamente. ¡Gracias por postular!
+            </p>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; <span id="year"></span> Departamento de Recursos Humanos. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

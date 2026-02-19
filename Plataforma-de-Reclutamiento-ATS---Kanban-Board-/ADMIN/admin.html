@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Recursos Humanos</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Panel de Administración</h1>
+            <p class="subtitle">Gestiona las aplicaciones de trabajo</p>
+        </header>
+
+        <div class="columns-container">
+            <!-- Columna de Postulantes -->
+            <div class="column" id="postulantesColumn">
+                <h2 class="column-title">Postulantes</h2>
+                <div class="cards-container" id="postulantesContainer">
+                    <!-- Las tarjetas se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Columna de Entrevistas -->
+            <div class="column" id="entrevistasColumn">
+                <h2 class="column-title">A Entrevistas</h2>
+                <div class="cards-container" id="entrevistasContainer">
+                    <!-- Las tarjetas se moverán aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para ver detalles del CV -->
+        <div id="cvModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>CV del Postulante</h2>
+                <div id="cvContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

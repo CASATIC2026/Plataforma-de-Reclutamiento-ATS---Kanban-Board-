@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Postulantes - Recursos Humanos</title>
+    <link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+    <header class="panel-header">
+        <div class="panel-brand">
+            <span class="dot"></span>
+            <span class="label">Panel de Postulaciones</span>
+        </div>
+        <div class="panel-meta">
+            <span class="pill">Postulantes activos</span>
+        </div>
+    </header>
+
+    <main class="board">
+        <section class="column" data-status="postulante">
+            <header class="column-header">
+                <h2>Postulantes</h2>
+                <span class="counter" id="count-postulantes">0</span>
+            </header>
+            <div class="column-body" id="column-postulantes"></div>
+        </section>
+
+        <section class="column" data-status="entrevista">
+            <header class="column-header">
+                <h2>A entrevistas</h2>
+                <span class="counter" id="count-entrevista">0</span>
+            </header>
+            <div class="column-body empty-hint" id="column-entrevista" data-hint="Arrastra aquí a los seleccionados para entrevista"></div>
+        </section>
+
+        <section class="column" data-status="rechazado">
+            <header class="column-header">
+                <h2>Rechazados</h2>
+                <span class="counter" id="count-rechazado">0</span>
+            </header>
+            <div class="column-body empty-hint" id="column-rechazado" data-hint="Arrastra aquí a los descartados"></div>
+        </section>
+    </main>
+
+    <template id="card-template">
+        <article class="candidate-card" draggable="true">
+            <header class="card-header">
+                <h3 class="card-name"></h3>
+                <span class="card-age"></span>
+            </header>
+            <div class="card-body">
+                <div class="card-row">
+                    <span class="label">Correo</span>
+                    <span class="value card-email"></span>
+                </div>
+                <div class="card-row">
+                    <span class="label">Puesto</span>
+                    <span class="value card-position"></span>
+                </div>
+            </div>
+            <footer class="card-footer">
+                <button type="button" class="btn-secondary view-cv">Ver CV</button>
+            </footer>
+        </article>
+    </template>
+
+    <dialog id="cvDialog" class="cv-dialog">
+        <div class="cv-dialog-inner">
+            <header class="cv-header">
+                <h2 id="cvTitle">CV del postulante</h2>
+                <button type="button" class="icon-button" id="closeCvDialog" aria-label="Cerrar">
+                    ✕
+                </button>
+            </header>
+            <div class="cv-content">
+                <iframe id="cvFrame" title="CV PDF" frameborder="0"></iframe>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="panel.js"></script>
+</body>
+</html>
+
