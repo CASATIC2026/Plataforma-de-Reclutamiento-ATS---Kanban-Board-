@@ -1,0 +1,79 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+h2 { text-align: center; color: #333; }
+
+.input-group { margin-bottom: 1.5rem; }
+
+label { display: block; margin-bottom: 5px; color: #666; font-weight: 600; }
+
+input[type="text"], input[type="date"], input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Área de Drag & Drop */
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background-color: #fafafa;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+#drop-area.active {
+    border-color: #4CAF50;
+    background-color: #e8f5e9;
+}
+
+.icon { font-size: 40px; color: #888; }
+
+#browseBtn {
+    background: #00bcd4;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#file-name {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.submit-btn:hover { background-color: #555; }
