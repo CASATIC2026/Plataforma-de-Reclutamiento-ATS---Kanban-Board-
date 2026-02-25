@@ -1,0 +1,13 @@
+ 
+# Backend
+RecruitmentAPI/bin/
+RecruitmentAPI/obj/
+RecruitmentAPI/appsettings.Development.json
+
+# Frontend
+recruitment-frontend/node_modules/
+recruitment-frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
