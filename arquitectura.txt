@@ -1,0 +1,124 @@
+RecruitmentAPI/
+│
+├── Controllers/                  # 🎯 Entry point — receives HTTP requests
+│   └── VacantesController.cs     #    POST /api/vacantes, GET /api/vacantes, etc.
+│
+├── Services/                     # 🧠 Business logic lives HERE
+│   ├── Interfaces/
+│   │   └── IVacanteService.cs    #    Contract: "what can we DO with vacantes?"
+│   └── VacanteService.cs         #    Implementation: the actual logic
+│
+├── Repositories/                 # 💾 Talks to the database, nothing else
+│   ├── Interfaces/
+│   │   └── IVacanteRepository.cs
+│   └── VacanteRepository.cs
+│
+├── Models/                       # 📦 Our domain entities (tables in DB)
+│   ├── Vacante.cs                #    The job posting itself
+│   └── Requisito.cs              #    Requirements/tags for each vacante
+│
+├── DTOs/                         # 📬 What we SEND and RECEIVE (not raw entities)
+│   ├── CreateVacanteDTO.cs       #    What the frontend sends to create one
+│   └── VacanteResponseDTO.cs     #    What we send back to the frontend
+│
+├── Data/                         # 🔌 EF Core database context & config
+│   ├── AppDbContext.cs
+│   └── Configurations/
+│       ├── VacanteConfiguration.cs    # Fluent API config for Vacante table
+│       └── RequisitoConfiguration.cs
+│
+├── Mappings/                     # 🔄 Entity ↔ DTO conversion
+│   └── VacanteMappingProfile.cs  #    (we can use AutoMapper or manual)
+│
+├── Migrations/                   # 🏗️ EF Core auto-generated migrations
+│
+├── Storage/                      # 📂 Where uploaded CVs will live (local)
+│   └── (CVs go here later)
+│
+├── Program.cs                    # 🚀 App entry point + DI registration
+├── appsettings.json              # ⚙️ Connection strings, config
+└── RecruitmentAPI.csproj
+
+
+recruitment-frontend/
+│
+├── public/
+│   └── index.html
+│
+├── src/
+│   ├── api/                      # 🌐 All HTTP calls to backend
+│   │   └── vacantesApi.js        #    createVacante(), getVacantes(), etc.
+│   │
+│   ├── components/               # 🧩 Reusable UI pieces
+│   │   ├── common/               #    Buttons, Inputs, Modals, etc.
+│   │   │   ├── Button.jsx
+│   │   │   ├── Input.jsx
+│   │   │   └── Modal.jsx
+│   │   └── vacantes/             #    Vacante-specific components
+│   │       ├── VacanteCard.jsx   #    One job posting card
+│   │       ├── VacanteForm.jsx   #    Form to create/edit vacante
+│   │       └── VacanteList.jsx   #    Grid/list of all vacantes
+│   │
+│   ├── pages/                    # 📄 Full page views (routes)
+│   │   ├── AdminVacantesPage.jsx #    Recruiter: manage vacantes
+│   │   └── PublicVacantesPage.jsx#    Candidates: see & apply
+│   │
+│   ├── hooks/                    # 🪝 Custom React hooks
+│   │   └── useVacantes.js        #    Fetch, create, delete logic
+│   │
+│   ├── context/                  # 🌍 Global state (later: auth, etc.)
+│   │
+│   ├── layouts/                  # 📐 Page wrappers (navbar, footer)
+│   │   └── MainLayout.jsx
+│   │
+│   ├── App.jsx                   # 🛣️ Router setup
+│   ├── main.jsx                  # 🚀 React entry point
+│   └── index.css                 # 🎨 Tailwind imports
+│
+├── tailwind.config.js
+├── postcss.config.js
+├── vite.config.js                # ⚡ Using Vite (fast dev server)
+└── package.json
+
+
+[Recruiter fills form in React]
+        │
+        ▼
+  VacanteForm.jsx  →  vacantesApi.js  →  POST /api/vacantes
+        │                                        │
+        │                                        ▼
+        │                              VacantesController.cs
+        │                                        │
+        │                                        ▼
+        │                              IVacanteService.cs
+        │                              VacanteService.cs
+        │                                (validates, maps DTO → Entity)
+        │                                        │
+        │                                        ▼
+        │                              IVacanteRepository.cs
+        │                              VacanteRepository.cs
+        │                                (saves to PostgreSQL)
+        │                                        │
+        │                                        ▼
+        │                                  PostgreSQL 💾
+        │                                        │
+        ▼                                        ▼
+  UI updates with                     Returns VacanteResponseDTO
+  new vacante card                    back up the chain
+
+
+
+┌──────────────────────────┐       ┌──────────────────────────┐
+│       vacantes           │       │      requisitos          │
+├──────────────────────────┤       ├──────────────────────────┤
+│ id (PK, UUID)            │       │ id (PK, UUID)            │
+│ titulo (varchar)         │       │ vacante_id (FK → vacantes│
+│ descripcion (text)       │       │ nombre (varchar)         │
+│ ubicacion (varchar)      │       │ created_at (timestamp)   │
+│ tipo_contrato (varchar)  │       └──────────────────────────┘
+│ salario_min (decimal?)   │
+│ salario_max (decimal?)   │        1 vacante → N requisitos
+│ esta_activa (bool)       │
+│ created_at (timestamp)   │
+│ updated_at (timestamp)   │
+└──────────────────────────┘
