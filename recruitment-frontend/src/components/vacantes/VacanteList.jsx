@@ -1,6 +1,6 @@
 import VacanteCard from './VacanteCard';
 
-export default function VacanteList({ vacantes, onDelete, showActions = false }) {
+export default function VacanteList({ vacantes, onDelete, onApply, showActions = false }) {
   if (vacantes.length === 0) {
     return (
       <div className="text-center py-12 text-gray-400">
@@ -16,6 +16,7 @@ export default function VacanteList({ vacantes, onDelete, showActions = false })
           key={vacante.id}
           vacante={vacante}
           onDelete={onDelete}
+          onApply={onApply}
           showActions={showActions}
         />
       ))}

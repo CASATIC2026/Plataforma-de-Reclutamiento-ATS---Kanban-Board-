@@ -15,9 +15,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Repository layer
 builder.Services.AddScoped<IVacanteRepository, VacanteRepository>();
+builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
 
 // Service layer
 builder.Services.AddScoped<IVacanteService, VacanteService>();
+builder.Services.AddScoped<IPostulacionService, PostulacionService>();
 
 // Controllers
 builder.Services.AddControllers();

@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Vacante> Vacantes => Set<Vacante>();
     public DbSet<Requisito> Requisitos => Set<Requisito>();
+    public DbSet<Postulacion> Postulaciones => Set<Postulacion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

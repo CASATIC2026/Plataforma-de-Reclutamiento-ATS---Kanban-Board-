@@ -22,6 +22,53 @@ namespace RecruitmentAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("RecruitmentAPI.Models.Postulacion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CvFileName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("CvFilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NombreCandidato")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("VacanteId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VacanteId");
+
+                    b.ToTable("postulaciones", (string)null);
+                });
+
             modelBuilder.Entity("RecruitmentAPI.Models.Requisito", b =>
                 {
                     b.Property<Guid>("Id")
@@ -101,6 +148,17 @@ namespace RecruitmentAPI.Migrations
                     b.ToTable("vacantes", (string)null);
                 });
 
+            modelBuilder.Entity("RecruitmentAPI.Models.Postulacion", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Vacante", "Vacante")
+                        .WithMany("Postulaciones")
+                        .HasForeignKey("VacanteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vacante");
+                });
+
             modelBuilder.Entity("RecruitmentAPI.Models.Requisito", b =>
                 {
                     b.HasOne("RecruitmentAPI.Models.Vacante", "Vacante")
@@ -114,6 +172,8 @@ namespace RecruitmentAPI.Migrations
 
             modelBuilder.Entity("RecruitmentAPI.Models.Vacante", b =>
                 {
+                    b.Navigation("Postulaciones");
+
                     b.Navigation("Requisitos");
                 });
 #pragma warning restore 612, 618

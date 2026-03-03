@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "D:\\TEST3\\RecruitmentPlatform\\RecruitmentAPI\\RecruitmentAPI.csproj": {}
+    "C:\\Users\\Grupo B\\Documents\\BM\\Nueva carpeta (3)\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj": {}
   },
   "projects": {
-    "D:\\TEST3\\RecruitmentPlatform\\RecruitmentAPI\\RecruitmentAPI.csproj": {
+    "C:\\Users\\Grupo B\\Documents\\BM\\Nueva carpeta (3)\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\TEST3\\RecruitmentPlatform\\RecruitmentAPI\\RecruitmentAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Grupo B\\Documents\\BM\\Nueva carpeta (3)\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
         "projectName": "RecruitmentAPI",
-        "projectPath": "D:\\TEST3\\RecruitmentPlatform\\RecruitmentAPI\\RecruitmentAPI.csproj",
-        "packagesPath": "C:\\Users\\admonostrator\\.nuget\\packages\\",
-        "outputPath": "D:\\TEST3\\RecruitmentPlatform\\RecruitmentAPI\\obj\\",
+        "projectPath": "C:\\Users\\Grupo B\\Documents\\BM\\Nueva carpeta (3)\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
+        "packagesPath": "C:\\Users\\Grupo B\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Grupo B\\Documents\\BM\\Nueva carpeta (3)\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\admonostrator\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Grupo B\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -85,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
