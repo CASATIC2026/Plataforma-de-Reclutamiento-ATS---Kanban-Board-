@@ -1,311 +1,140 @@
 # Kanban Board
 Repository: casatic2026/plataforma-de-reclutamiento-ats---kanban-board-
 Branch: development-BM
-Files analyzed: 104
-
-Directory structure:
-└── casatic2026-plataforma-de-reclutamiento-ats---kanban-board-/
-    ├── README.md
-    ├── arquitectura.txt
-    ├── Nuevo Documento de texto.txt
-    ├── Plataforma-de-Reclutamiento-ATS---Kanban-Board-.sln
-    ├── recruitment-frontend/
-    │   ├── README.md
-    │   ├── eslint.config.js
-    │   ├── index.html
-    │   ├── package-lock.json
-    │   ├── package.json
-    │   ├── vite.config.js
-    │   ├── .gitignore
-    │   ├── files/
-    │   │   ├── app.js
-    │   │   ├── index.html
-    │   │   ├── styles.css
-    │   │   └── .vs/
-    │   │       ├── slnx.sqlite
-    │   │       ├── VSWorkspaceState.json
-    │   │       └── files/
-    │   │           ├── FileContentIndex/
-    │   │           │   └── 8135b275-d2a3-4c9c-86b3-be45f389f935.vsidx
-    │   │           └── v17/
-    │   │               ├── DocumentLayout.json
-    │   │               └── .wsuo
-    │   ├── public/
-    │   └── src/
-    │       ├── App.jsx
-    │       ├── index.css
-    │       ├── main.jsx
-    │       ├── api/
-    │       │   ├── postulacionesApi.js
-    │       │   └── vacantesApi.js
-    │       ├── components/
-    │       │   ├── common/
-    │       │   │   ├── Button.jsx
-    │       │   │   ├── Input.jsx
-    │       │   │   └── Modal.jsx
-    │       │   ├── postulaciones/
-    │       │   │   ├── ApplyModal.jsx
-    │       │   │   ├── PostulacionCard.jsx
-    │       │   │   ├── PostulacionForm.jsx
-    │       │   │   └── PostulacionList.jsx
-    │       │   └── vacantes/
-    │       │       ├── JobCard.jsx
-    │       │       ├── JobDetailModal.jsx
-    │       │       ├── VacanteCard.jsx
-    │       │       ├── VacanteForm.jsx
-    │       │       └── VacanteList.jsx
-    │       ├── layouts/
-    │       │   ├── MainLayout.jsx
-    │       │   └── PublicLayout.jsx
-    │       ├── pages/
-    │       │   ├── AdminPostulacionesPage.jsx
-    │       │   ├── AdminVacantesPage.jsx
-    │       │   └── PublicVacantesPage.jsx
-    │       ├── styles/
-    │       │   └── talentbridge.css
-    │       └── utils/
-    │           └── vacanteHelpers.js
-    └── RecruitmentAPI/
-        ├── appsettings.Development.json
-        ├── appsettings.json
-        ├── Program.cs
-        ├── RecruitmentAPI.csproj
-        ├── RecruitmentAPI.http
-        ├── bin/
-        │   └── Debug/
-        │       └── net8.0/
-        │           ├── appsettings.Development.json
-        │           ├── appsettings.json
-        │           ├── RecruitmentAPI
-        │           ├── RecruitmentAPI.deps.json
-        │           ├── RecruitmentAPI.runtimeconfig.json
-        │           ├── cs/
-        │           ├── de/
-        │           ├── es/
-        │           ├── fr/
-        │           ├── it/
-        │           ├── ja/
-        │           ├── ko/
-        │           ├── pl/
-        │           ├── pt-BR/
-        │           ├── ru/
-        │           ├── tr/
-        │           ├── zh-Hans/
-        │           └── zh-Hant/
-        ├── Controllers/
-        │   ├── PostulacionesController.cs
-        │   └── VacantesController.cs
-        ├── Data/
-        │   ├── AppDbContext.cs
-        │   └── Configurations/
-        │       ├── PostulacionConfiguration.cs
-        │       ├── RequisitoConfiguration.cs
-        │       └── VacanteConfiguration.cs
-        ├── DTOs/
-        │   ├── CreatePostulacionDTO.cs
-        │   ├── CreateVacanteDTO.cs
-        │   ├── PostulacionResponseDTO.cs
-        │   ├── UpdateVacanteDTO.cs
-        │   └── VacanteResponseDTO.cs
-        ├── Migrations/
-        │   ├── 20260221213705_InitialCreate.cs
-        │   ├── 20260221213705_InitialCreate.Designer.cs
-        │   ├── 20260302103713_AddPostulaciones.cs
-        │   ├── 20260302103713_AddPostulaciones.Designer.cs
-        │   └── AppDbContextModelSnapshot.cs
-        ├── Models/
-        │   ├── Postulacion.cs
-        │   ├── Requisito.cs
-        │   └── Vacante.cs
-        ├── obj/
-        │   ├── project.assets.json
-        │   ├── project.nuget.cache
-        │   ├── RecruitmentAPI.csproj.nuget.dgspec.json
-        │   ├── RecruitmentAPI.csproj.nuget.g.props
-        │   ├── RecruitmentAPI.csproj.nuget.g.targets
-        │   └── Debug/
-        │       └── net8.0/
-        │           ├── apphost
-        │           ├── Recruitm.E6D0A455.Up2Date
-        │           ├── RecruitmentAPI.AssemblyInfo.cs
-        │           ├── RecruitmentAPI.AssemblyInfoInputs.cache
-        │           ├── RecruitmentAPI.assets.cache
-        │           ├── RecruitmentAPI.csproj.AssemblyReference.cache
-        │           ├── RecruitmentAPI.csproj.CoreCompileInputs.cache
-        │           ├── RecruitmentAPI.csproj.FileListAbsolute.txt
-        │           ├── RecruitmentAPI.GeneratedMSBuildEditorConfig.editorconfig
-        │           ├── RecruitmentAPI.genruntimeconfig.cache
-        │           ├── RecruitmentAPI.GlobalUsings.g.cs
-        │           ├── RecruitmentAPI.MvcApplicationPartsAssemblyInfo.cache
-        │           ├── RecruitmentAPI.MvcApplicationPartsAssemblyInfo.cs
-        │           ├── staticwebassets.build.json
-        │           ├── .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
-        │           ├── ref/
-        │           ├── refint/
-        │           └── staticwebassets/
-        │               ├── msbuild.build.RecruitmentAPI.props
-        │               ├── msbuild.buildMultiTargeting.RecruitmentAPI.props
-        │               └── msbuild.buildTransitive.RecruitmentAPI.props
-        ├── Properties/
-        │   └── launchSettings.json
-        ├── Repositories/
-        │   ├── PostulacionRepository.cs
-        │   ├── VacanteRepository.cs
-        │   └── Interfaces/
-        │       ├── IPostulacionRepository.cs
-        │       └── IVacanteRepository.cs
-        ├── Services/
-        │   ├── PostulacionService.cs
-        │   ├── VacanteService.cs
-        │   └── Interfaces/
-        │       ├── IPostulacionService.cs
-        │       └── IVacanteService.cs
-        └── Storage/
-            └── CVs/
-
-
 ================================================
-FILE: README.md
+  RECRUITMENT PLATFORM ATS — ARCHITECTURE
 ================================================
-# Kanban Board
 
 
+BACKEND: RecruitmentAPI/
+─────────────────────────────────────────────────────────────────
 
-================================================
-FILE: arquitectura.txt
-================================================
 RecruitmentAPI/
 │
-├── Controllers/                  # 🎯 Entry point — receives HTTP requests
-│   └── VacantesController.cs     #    POST /api/vacantes, GET /api/vacantes, etc.
+├── Controllers/                  # Entry point — receives HTTP requests
+│   ├── VacantesController.cs
+│   └── PostulacionesController.cs
 │
-├── Services/                     # 🧠 Business logic lives HERE
+├── Services/                     # Business logic
 │   ├── Interfaces/
-│   │   └── IVacanteService.cs    #    Contract: "what can we DO with vacantes?"
-│   └── VacanteService.cs         #    Implementation: the actual logic
+│   │   ├── IVacanteService.cs
+│   │   └── IPostulacionService.cs
+│   ├── VacanteService.cs
+│   └── PostulacionService.cs
 │
-├── Repositories/                 # 💾 Talks to the database, nothing else
+├── Repositories/                 # Talks to the database only
 │   ├── Interfaces/
-│   │   └── IVacanteRepository.cs
-│   └── VacanteRepository.cs
+│   │   ├── IVacanteRepository.cs
+│   │   └── IPostulacionRepository.cs
+│   ├── VacanteRepository.cs
+│   └── PostulacionRepository.cs
 │
-├── Models/                       # 📦 Our domain entities (tables in DB)
-│   ├── Vacante.cs                #    The job posting itself
-│   └── Requisito.cs              #    Requirements/tags for each vacante
+├── Models/                       # Domain entities (DB tables)
+│   ├── Vacante.cs
+│   ├── Requisito.cs
+│   └── Postulacion.cs
 │
-├── DTOs/                         # 📬 What we SEND and RECEIVE (not raw entities)
-│   ├── CreateVacanteDTO.cs       #    What the frontend sends to create one
-│   └── VacanteResponseDTO.cs     #    What we send back to the frontend
+├── DTOs/                         # What we send and receive
+│   ├── CreateVacanteDTO.cs
+│   ├── UpdateVacanteDTO.cs
+│   ├── VacanteResponseDTO.cs
+│   ├── CreatePostulacionDTO.cs
+│   └── PostulacionResponseDTO.cs
 │
-├── Data/                         # 🔌 EF Core database context & config
+├── Data/                         # EF Core context & config
 │   ├── AppDbContext.cs
 │   └── Configurations/
-│       ├── VacanteConfiguration.cs    # Fluent API config for Vacante table
-│       └── RequisitoConfiguration.cs
+│       ├── VacanteConfiguration.cs
+│       ├── RequisitoConfiguration.cs
+│       └── PostulacionConfiguration.cs
 │
-├── Mappings/                     # 🔄 Entity ↔ DTO conversion
-│   └── VacanteMappingProfile.cs  #    (we can use AutoMapper or manual)
+├── Migrations/                   # EF Core auto-generated
+│   ├── 20260221213705_InitialCreate
+│   └── 20260302103713_AddPostulaciones
 │
-├── Migrations/                   # 🏗️ EF Core auto-generated migrations
-│
-├── Storage/                      # 📂 Where uploaded CVs will live (local)
-│   └── (CVs go here later)
-│
-├── Program.cs                    # 🚀 App entry point + DI registration
-├── appsettings.json              # ⚙️ Connection strings, config
-└── RecruitmentAPI.csproj
+├── Storage/CVs/                  # Uploaded CVs saved here
+├── Program.cs                    # App entry point + DI registration
+└── appsettings.json
 
 
-recruitment-frontend/
+FRONTEND: recruitment-frontend/
+─────────────────────────────────────────────────────────────────
+
+recruitment-frontend/src/
 │
-├── public/
-│   └── index.html
+├── api/                          # All HTTP calls to backend
+│   ├── vacantesApi.js
+│   └── postulacionesApi.js
 │
-├── src/
-│   ├── api/                      # 🌐 All HTTP calls to backend
-│   │   └── vacantesApi.js        #    createVacante(), getVacantes(), etc.
-│   │
-│   ├── components/               # 🧩 Reusable UI pieces
-│   │   ├── common/               #    Buttons, Inputs, Modals, etc.
-│   │   │   ├── Button.jsx
-│   │   │   ├── Input.jsx
-│   │   │   └── Modal.jsx
-│   │   └── vacantes/             #    Vacante-specific components
-│   │       ├── VacanteCard.jsx   #    One job posting card
-│   │       ├── VacanteForm.jsx   #    Form to create/edit vacante
-│   │       └── VacanteList.jsx   #    Grid/list of all vacantes
-│   │
-│   ├── pages/                    # 📄 Full page views (routes)
-│   │   ├── AdminVacantesPage.jsx #    Recruiter: manage vacantes
-│   │   └── PublicVacantesPage.jsx#    Candidates: see & apply
-│   │
-│   ├── hooks/                    # 🪝 Custom React hooks
-│   │   └── useVacantes.js        #    Fetch, create, delete logic
-│   │
-│   ├── context/                  # 🌍 Global state (later: auth, etc.)
-│   │
-│   ├── layouts/                  # 📐 Page wrappers (navbar, footer)
-│   │   └── MainLayout.jsx
-│   │
-│   ├── App.jsx                   # 🛣️ Router setup
-│   ├── main.jsx                  # 🚀 React entry point
-│   └── index.css                 # 🎨 Tailwind imports
+├── components/
+│   ├── common/                   # Reusable UI primitives
+│   │   ├── Button.jsx
+│   │   ├── Input.jsx
+│   │   └── Modal.jsx
+│   ├── vacantes/
+│   │   ├── VacanteCard.jsx
+│   │   ├── VacanteForm.jsx
+│   │   ├── VacanteList.jsx
+│   │   ├── JobCard.jsx
+│   │   └── JobDetailModal.jsx
+│   └── postulaciones/
+│       ├── ApplyModal.jsx
+│       ├── PostulacionForm.jsx
+│       ├── PostulacionCard.jsx
+│       └── PostulacionList.jsx
 │
-├── tailwind.config.js
-├── postcss.config.js
-├── vite.config.js                # ⚡ Using Vite (fast dev server)
-└── package.json
+├── pages/
+│   ├── PublicVacantesPage.jsx    # Candidates: browse & apply
+│   ├── AdminVacantesPage.jsx     # Recruiter: manage vacantes
+│   └── AdminPostulacionesPage.jsx# Recruiter: view applications
+│
+├── layouts/
+│   ├── MainLayout.jsx
+│   └── PublicLayout.jsx
+│
+├── utils/
+│   └── vacanteHelpers.js
+│
+├── App.jsx                       # Router setup
+└── main.jsx                      # React entry point
 
 
-[Recruiter fills form in React]
-        │
-        ▼
-  VacanteForm.jsx  →  vacantesApi.js  →  POST /api/vacantes
-        │                                        │
-        │                                        ▼
-        │                              VacantesController.cs
-        │                                        │
-        │                                        ▼
-        │                              IVacanteService.cs
-        │                              VacanteService.cs
-        │                                (validates, maps DTO → Entity)
-        │                                        │
-        │                                        ▼
-        │                              IVacanteRepository.cs
-        │                              VacanteRepository.cs
-        │                                (saves to PostgreSQL)
-        │                                        │
-        │                                        ▼
-        │                                  PostgreSQL 💾
-        │                                        │
-        ▼                                        ▼
-  UI updates with                     Returns VacanteResponseDTO
-  new vacante card                    back up the chain
+REQUEST FLOW
+─────────────────────────────────────────────────────────────────
+
+[React form] → api/*.js → HTTP request
+                                  │
+                                  ▼
+                          Controller (receives request)
+                                  │
+                                  ▼
+                          Service (validates, maps DTO → Entity)
+                                  │
+                                  ▼
+                          Repository (reads/writes PostgreSQL)
+                                  │
+                                  ▼
+                          Returns DTO back up the chain → UI
 
 
+DATABASE SCHEMA
+─────────────────────────────────────────────────────────────────
 
 ┌──────────────────────────┐         ┌──────────────────────────┐
 │         vacantes         │         │        requisitos         │
 ├──────────────────────────┤         ├──────────────────────────┤
 │ Id (PK, UUID)            │────┐    │ Id (PK, UUID)            │
-│ Titulo (varchar 200)     │    │    │ VacanteId (FK → vacantes)│
-│ Descripcion (text)       │    └───>│ Descripcion (varchar 500)│
+│ Titulo (varchar 200)     │    └───>│ VacanteId (FK → vacantes)│
+│ Descripcion (text)       │         │ Descripcion (varchar 500)│
 │ Ubicacion (varchar 200)  │         │ CreatedAt (timestamptz)  │
 │ TipoContrato (varchar)   │         └──────────────────────────┘
 │ SalarioMin (decimal?)    │
-│ SalarioMax (decimal?)    │           1 vacante → N requisitos
-│ EstaActiva (bool)        │
-│ CreatedAt (timestamptz)  │
-│ UpdatedAt (timestamptz)  │
-└──────────────────────────┘
-
-
-┌──────────────────────────┐         ┌──────────────────────────┐
-│         vacantes         │         │      postulaciones        │
-├──────────────────────────┤         ├──────────────────────────┤
-│ Id (PK, UUID)            │────┐    │ Id (PK, UUID)            │
-└──────────────────────────┘    │    │ VacanteId (FK → vacantes)│
-                                └───>│ NombreCandidato (varchar)│
+│ SalarioMax (decimal?)    │         ┌──────────────────────────┐
+│ EstaActiva (bool)        │         │      postulaciones        │
+│ CreatedAt (timestamptz)  │         ├──────────────────────────┤
+│ UpdatedAt (timestamptz)  │────┐    │ Id (PK, UUID)            │
+└──────────────────────────┘    └───>│ VacanteId (FK → vacantes)│
+                                     │ NombreCandidato (varchar)│
                                      │ Email (varchar 200)      │
                                      │ Telefono (varchar 20)    │
                                      │ CvFileName (varchar 300) │
@@ -313,20 +142,13 @@ recruitment-frontend/
                                      │ CreatedAt (timestamptz)  │
                                      └──────────────────────────┘
 
-                                       1 vacante → N postulaciones
+ vacantes ──< requisitos      ON DELETE CASCADE
+ vacantes ──< postulaciones   ON DELETE CASCADE
 
+ Indexes: IX_requisitos_VacanteId, IX_postulaciones_VacanteId
 
-RELATIONSHIPS
-─────────────────────────────────────────────────────────────────
- vacantes  ──< requisitos    via VacanteId   ON DELETE CASCADE
- vacantes  ──< postulaciones via VacanteId   ON DELETE CASCADE
-
-INDEXES
-─────────────────────────────────────────────────────────────────
- IX_requisitos_VacanteId       on requisitos(VacanteId)
- IX_postulaciones_VacanteId    on postulaciones(VacanteId)
 
 MIGRATIONS APPLIED
 ─────────────────────────────────────────────────────────────────
  20260221213705_InitialCreate      → vacantes, requisitos
- 20260225130843_AddPostulaciones   → postulaciones
+ 20260302103713_AddPostulaciones   → postulaciones
