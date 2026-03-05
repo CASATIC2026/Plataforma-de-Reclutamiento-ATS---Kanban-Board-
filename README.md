@@ -3,8 +3,6 @@ Repository: casatic2026/plataforma-de-reclutamiento-ats---kanban-board-
 Branch: development-BM
 Files analyzed: 104
 
-Estimated tokens: 172.8k
-
 Directory structure:
 └── casatic2026-plataforma-de-reclutamiento-ats---kanban-board-/
     ├── README.md
