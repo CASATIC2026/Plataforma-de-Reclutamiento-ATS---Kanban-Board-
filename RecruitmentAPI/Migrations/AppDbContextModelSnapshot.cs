@@ -49,6 +49,7 @@ namespace RecruitmentAPI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+<<<<<<< HEAD
                     b.Property<string>("Estado")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -56,6 +57,8 @@ namespace RecruitmentAPI.Migrations
                         .HasColumnType("character varying(50)")
                         .HasDefaultValue("Nuevo");
 
+=======
+>>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
                     b.Property<string>("NombreCandidato")
                         .IsRequired()
                         .HasMaxLength(200)

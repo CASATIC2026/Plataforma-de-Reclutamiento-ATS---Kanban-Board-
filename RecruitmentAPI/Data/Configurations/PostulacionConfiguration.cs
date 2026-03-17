@@ -35,12 +35,15 @@ public class PostulacionConfiguration : IEntityTypeConfiguration<Postulacion>
         builder.Property(p => p.CreatedAt)
             .HasDefaultValueSql("NOW()");
 
+<<<<<<< HEAD
         
         builder.Property(p => p.Estado)
             .IsRequired()
             .HasMaxLength(50)
             .HasDefaultValue("Nuevo");
 
+=======
+>>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
         // Relationship: one vacante → many postulaciones
         builder.HasOne(p => p.Vacante)
             .WithMany(v => v.Postulaciones)

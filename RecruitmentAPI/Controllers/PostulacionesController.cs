@@ -52,6 +52,7 @@ public class PostulacionesController : ControllerBase
         if (!deleted) return NotFound(new { message = "Postulación no encontrada" });
         return NoContent();
     }
+<<<<<<< HEAD
 
     [HttpPatch("{id:guid}/estado")]
 public async Task<IActionResult> UpdateEstado(Guid id, [FromBody] UpdatePostulacionEstadoDTO dto)
@@ -67,4 +68,6 @@ public async Task<IActionResult> UpdateEstado(Guid id, [FromBody] UpdatePostulac
         return BadRequest(new { error = ex.Message });
     }
 }
+=======
+>>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
 }

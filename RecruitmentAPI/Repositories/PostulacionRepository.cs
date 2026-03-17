@@ -54,6 +54,7 @@ public class PostulacionRepository : IPostulacionRepository
         await _context.SaveChangesAsync();
         return true;
     }
+<<<<<<< HEAD
 
     public async Task<Postulacion?> UpdateEstadoAsync(Guid id, string nuevoEstado)
 {
@@ -64,4 +65,6 @@ public class PostulacionRepository : IPostulacionRepository
     await _context.SaveChangesAsync();
     return postulacion;
 }
+=======
+>>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
 }

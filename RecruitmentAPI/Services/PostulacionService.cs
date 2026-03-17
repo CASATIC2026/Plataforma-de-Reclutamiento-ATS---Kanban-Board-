@@ -59,7 +59,11 @@ public class PostulacionService : IPostulacionService
             Email = dto.Email,
             Telefono = dto.Telefono,
             VacanteId = dto.VacanteId,
+<<<<<<< HEAD
             CvFileName = cvFileName, 
+=======
+            CvFileName = cvFileName,
+>>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
             CvFilePath = cvFilePath,
         };
 
@@ -97,6 +101,7 @@ public class PostulacionService : IPostulacionService
             CreatedAt = postulacion.CreatedAt,
         };
     }
+<<<<<<< HEAD
 
     public async Task<PostulacionResponseDTO?> UpdateEstadoAsync(Guid id, UpdatePostulacionEstadoDTO dto)
 {
@@ -119,4 +124,6 @@ public class PostulacionService : IPostulacionService
         CreatedAt = postulacion.CreatedAt
     };
 }
+=======
+>>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
 }
