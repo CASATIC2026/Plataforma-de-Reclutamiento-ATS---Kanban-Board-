@@ -1,6 +1,6 @@
 import Button from '../common/Button';
 
-export default function VacanteCard({ vacante, onDelete, showActions = false }) {
+export default function VacanteCard({ vacante, onDelete, onApply, showActions = false }) {
   return (
     <div className="bg-white rounded-xl shadow hover:shadow-md transition-shadow p-6 flex flex-col">
       {/* Header */}
@@ -54,7 +54,9 @@ export default function VacanteCard({ vacante, onDelete, showActions = false }) 
 
         {!showActions && (
           <div className="pt-4 border-t border-gray-100">
-            <Button>Postularme</Button>
+            <Button onClick={() => onApply(vacante.id, vacante.titulo)}>
+              Postularme
+            </Button>
           </div>
         )}
       </div>

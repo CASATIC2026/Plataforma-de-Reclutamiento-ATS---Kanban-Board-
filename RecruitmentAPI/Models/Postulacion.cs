@@ -9,6 +9,7 @@ public class Postulacion
     public string CvFileName { get; set; } = string.Empty;
     public string CvFilePath { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string Estado { get; set; } = "Nuevo";
 
     // Foreign key to Vacante
     public Guid VacanteId { get; set; }

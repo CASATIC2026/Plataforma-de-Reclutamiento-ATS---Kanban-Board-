@@ -17,9 +17,15 @@ export default function MainLayout() {
             </Link>
             <Link
               to="/admin/vacantes"
+              className="text-gray-600 hover:text-indigo-600 transition-colors"
+            >
+              Admin Vacantes
+            </Link>
+            <Link
+              to="/admin/postulaciones"
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
-              Panel Admin
+              Postulaciones
             </Link>
           </div>
         </div>
