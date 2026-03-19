@@ -17,6 +17,7 @@ public class Postulacion
     public string CvFileName { get; set; } = string.Empty;
     public string CvFilePath { get; set; } = string.Empty;
     public EstadoPostulacion Estado { get; set; } = EstadoPostulacion.Nuevo;
+    public string? NotasInternas { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

@@ -9,6 +9,7 @@ export default function KanbanColumn({
   onDragStart,
   onDragOver,
   onDrop,
+  onCardClick,
 }) {
   return (
     <div
@@ -27,7 +28,6 @@ export default function KanbanColumn({
       {/* Cards area */}
       <div className="flex-1 p-2 space-y-2 overflow-y-auto">
         {loading ? (
-          // Loading skeleton
           Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
@@ -49,6 +49,7 @@ export default function KanbanColumn({
               key={card.id}
               postulacion={card}
               onDragStart={onDragStart}
+              onCardClick={onCardClick}
             />
           ))
         )}

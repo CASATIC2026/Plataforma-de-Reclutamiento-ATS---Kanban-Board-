@@ -12,6 +12,7 @@ public class PostulacionResponseDTO
     public Guid VacanteId { get; set; }
     public string VacanteTitulo { get; set; } = string.Empty;
     public EstadoPostulacion Estado { get; set; }
+    public string? NotasInternas { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

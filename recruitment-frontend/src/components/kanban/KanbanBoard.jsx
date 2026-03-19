@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getPostulaciones, updateEstado } from '../../api/postulacionesApi';
 import KanbanColumn from './KanbanColumn';
+import CandidateProfileModal from './CandidateProfileModal';
 
 const COLUMNS = [
   { estado: 0, title: 'Nuevo',          color: 'bg-blue-200 text-blue-900' },
@@ -13,6 +14,7 @@ export default function KanbanBoard() {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [selectedCard, setSelectedCard] = useState(null);
   const dragId = useRef(null);
   const toastTimer = useRef(null);
 
@@ -48,7 +50,6 @@ export default function KanbanBoard() {
       const card = cards.find((c) => c.id === id);
       if (!card || card.estado === targetEstado) return;
 
-      // Optimistic update
       const previousCards = cards;
       setCards((prev) =>
         prev.map((c) =>
@@ -64,7 +65,6 @@ export default function KanbanBoard() {
         const col = COLUMNS.find((c) => c.estado === targetEstado);
         showToast(`Movido a "${col?.title}"`, 'success');
       } catch {
-        // Rollback
         setCards(previousCards);
         showToast('Error al actualizar estado', 'error');
       }
@@ -72,12 +72,23 @@ export default function KanbanBoard() {
     [cards, showToast]
   );
 
+  const handleCardClick = useCallback((postulacion) => {
+    setSelectedCard(postulacion);
+  }, []);
+
+  const handleNotasUpdated = useCallback((updatedPostulacion) => {
+    setCards((prev) =>
+      prev.map((c) => (c.id === updatedPostulacion.id ? updatedPostulacion : c))
+    );
+    setSelectedCard(updatedPostulacion);
+  }, []);
+
   return (
     <div className="relative">
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${
+          className={`fixed top-4 right-4 z-40 px-4 py-2 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${
             toast.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'
           }`}
         >
@@ -98,9 +109,19 @@ export default function KanbanBoard() {
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
+            onCardClick={handleCardClick}
           />
         ))}
       </div>
+
+      {/* Candidate profile modal */}
+      {selectedCard && (
+        <CandidateProfileModal
+          postulacion={selectedCard}
+          onClose={() => setSelectedCard(null)}
+          onNotasUpdated={handleNotasUpdated}
+        />
+      )}
     </div>
   );
 }

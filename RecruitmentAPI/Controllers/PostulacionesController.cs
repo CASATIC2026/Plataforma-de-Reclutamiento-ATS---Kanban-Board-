@@ -46,6 +46,39 @@ public class PostulacionesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [HttpGet("{id}/cv")]
+    public async Task<IActionResult> GetCv(Guid id)
+    {
+        var cvInfo = await _service.GetCvAsync(id);
+        if (cvInfo == null) return NotFound(new { message = "CV no encontrado" });
+
+        var (filePath, fileName) = cvInfo.Value;
+        if (!System.IO.File.Exists(filePath))
+            return NotFound(new { message = "Archivo no encontrado en disco" });
+
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        var contentType = ext switch
+        {
+            ".pdf" => "application/pdf",
+            ".doc" => "application/msword",
+            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            _ => "application/octet-stream"
+        };
+
+        Response.Headers.Append("Content-Disposition",
+            ext == ".pdf" ? $"inline; filename=\"{fileName}\"" : $"attachment; filename=\"{fileName}\"");
+
+        return PhysicalFile(filePath, contentType);
+    }
+
+    [HttpPatch("{id}/notas")]
+    public async Task<ActionResult<PostulacionResponseDTO>> UpdateNotas(Guid id, [FromBody] UpdateNotasDTO dto)
+    {
+        var updated = await _service.UpdateNotasAsync(id, dto.Notas);
+        if (updated == null) return NotFound(new { message = "Postulación no encontrada" });
+        return Ok(updated);
+    }
+
     [HttpPatch("{id}/estado")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateEstado(Guid id, [FromBody] UpdateEstadoDTO dto)
     {

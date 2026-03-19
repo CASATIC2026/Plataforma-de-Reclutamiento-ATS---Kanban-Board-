@@ -82,6 +82,26 @@ public class PostulacionService : IPostulacionService
         return updated == null ? null : MapToResponseDTO(updated);
     }
 
+    public async Task<PostulacionResponseDTO?> UpdateNotasAsync(Guid id, string? notas)
+    {
+        var postulacion = await _repository.GetByIdAsync(id);
+        if (postulacion == null) return null;
+
+        postulacion.NotasInternas = notas;
+        postulacion.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await _repository.UpdateAsync(postulacion);
+        return updated == null ? null : MapToResponseDTO(updated);
+    }
+
+    public async Task<(string FilePath, string FileName)?> GetCvAsync(Guid id)
+    {
+        var postulacion = await _repository.GetByIdAsync(id);
+        if (postulacion == null || string.IsNullOrEmpty(postulacion.CvFilePath))
+            return null;
+        return (postulacion.CvFilePath, postulacion.CvFileName);
+    }
+
     public async Task<bool> DeleteAsync(Guid id)
     {
         var postulacion = await _repository.GetByIdAsync(id);
@@ -107,6 +127,7 @@ public class PostulacionService : IPostulacionService
             VacanteId = postulacion.VacanteId,
             VacanteTitulo = postulacion.Vacante?.Titulo ?? string.Empty,
             Estado = postulacion.Estado,
+            NotasInternas = postulacion.NotasInternas,
             CreatedAt = postulacion.CreatedAt,
             UpdatedAt = postulacion.UpdatedAt,
         };
