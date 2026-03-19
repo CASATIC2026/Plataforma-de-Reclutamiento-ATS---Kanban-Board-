@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RecruitmentAPI.Data;
@@ -11,9 +12,11 @@ using RecruitmentAPI.Data;
 namespace RecruitmentAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260317161635_AddEstadoToPostulaciones")]
+    partial class AddEstadoToPostulaciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,14 +52,6 @@ namespace RecruitmentAPI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-<<<<<<< HEAD
-                    b.Property<int>("Estado")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-=======
-<<<<<<< HEAD
                     b.Property<string>("Estado")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -64,9 +59,6 @@ namespace RecruitmentAPI.Migrations
                         .HasColumnType("character varying(50)")
                         .HasDefaultValue("Nuevo");
 
-=======
->>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
->>>>>>> 4db2853345a21fdb3ae6ce6d64588c52dee8d11f
                     b.Property<string>("NombreCandidato")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -76,11 +68,6 @@ namespace RecruitmentAPI.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
 
                     b.Property<Guid>("VacanteId")
                         .HasColumnType("uuid");

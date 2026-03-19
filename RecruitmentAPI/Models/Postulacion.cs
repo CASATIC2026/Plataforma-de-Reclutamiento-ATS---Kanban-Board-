@@ -18,7 +18,11 @@ public class Postulacion
     public string CvFilePath { get; set; } = string.Empty;
     public EstadoPostulacion Estado { get; set; } = EstadoPostulacion.Nuevo;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+<<<<<<< HEAD
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+=======
+    public string Estado { get; set; } = "Nuevo";
+>>>>>>> 4db2853345a21fdb3ae6ce6d64588c52dee8d11f
 
     // Foreign key to Vacante
     public Guid VacanteId { get; set; }
