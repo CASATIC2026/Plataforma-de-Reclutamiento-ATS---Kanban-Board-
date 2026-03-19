@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentAPI.DTOs;
+using RecruitmentAPI.Models;
 using RecruitmentAPI.Services.Interfaces;
 
 namespace RecruitmentAPI.Controllers;
@@ -43,6 +44,18 @@ public class PostulacionesController : ControllerBase
     {
         var created = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    [HttpPatch("{id}/estado")]
+    public async Task<ActionResult<PostulacionResponseDTO>> UpdateEstado(Guid id, [FromBody] UpdateEstadoDTO dto)
+    {
+        if (!Enum.IsDefined(typeof(EstadoPostulacion), dto.Estado))
+            return BadRequest(new { message = "Valor de estado inválido. Use 0 (Nuevo), 1 (Entrevista), 2 (PruebaTecnica) o 3 (Oferta)." });
+
+        var updated = await _service.UpdateEstadoAsync(id, dto.Estado);
+        if (updated == null) return NotFound(new { message = "Postulación no encontrada" });
+
+        return Ok(updated);
     }
 
     [HttpDelete("{id}")]

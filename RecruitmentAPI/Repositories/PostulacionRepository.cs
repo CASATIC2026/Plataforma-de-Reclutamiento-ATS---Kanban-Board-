@@ -45,6 +45,13 @@ public class PostulacionRepository : IPostulacionRepository
         return postulacion;
     }
 
+    public async Task<Postulacion?> UpdateAsync(Postulacion postulacion)
+    {
+        _context.Postulaciones.Update(postulacion);
+        await _context.SaveChangesAsync();
+        return await GetByIdAsync(postulacion.Id);
+    }
+
     public async Task<bool> DeleteAsync(Guid id)
     {
         var postulacion = await _context.Postulaciones.FindAsync(id);

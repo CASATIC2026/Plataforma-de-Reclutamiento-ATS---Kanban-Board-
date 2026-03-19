@@ -32,7 +32,14 @@ public class PostulacionConfiguration : IEntityTypeConfiguration<Postulacion>
         builder.Property(p => p.CvFilePath)
             .HasMaxLength(500);
 
+        builder.Property(p => p.Estado)
+            .HasConversion<int>()
+            .HasDefaultValue(EstadoPostulacion.Nuevo);
+
         builder.Property(p => p.CreatedAt)
+            .HasDefaultValueSql("NOW()");
+
+        builder.Property(p => p.UpdatedAt)
             .HasDefaultValueSql("NOW()");
 
         // Relationship: one vacante → many postulaciones

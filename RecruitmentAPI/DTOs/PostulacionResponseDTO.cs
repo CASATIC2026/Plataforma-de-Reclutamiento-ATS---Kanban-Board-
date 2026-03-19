@@ -1,3 +1,5 @@
+using RecruitmentAPI.Models;
+
 namespace RecruitmentAPI.DTOs;
 
 public class PostulacionResponseDTO
@@ -9,5 +11,7 @@ public class PostulacionResponseDTO
     public string CvFileName { get; set; } = string.Empty;
     public Guid VacanteId { get; set; }
     public string VacanteTitulo { get; set; } = string.Empty;
+    public EstadoPostulacion Estado { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

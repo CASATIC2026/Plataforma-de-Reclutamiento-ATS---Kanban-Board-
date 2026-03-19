@@ -8,5 +8,6 @@ public interface IPostulacionRepository
     Task<Postulacion?> GetByIdAsync(Guid id);
     Task<List<Postulacion>> GetByVacanteIdAsync(Guid vacanteId);
     Task<Postulacion> CreateAsync(Postulacion postulacion);
+    Task<Postulacion?> UpdateAsync(Postulacion postulacion);
     Task<bool> DeleteAsync(Guid id);
 }

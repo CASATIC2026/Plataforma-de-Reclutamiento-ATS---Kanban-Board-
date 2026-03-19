@@ -1,4 +1,5 @@
 using RecruitmentAPI.DTOs;
+using RecruitmentAPI.Models;
 
 namespace RecruitmentAPI.Services.Interfaces;
 
@@ -8,5 +9,6 @@ public interface IPostulacionService
     Task<PostulacionResponseDTO?> GetByIdAsync(Guid id);
     Task<List<PostulacionResponseDTO>> GetByVacanteIdAsync(Guid vacanteId);
     Task<PostulacionResponseDTO> CreateAsync(CreatePostulacionDTO dto);
+    Task<PostulacionResponseDTO?> UpdateEstadoAsync(Guid id, EstadoPostulacion estado);
     Task<bool> DeleteAsync(Guid id);
 }

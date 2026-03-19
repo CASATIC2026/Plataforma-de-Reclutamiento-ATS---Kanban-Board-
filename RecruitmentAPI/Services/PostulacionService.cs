@@ -70,6 +70,18 @@ public class PostulacionService : IPostulacionService
         return MapToResponseDTO(withVacante!);
     }
 
+    public async Task<PostulacionResponseDTO?> UpdateEstadoAsync(Guid id, EstadoPostulacion estado)
+    {
+        var postulacion = await _repository.GetByIdAsync(id);
+        if (postulacion == null) return null;
+
+        postulacion.Estado = estado;
+        postulacion.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await _repository.UpdateAsync(postulacion);
+        return updated == null ? null : MapToResponseDTO(updated);
+    }
+
     public async Task<bool> DeleteAsync(Guid id)
     {
         var postulacion = await _repository.GetByIdAsync(id);
@@ -94,7 +106,9 @@ public class PostulacionService : IPostulacionService
             CvFileName = postulacion.CvFileName,
             VacanteId = postulacion.VacanteId,
             VacanteTitulo = postulacion.Vacante?.Titulo ?? string.Empty,
+            Estado = postulacion.Estado,
             CreatedAt = postulacion.CreatedAt,
+            UpdatedAt = postulacion.UpdatedAt,
         };
     }
 }

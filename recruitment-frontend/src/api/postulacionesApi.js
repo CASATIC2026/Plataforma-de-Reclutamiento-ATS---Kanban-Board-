@@ -12,4 +12,7 @@ export const getPostulacionesByVacante = (vacanteId) =>
 export const createPostulacion = (formData) =>
   API.post('/postulaciones', formData);
 
+export const updateEstado = (id, estado) =>
+  API.patch(`/postulaciones/${id}/estado`, { estado });
+
 export const deletePostulacion = (id) => API.delete(`/postulaciones/${id}`);

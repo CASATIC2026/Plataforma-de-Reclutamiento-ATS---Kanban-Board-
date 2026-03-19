@@ -23,9 +23,15 @@ export default function MainLayout() {
             </Link>
             <Link
               to="/admin/postulaciones"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              className="text-gray-600 hover:text-indigo-600 transition-colors"
             >
               Postulaciones
+            </Link>
+            <Link
+              to="/admin/kanban"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Kanban
             </Link>
           </div>
         </div>
