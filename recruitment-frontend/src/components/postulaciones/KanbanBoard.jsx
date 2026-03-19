@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DndContext, DragOverlay, useDroppable } from "@dnd-kit/core";
 import KanbanCard from "./KanbanCard";
-import { updateEstadoPostulacion } from "../../api/postulacionesApi";
+import { updateEstado as updateEstadoPostulacion } from "../../api/postulacionesApi";
 
 const COLUMNAS = [
   { id: "Nuevo",         label: "🆕 Nuevos",          color: "bg-blue-50   border-blue-200"   },

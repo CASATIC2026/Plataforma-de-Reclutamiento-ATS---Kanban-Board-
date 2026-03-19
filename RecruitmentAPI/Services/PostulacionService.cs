@@ -59,11 +59,7 @@ public class PostulacionService : IPostulacionService
             Email = dto.Email,
             Telefono = dto.Telefono,
             VacanteId = dto.VacanteId,
-<<<<<<< HEAD
-            CvFileName = cvFileName, 
-=======
             CvFileName = cvFileName,
->>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
             CvFilePath = cvFilePath,
         };
 
@@ -115,29 +111,4 @@ public class PostulacionService : IPostulacionService
             UpdatedAt = postulacion.UpdatedAt,
         };
     }
-<<<<<<< HEAD
-
-    public async Task<PostulacionResponseDTO?> UpdateEstadoAsync(Guid id, UpdatePostulacionEstadoDTO dto)
-{
-    var estadosValidos = new[] { "Nuevo", "Entrevista", "PruebaTecnica", "Oferta" };
-    if (!estadosValidos.Contains(dto.Estado))
-        throw new ArgumentException($"Estado inválido: {dto.Estado}");
-
-    var postulacion = await _repository.UpdateEstadoAsync(id, dto.Estado);
-    if (postulacion is null) return null;
-
-    return new PostulacionResponseDTO
-    {
-        Id = postulacion.Id,
-        VacanteId = postulacion.VacanteId,
-        NombreCandidato = postulacion.NombreCandidato,
-        Email = postulacion.Email,
-        Telefono = postulacion.Telefono,
-        CvFileName = postulacion.CvFileName,
-        Estado = postulacion.Estado,
-        CreatedAt = postulacion.CreatedAt
-    };
-}
-=======
->>>>>>> 0145ebc5970147f9474b6bd257190a89db667477
 }
