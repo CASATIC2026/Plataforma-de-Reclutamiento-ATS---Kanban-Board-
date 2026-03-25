@@ -35,17 +35,17 @@ export default function AdminVacantesPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-gray-800">Administrar Vacantes</h1>
+      <h1 className="text-2xl font-bold text-navy">Administrar Vacantes</h1>
 
       <VacanteForm onSubmit={handleCreate} />
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">
+        <h2 className="text-lg font-semibold text-navy mb-4">
           Vacantes creadas ({vacantes.length})
         </h2>
 
         {loading ? (
-          <p className="text-gray-400">Cargando...</p>
+          <p className="text-gray-500">Cargando...</p>
         ) : (
           <VacanteList
             vacantes={vacantes}

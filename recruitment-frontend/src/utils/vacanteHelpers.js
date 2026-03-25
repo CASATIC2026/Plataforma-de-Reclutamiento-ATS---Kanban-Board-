@@ -24,8 +24,8 @@ export function getLogoLetters(titulo) {
 
 export function formatSalary(min, max) {
   if (min && max) return `$${Number(min).toLocaleString('USD')} – $${Number(max).toLocaleString('USD')} USD`;
-  if (min) return `Desde $${Number(min).toLocaleString('USD')} MXN`;
-  if (max) return `Hasta $${Number(max).toLocaleString('USD')} MXN`;
+  if (min) return `Desde $${Number(min).toLocaleString('USD')} USD`;
+  if (max) return `Hasta $${Number(max).toLocaleString('USD')} USD`;
   return 'Salario a convenir';
 }
 

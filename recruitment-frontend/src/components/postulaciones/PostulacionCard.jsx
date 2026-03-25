@@ -12,12 +12,12 @@ export default function PostulacionCard({ postulacion, onDelete }) {
       {/* Candidate name + date */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-gray-800">{postulacion.nombreCandidato}</h3>
+          <h3 className="font-semibold text-navy">{postulacion.nombreCandidato}</h3>
           <p className="text-xs text-gray-400 mt-0.5">{fecha}</p>
         </div>
 
         {postulacion.cvFileName && (
-          <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full whitespace-nowrap">
+          <span className="text-xs bg-accent-bg text-accent px-2 py-1 rounded-full whitespace-nowrap">
             CV adjunto
           </span>
         )}

@@ -16,8 +16,14 @@ export default function VacanteForm({ onSubmit }) {
   const [requisitos, setRequisitos] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const RESTRICTED_FIELDS = ['titulo', 'descripcion', 'ubicacion'];
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const cleaned = RESTRICTED_FIELDS.includes(name)
+      ? value.replace(/^[\s.:;]+/, '')
+      : value;
+    setForm({ ...form, [name]: cleaned });
   };
 
   const addRequisito = () => {
@@ -68,8 +74,8 @@ export default function VacanteForm({ onSubmit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4">
-      <h2 className="text-lg font-bold text-gray-800">Nueva Vacante</h2>
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4 border-l-4 border-accent">
+      <h2 className="text-lg font-bold text-navy">Nueva Vacante</h2>
 
       <Input label="Título" name="titulo" value={form.titulo} onChange={handleChange} required />
 
@@ -99,7 +105,7 @@ export default function VacanteForm({ onSubmit }) {
             name="tipoContrato"
             value={form.tipoContrato}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
           >
             <option>Tiempo completo</option>
             <option>Medio tiempo</option>
@@ -125,7 +131,7 @@ export default function VacanteForm({ onSubmit }) {
             onChange={(e) => setRequisitoInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ej: C#, Junior, Inglés..."
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
           />
           <Button type="button" onClick={addRequisito}>
             Agregar
@@ -137,13 +143,13 @@ export default function VacanteForm({ onSubmit }) {
             {requisitos.map((req, index) => (
               <span
                 key={index}
-                className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm"
+                className="inline-flex items-center gap-1 bg-accent-bg text-accent px-3 py-1 rounded-full text-sm"
               >
                 {req}
                 <button
                   type="button"
                   onClick={() => removeRequisito(index)}
-                  className="text-indigo-400 hover:text-indigo-700 font-bold"
+                  className="text-accent hover:text-accent-light font-bold"
                 >
                   ×
                 </button>

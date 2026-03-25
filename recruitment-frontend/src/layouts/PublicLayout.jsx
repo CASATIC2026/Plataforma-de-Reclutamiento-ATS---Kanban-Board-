@@ -31,7 +31,7 @@ export default function PublicLayout() {
         </nav>
 
         <div className="navbar__actions">
-          {live && <span className="live-badge">En vivo</span>}
+          
           <button className="btn btn--ghost">Iniciar Sesión</button>
           <Link to="/admin/vacantes" className="admin-link">⚙ Panel Admin</Link>
         </div>
@@ -44,11 +44,15 @@ export default function PublicLayout() {
           <div className="footer__brand">
             <div className="navbar__brand">
               <div className="navbar__logo">
-                <span className="logo-icon">TB</span>
+                <span className="logo-icon">TSV</span>
               </div>
-              <span className="navbar__name">TalentBridge</span>
+              <span className="navbar__name">Talentify SV</span>
             </div>
-            <p className="footer__tagline">Conectando talento con oportunidad.</p>
+             <p style={{
+          color: "#fff", fontFamily: "'Jersey 25', sans-serif", fontSize: "18px",
+          opacity: 0.8, maxWidth: "640px", margin: "0 auto 36px",
+          animation: "fadeUp 0.7s 0.2s ease both",
+        }}>Conectamos talento excepcional con las empresas más innovadoras de El Salvador</p>
           </div>
 
           <div className="footer__links">

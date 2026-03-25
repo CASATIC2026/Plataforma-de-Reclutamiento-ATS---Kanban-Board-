@@ -7,27 +7,27 @@
    [1] VARIABLES & RESET
 ============================================================ */
 :root {
-  --clr-bg:         #F4F2EE;
+  --clr-bg:         #FFF5F5;
   --clr-surface:    #FFFFFF;
-  --clr-surface-2:  #EDE9E1;
-  --clr-border:     #DDD9D0;
+  --clr-surface-2:  #F4F4F4;
+  --clr-border:     #D2D1D1;
 
-  --clr-navy:       #1C2B3A;
-  --clr-navy-light: #2E4055;
-  --clr-slate:      #4A5C6B;
+  --clr-navy:       #131931;
+  --clr-navy-light: #1a2040;
+  --clr-slate:      #464646;
   --clr-muted:      #7A8C98;
 
-  --clr-accent:     #C4622D;
-  --clr-accent-lt:  #D97844;
+  --clr-accent:     #CD7B4F;
+  --clr-accent-lt:  #b5673d;
   --clr-accent-bg:  #FFF1EB;
 
-  --clr-gold:       #B8943E;
-  --clr-gold-bg:    #FBF6E9;
+  --clr-gold:       #1F9DB9;
+  --clr-gold-bg:    #F0F9FC;
 
-  --clr-green:      #2E7D52;
-  --clr-green-bg:   #EAF5EF;
+  --clr-green:      #319E85;
+  --clr-green-bg:   #E8F5F0;
 
-  --clr-urgent:     #C4622D;
+  --clr-urgent:     #CD7B4F;
   --clr-urgent-bg:  #FFF1EB;
 
   --ff-display:     'Playfair Display', Georgia, serif;
@@ -230,7 +230,7 @@ em { font-style: italic; color: var(--clr-accent); }
   position: relative;
   overflow: hidden;
   padding: 80px 40px 60px;
-  background: linear-gradient(155deg, #1C2B3A 0%, #2E4055 60%, #3A5068 100%);
+  background: linear-gradient(155deg, #131931 0%, #1a2040 60%, #1F9DB9 100%);
   color: #fff;
   font-family: var(--ff-body);
 }

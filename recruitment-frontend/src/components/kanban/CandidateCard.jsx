@@ -9,7 +9,7 @@ export default function CandidateCard({ postulacion, onDragStart, onCardClick })
       draggable
       onDragStart={(e) => onDragStart(e, postulacion.id)}
       onClick={() => onCardClick?.(postulacion)}
-      className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm cursor-pointer hover:shadow-md hover:border-indigo-300 transition-all select-none"
+      className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm cursor-pointer hover:shadow-md hover:border-accent transition-all select-none"
     >
       {/* Candidate name */}
       <p className="font-semibold text-gray-900 text-sm truncate">
@@ -17,7 +17,7 @@ export default function CandidateCard({ postulacion, onDragStart, onCardClick })
       </p>
 
       {/* Vacancy title */}
-      <p className="text-xs text-indigo-600 font-medium truncate mt-0.5">
+      <p className="text-xs text-navy font-medium truncate mt-0.5">
         {postulacion.vacanteTitulo}
       </p>
 

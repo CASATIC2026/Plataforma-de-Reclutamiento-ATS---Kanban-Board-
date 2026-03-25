@@ -13,7 +13,7 @@ export default function KanbanColumn({
 }) {
   return (
     <div
-      className="flex flex-col bg-gray-100 rounded-xl min-h-[500px] w-64 flex-shrink-0"
+      className="flex flex-col bg-gray-50 rounded-xl min-h-[500px] w-64 flex-shrink-0 border border-gray-200"
       onDragOver={onDragOver}
       onDrop={(e) => onDrop(e, estado)}
     >
@@ -33,14 +33,14 @@ export default function KanbanColumn({
               key={i}
               className="bg-white rounded-lg border border-gray-200 p-3 animate-pulse"
             >
-              <div className="h-3 bg-gray-200 rounded w-3/4 mb-2" />
-              <div className="h-2 bg-gray-200 rounded w-1/2 mb-3" />
-              <div className="h-2 bg-gray-200 rounded w-5/6 mb-1" />
-              <div className="h-2 bg-gray-200 rounded w-1/3" />
+              <div className="h-3 bg-gray-300 rounded w-3/4 mb-2" />
+              <div className="h-2 bg-gray-300 rounded w-1/2 mb-3" />
+              <div className="h-2 bg-gray-300 rounded w-5/6 mb-1" />
+              <div className="h-2 bg-gray-300 rounded w-1/3" />
             </div>
           ))
         ) : cards.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-gray-400 text-xs text-center px-4">
+          <div className="flex items-center justify-center h-32 text-gray-500 text-xs text-center px-4">
             Arrastra candidatos aquí
           </div>
         ) : (

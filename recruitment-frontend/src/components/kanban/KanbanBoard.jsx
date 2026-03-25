@@ -4,10 +4,10 @@ import KanbanColumn from './KanbanColumn';
 import CandidateProfileModal from './CandidateProfileModal';
 
 const COLUMNS = [
-  { estado: 0, title: 'Nuevo',          color: 'bg-blue-200 text-blue-900' },
-  { estado: 1, title: 'Entrevista',     color: 'bg-yellow-200 text-yellow-900' },
-  { estado: 2, title: 'Prueba Técnica', color: 'bg-purple-200 text-purple-900' },
-  { estado: 3, title: 'Oferta',         color: 'bg-emerald-200 text-emerald-900' },
+  { estado: 0, title: 'Nuevo',          color: 'bg-teal-light text-teal' },
+  { estado: 1, title: 'Entrevista',     color: 'bg-accent-bg text-accent' },
+  { estado: 2, title: 'Prueba Técnica', color: 'bg-navy-lighter text-white' },
+  { estado: 3, title: 'Oferta',         color: 'bg-green-light text-green' },
 ];
 
 export default function KanbanBoard() {
@@ -89,7 +89,7 @@ export default function KanbanBoard() {
       {toast && (
         <div
           className={`fixed top-4 right-4 z-40 px-4 py-2 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${
-            toast.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'
+            toast.type === 'error' ? 'bg-red-500' : 'bg-green'
           }`}
         >
           {toast.message}

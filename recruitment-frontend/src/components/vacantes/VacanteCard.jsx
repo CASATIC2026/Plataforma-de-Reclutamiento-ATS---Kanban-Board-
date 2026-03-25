@@ -5,7 +5,7 @@ export default function VacanteCard({ vacante, onDelete, onApply, showActions = 
     <div className="bg-white rounded-xl shadow hover:shadow-md transition-shadow p-6 flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-3">
-        <h3 className="text-lg font-bold text-gray-800">{vacante.titulo}</h3>
+        <h3 className="text-lg font-bold text-navy">{vacante.titulo}</h3>
         <span
           className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
             vacante.estaActiva
@@ -21,7 +21,7 @@ export default function VacanteCard({ vacante, onDelete, onApply, showActions = 
       <p className="text-gray-500 text-sm mb-1">{vacante.ubicacion} · {vacante.tipoContrato}</p>
 
       {vacante.salarioMin && vacante.salarioMax && (
-        <p className="text-indigo-600 font-semibold text-sm mb-3">
+        <p className="text-accent font-semibold text-sm mb-3">
           ${vacante.salarioMin.toLocaleString()} - ${vacante.salarioMax.toLocaleString()}
         </p>
       )}

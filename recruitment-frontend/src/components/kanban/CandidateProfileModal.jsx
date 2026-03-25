@@ -3,10 +3,10 @@ import { updateNotas, getCvUrl } from '../../api/postulacionesApi';
 import { formatRelativeDate } from '../../utils/vacanteHelpers';
 
 const ESTADO_LABELS = {
-  0: { label: 'Nuevo',          color: 'bg-blue-100 text-blue-800' },
-  1: { label: 'Entrevista',     color: 'bg-yellow-100 text-yellow-800' },
-  2: { label: 'Prueba Técnica', color: 'bg-purple-100 text-purple-800' },
-  3: { label: 'Oferta',         color: 'bg-emerald-100 text-emerald-800' },
+  0: { label: 'Nuevo',          color: 'bg-teal-light text-teal' },
+  1: { label: 'Entrevista',     color: 'bg-accent-bg text-accent' },
+  2: { label: 'Prueba Técnica', color: 'bg-gray-800 text-white' },
+  3: { label: 'Oferta',         color: 'bg-green-light text-green' },
 };
 
 function InfoRow({ label, value }) {
@@ -14,7 +14,7 @@ function InfoRow({ label, value }) {
   return (
     <div>
       <p className="text-xs text-gray-400 uppercase tracking-wide">{label}</p>
-      <p className="text-sm text-gray-800 font-medium mt-0.5">{value}</p>
+      <p className="text-sm text-navy font-medium mt-0.5">{value}</p>
     </div>
   );
 }
@@ -74,7 +74,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
         <div className="flex items-start justify-between px-6 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-xl font-bold text-gray-900">{postulacion.nombreCandidato}</h2>
-            <p className="text-sm text-indigo-600 font-medium mt-0.5">{postulacion.vacanteTitulo}</p>
+            <p className="text-sm text-navy font-medium mt-0.5">{postulacion.vacanteTitulo}</p>
           </div>
           <div className="flex items-center gap-3 ml-4">
             <span className={`text-xs font-semibold px-3 py-1 rounded-full ${estado.color}`}>
@@ -127,14 +127,14 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                   </svg>
                   <div className="text-center">
                     <p className="text-sm font-medium text-gray-700">
-                      Archivo <span className="uppercase text-indigo-600">.{ext}</span>
+                      Archivo <span className="uppercase text-navy">.{ext}</span>
                     </p>
                     <p className="text-xs text-gray-400 mt-1">La previsualización no está disponible para este formato</p>
                   </div>
                   <a
                     href={cvUrl}
                     download
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy-light transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -152,7 +152,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                 <a
                   href={cvUrl}
                   download
-                  className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 transition-colors"
+                  className="text-xs text-navy hover:text-navy-light font-medium flex items-center gap-1 transition-colors"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -196,7 +196,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
                 placeholder="Agrega observaciones, comentarios del equipo o próximos pasos…"
-                className="flex-1 w-full resize-none rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all"
+                className="flex-1 w-full resize-none rounded-lg border border-gray-200 bg-gray-50 text-sm text-navy placeholder-gray-400 p-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
                 style={{ minHeight: '140px' }}
               />
               <p className="text-xs text-gray-400 mt-2">

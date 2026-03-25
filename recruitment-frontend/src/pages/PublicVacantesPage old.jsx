@@ -160,21 +160,11 @@ export default function PublicVacantesPage() {
               onChange={(e) => setLocationFilter(e.target.value)}
             >
               <option value="">Todas las ciudades</option>
-              <option value="San Salvador">San Salvador</option>
-              <option value="La Paz">La paz</option>
-              <option value="La Libertad">La Libertad</option>
-              <option value="Cuscatlan">Cuscatlan</option>
-              <option value="Usulutan">Usulutan</option>
-              <option value="Sonsonate">Sonsonate</option>
-              <option value="Santa Ana">Santa Ana</option>
-              <option value="Chalatenango">Chalatenango</option>
-              <option value="Cabañas">Cabañas</option>
-              <option value="San Vicente">San Vicente</option>
-              <option value="San Miguel">San Miguel</option>
-              <option value="Morazan">Morazan</option>
-              <option value="La union">La union</option>
-              <option value="Ahuachapan">Ahuachapan</option>
-
+              <option value="Ciudad de México">CDMX</option>
+              <option value="Monterrey">Monterrey</option>
+              <option value="Guadalajara">Guadalajara</option>
+              <option value="Querétaro">Querétaro</option>
+              <option value="Remoto">Remoto</option>
             </select>
             <button
               className="btn btn--accent"
