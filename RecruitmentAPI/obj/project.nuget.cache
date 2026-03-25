@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "umi/c/0Wz2w=",
+  "dgSpecHash": "jrxzRFG96Ko=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Grupo B\\Documents\\BM\\Nueva carpeta (3)\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
+  "projectFilePath": "C:\\Users\\Grupo B\\Documents\\BM\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Grupo B\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Grupo B\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.24\\microsoft.aspnetcore.openapi.8.0.24.nupkg.sha512",
