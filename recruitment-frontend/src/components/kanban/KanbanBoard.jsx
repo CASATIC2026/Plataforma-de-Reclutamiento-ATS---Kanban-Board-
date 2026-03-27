@@ -10,18 +10,25 @@ const COLUMNS = [
   { estado: 3, title: 'Oferta',         color: 'bg-green-light text-green' },
 ];
 
+const MAX_TOASTS = 10;
+let toastIdCounter = 0;
+
 export default function KanbanBoard() {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState(null);
+  const [toasts, setToasts] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const dragId = useRef(null);
-  const toastTimer = useRef(null);
 
   const showToast = useCallback((message, type = 'success') => {
-    clearTimeout(toastTimer.current);
-    setToast({ message, type });
-    toastTimer.current = setTimeout(() => setToast(null), 3000);
+    const id = ++toastIdCounter;
+    setToasts((prev) => {
+      const next = [...prev, { id, message, type }];
+      return next.length > MAX_TOASTS ? next.slice(next.length - MAX_TOASTS) : next;
+    });
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
   }, []);
 
   useEffect(() => {
@@ -85,16 +92,23 @@ export default function KanbanBoard() {
 
   return (
     <div className="relative">
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`fixed top-4 right-4 z-40 px-4 py-2 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${
-            toast.type === 'error' ? 'bg-red-500' : 'bg-green'
-          }`}
-        >
-          {toast.message}
-        </div>
-      )}
+      {/* Toasts */}
+      <div className="fixed right-6 z-50" style={{ top: '5rem' }}>
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            className="mb-2 px-5 py-3 rounded-lg shadow-lg text-sm font-semibold"
+            style={{
+              backgroundColor: t.type === 'error' ? '#ef4444' : '#d1fae5',
+              color: t.type === 'error' ? '#fff' : '#131931',
+              border: t.type === 'error' ? '1px solid #dc2626' : '1px solid #6ee7b7',
+              animation: 'fadeUp 0.25s ease',
+            }}
+          >
+            {t.message}
+          </div>
+        ))}
+      </div>
 
       {/* Board */}
       <div className="flex gap-4 overflow-x-auto pb-4">

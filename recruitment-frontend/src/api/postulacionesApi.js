@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const API = axios.create({
-  baseURL: '/api',
-});
+import API from './axiosInstance';
 
 export const getPostulaciones = () => API.get('/postulaciones');
 

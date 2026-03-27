@@ -1,4 +1,7 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RecruitmentAPI.Data;
 using RecruitmentAPI.Repositories;
 using RecruitmentAPI.Repositories.Interfaces;
@@ -20,6 +23,30 @@ builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
 // Service layer
 builder.Services.AddScoped<IVacanteService, VacanteService>();
 builder.Services.AddScoped<IPostulacionService, PostulacionService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"]!;
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // Controllers
 builder.Services.AddControllers();
@@ -39,6 +66,33 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+
+// Seed default admin user
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate(); // Ensure all migrations are applied
+    if (!db.Usuarios.Any(u => u.Rol == RecruitmentAPI.Models.RolUsuario.Administrador))
+    {
+        db.Usuarios.Add(new RecruitmentAPI.Models.Usuario
+        {
+            Nombre = "Admin",
+            Apellido = "TalentBridge",
+            Email = "admin@talentbridge.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+            Rol = RecruitmentAPI.Models.RolUsuario.Administrador
+        });
+        db.SaveChanges();
+        Console.WriteLine(">> Admin seed user created: admin@talentbridge.com");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($">> Seed warning: {ex.Message}");
+}
 
 app.Run();

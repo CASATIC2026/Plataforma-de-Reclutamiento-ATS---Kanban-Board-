@@ -20,7 +20,13 @@ export default function KanbanColumn({
       {/* Column header */}
       <div className={`flex items-center justify-between px-3 py-2.5 rounded-t-xl ${color}`}>
         <span className="font-semibold text-sm">{title}</span>
-        <span className="text-xs font-bold bg-white/30 px-2 py-0.5 rounded-full">
+        <span
+          className="text-xs font-bold px-2 py-0.5 rounded-full"
+          style={color.includes('text-white')
+            ? { backgroundColor: '#fff', color: '#131931' }
+            : { backgroundColor: 'rgba(255,255,255,0.3)' }
+          }
+        >
           {loading ? '…' : cards.length}
         </span>
       </div>

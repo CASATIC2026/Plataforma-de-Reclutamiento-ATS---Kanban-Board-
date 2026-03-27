@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Services.Interfaces;
@@ -30,6 +31,7 @@ public class VacantesController : ControllerBase
         return Ok(vacante);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<VacanteResponseDTO>> Create([FromBody] CreateVacanteDTO dto)
     {
@@ -37,6 +39,7 @@ public class VacantesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<ActionResult<VacanteResponseDTO>> Update(Guid id, [FromBody] UpdateVacanteDTO dto)
     {
@@ -45,6 +48,7 @@ public class VacantesController : ControllerBase
         return Ok(updated);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {

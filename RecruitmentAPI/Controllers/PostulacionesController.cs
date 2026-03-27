@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Models;
@@ -71,6 +72,7 @@ public class PostulacionesController : ControllerBase
         return PhysicalFile(filePath, contentType);
     }
 
+    [Authorize]
     [HttpPatch("{id}/notas")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateNotas(Guid id, [FromBody] UpdateNotasDTO dto)
     {
@@ -79,6 +81,7 @@ public class PostulacionesController : ControllerBase
         return Ok(updated);
     }
 
+    [Authorize]
     [HttpPatch("{id}/estado")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateEstado(Guid id, [FromBody] UpdateEstadoDTO dto)
     {
@@ -91,6 +94,7 @@ public class PostulacionesController : ControllerBase
         return Ok(updated);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {

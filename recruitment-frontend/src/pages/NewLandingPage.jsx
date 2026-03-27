@@ -301,113 +301,6 @@ export default function NewLandingPage() {
         @keyframes pulse { 0%,100% { opacity:0.7; } 50% { opacity:1; } }
       `}</style>
 
-      {/* HEADER */}
-      <header
-        style={{
-          background: '#E0E0E0',
-          height: '90px',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 40px',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-        }}
-      >
-        {/* Logo */}
-        <div
-          style={{
-            width: '70px',
-            height: '70px',
-            borderRadius: '50%',
-            background: '#3a3a3a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              color: '#fff',
-              fontFamily: "'Maven Pro', sans-serif",
-              fontWeight: 700,
-              fontSize: '22px',
-            }}
-          >
-            Talent
-          </span>
-        </div>
-
-        {/* Nav */}
-        <nav
-          style={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            background: '#CD7B4F',
-            borderRadius: '10px',
-            padding: '0 32px',
-            height: '50px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '40px',
-          }}
-        >
-          {['Inicio', 'Empresas', 'Recursos'].map((item) => (
-            <a
-              key={item}
-              href="#"
-              style={{
-                color: '#fff',
-                fontFamily: 'sans-serif',
-                fontSize: '18px',
-                textDecoration: 'none',
-                transition: 'opacity 0.2s',
-              }}
-              onMouseEnter={(e) => (e.target.style.opacity = '0.7')}
-              onMouseLeave={(e) => (e.target.style.opacity = '1')}
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-
-        {/* Auth buttons */}
-        <div style={{ display: 'flex', gap: '12px', marginLeft: '20px' }}>
-          <button
-            style={{
-              background: '#C5C6DD',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '10px 24px',
-              fontFamily: 'sans-serif',
-              fontWeight: 700,
-              fontSize: '16px',
-              cursor: 'pointer',
-              color: '#000',
-            }}
-          >
-            Iniciar sesión
-          </button>
-          <button
-            style={{
-              background: '#111114',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '10px 24px',
-              fontFamily: 'sans-serif',
-              fontWeight: 700,
-              fontSize: '16px',
-              cursor: 'pointer',
-              color: '#fff',
-            }}
-          >
-            Registrarse
-          </button>
-        </div>
-      </header>
-
       {/* HERO */}
       <section
         style={{
@@ -444,7 +337,7 @@ export default function NewLandingPage() {
           }}
         />
 
-        <p
+        <h1
           style={{
             color: '#fff',
             fontFamily: "'Kaisei Decol', serif",
@@ -454,7 +347,7 @@ export default function NewLandingPage() {
           }}
         >
           Encuentra el trabajo
-        </p>
+        </h1>
         <p
           style={{
             color: '#1F9DB9',
@@ -777,96 +670,6 @@ export default function NewLandingPage() {
           </div>
         )}
       </section>
-
-      {/* FOOTER */}
-      <footer style={{ background: '#131931', padding: '48px 40px 32px', color: '#fff' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '40px',
-              paddingBottom: '32px',
-              borderBottom: '1px solid rgba(189,189,189,0.3)',
-            }}
-          >
-            {/* Brand */}
-            <div style={{ maxWidth: '260px' }}>
-              <p
-                style={{
-                  fontFamily: "'Maven Pro', sans-serif",
-                  fontWeight: 700,
-                  fontSize: '22px',
-                  margin: '0 0 12px',
-                }}
-              >
-                TALENTO
-              </p>
-              <p
-                style={{
-                  color: 'rgba(255,255,255,0.5)',
-                  fontFamily: 'sans-serif',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  lineHeight: '1.5',
-                  margin: 0,
-                }}
-              >
-                Conectando talento con Oportunidades
-              </p>
-            </div>
-
-            {/* Footer links */}
-            {[
-              { title: 'Candidatos', links: ['Buscar empleos', 'Mi perfil', 'Recursos'] },
-              { title: 'Empresas', links: ['Buscar empleos', 'Mi perfil', 'Recursos'] },
-              { title: 'Administracion', links: ['Buscar empleos', 'Mi perfil', 'Recursos'] },
-            ].map((col) => (
-              <div key={col.title}>
-                <p
-                  style={{
-                    fontFamily: 'sans-serif',
-                    fontWeight: 700,
-                    fontSize: '18px',
-                    margin: '0 0 14px',
-                  }}
-                >
-                  {col.title}
-                </p>
-                {col.links.map((l) => (
-                  <p
-                    key={l}
-                    style={{
-                      color: 'rgba(255,255,255,0.5)',
-                      fontFamily: 'sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 700,
-                      margin: '0 0 8px',
-                      cursor: 'pointer',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.color = '#CD7B4F')}
-                    onMouseLeave={(e) => (e.target.style.color = 'rgba(255,255,255,0.5)')}
-                  >
-                    {l}
-                  </p>
-                ))}
-              </div>
-            ))}
-          </div>
-          <p
-            style={{
-              textAlign: 'center',
-              color: 'rgba(189,189,189,0.6)',
-              fontFamily: "'Jersey 25', sans-serif",
-              fontSize: '17px',
-              marginTop: '24px',
-            }}
-          >
-            © 2025 Talent. Todos los derechos reservados
-          </p>
-        </div>
-      </footer>
 
       {/* ===== MODALS ===== */}
       {selectedJob && (
