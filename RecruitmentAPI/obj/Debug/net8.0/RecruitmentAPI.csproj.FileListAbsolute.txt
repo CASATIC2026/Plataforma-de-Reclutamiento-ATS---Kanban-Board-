@@ -560,7 +560,6 @@ C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS-
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\obj\Debug\net8.0\RecruitmentAPI.pdb
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\obj\Debug\net8.0\RecruitmentAPI.genruntimeconfig.cache
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\obj\Debug\net8.0\ref\RecruitmentAPI.dll
-<<<<<<< HEAD
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
@@ -570,8 +569,6 @@ C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS-
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Grupo B\Documents\BM\Nueva carpeta (3)\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
-=======
->>>>>>> adbe524e24840347c9f85bb06cfec26628c0ba43
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\appsettings.json
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\RecruitmentAPI.staticwebassets.endpoints.json
@@ -580,13 +577,9 @@ C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Re
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\RecruitmentAPI.runtimeconfig.json
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\RecruitmentAPI.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\RecruitmentAPI.pdb
-<<<<<<< HEAD
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Humanizer.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-=======
-C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Humanizer.dll
->>>>>>> adbe524e24840347c9f85bb06cfec26628c0ba43
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
@@ -604,15 +597,12 @@ C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Re
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
-<<<<<<< HEAD
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
-=======
->>>>>>> adbe524e24840347c9f85bb06cfec26628c0ba43
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Microsoft.OpenApi.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Mono.TextTemplating.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\Npgsql.dll
@@ -626,10 +616,7 @@ C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\Re
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\System.Composition.Hosting.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\System.Composition.Runtime.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\System.Composition.TypedParts.dll
-<<<<<<< HEAD
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
-=======
->>>>>>> adbe524e24840347c9f85bb06cfec26628c0ba43
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
 C:\Users\Grupo B\Documents\BM\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\RecruitmentAPI\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll

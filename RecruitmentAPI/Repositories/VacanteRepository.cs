@@ -18,6 +18,7 @@ public class VacanteRepository : IVacanteRepository
     {
         return await _context.Vacantes
             .Include(v => v.Requisitos)
+            .Include(v => v.Postulaciones)
             .OrderByDescending(v => v.CreatedAt)
             .ToListAsync();
     }
@@ -26,6 +27,7 @@ public class VacanteRepository : IVacanteRepository
     {
         return await _context.Vacantes
             .Include(v => v.Requisitos)
+            .Include(v => v.Postulaciones)
             .FirstOrDefaultAsync(v => v.Id == id);
     }
 

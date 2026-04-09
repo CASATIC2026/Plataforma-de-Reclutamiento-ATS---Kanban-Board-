@@ -15,4 +15,7 @@ public class VacanteResponseDTO
 
     // Send back requisitos as simple strings — frontend doesn't need GUIDs of each tag
     public List<string> Requisitos { get; set; } = new();
+
+    // Count of applications for this vacancy (for stats dashboard)
+    public int PostulacionesCount { get; set; }
 }

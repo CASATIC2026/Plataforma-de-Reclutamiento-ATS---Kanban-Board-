@@ -26,9 +26,12 @@ export default function PublicLayout() {
         style={{ boxShadow: scrolled ? '0 2px 20px rgba(28,43,58,0.12)' : 'none' }}
       >
         <div className="navbar__brand">
-          <div className="navbar__logo">
-            <span className="logo-icon">TSV</span>
-          </div>
+          <img
+            src="/images/logotalentifysv.png"
+            alt="Talentify SV Logo"
+            className="navbar__logo-img"
+            style={{ height: '48px', width: 'auto' }}
+          />
           <span className="navbar__name">Talentify SV</span>
         </div>
 
@@ -61,9 +64,12 @@ export default function PublicLayout() {
         <div className="container footer__inner">
           <div className="footer__brand">
             <div className="navbar__brand">
-              <div className="navbar__logo">
-                <span className="logo-icon">TSV</span>
-              </div>
+              <img
+                src="/images/logotalentifysv.png"
+                alt="Talentify SV Logo"
+                className="navbar__logo-img"
+                style={{ height: '48px', width: 'auto' }}
+              />
               <span className="navbar__name">Talentify SV</span>
             </div>
              <p style={{

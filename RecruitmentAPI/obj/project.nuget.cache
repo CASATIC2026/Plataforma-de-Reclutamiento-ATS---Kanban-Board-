@@ -1,10 +1,6 @@
 {
   "version": 2,
-<<<<<<< HEAD
   "dgSpecHash": "qidq7XT0drg=",
-=======
-  "dgSpecHash": "jrxzRFG96Ko=",
->>>>>>> adbe524e24840347c9f85bb06cfec26628c0ba43
   "success": true,
   "projectFilePath": "C:\\Users\\Grupo B\\Documents\\BM\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
   "expectedPackageFiles": [

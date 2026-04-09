@@ -97,7 +97,8 @@ public class VacanteService : IVacanteService
             EstaActiva = vacante.EstaActiva,
             CreatedAt = vacante.CreatedAt,
             UpdatedAt = vacante.UpdatedAt,
-            Requisitos = vacante.Requisitos.Select(r => r.Nombre).ToList()
+            Requisitos = vacante.Requisitos.Select(r => r.Nombre).ToList(),
+            PostulacionesCount = vacante.Postulaciones.Count
         };
     }
 }

@@ -14,8 +14,13 @@ export default function MainLayout() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow" style={{ borderBottom: '2px solid #CD7B4F' }}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" style={{ color: '#131931', fontSize: '1.25rem', fontWeight: 'bold' }}>
-            Talentify SV
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img
+              src="/images/logotalentifysv.png"
+              alt="Talentify SV Logo"
+              style={{ height: '40px', width: 'auto' }}
+            />
+            <span style={{ color: '#131931', fontSize: '1.1rem', fontWeight: 'bold' }}>Talentify SV</span>
           </Link>
           <div className="flex gap-4 items-center">
             <Link
