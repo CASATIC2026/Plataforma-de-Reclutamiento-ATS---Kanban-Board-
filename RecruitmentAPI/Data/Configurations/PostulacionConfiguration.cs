@@ -36,6 +36,22 @@ public class PostulacionConfiguration : IEntityTypeConfiguration<Postulacion>
             .HasConversion<int>()
             .HasDefaultValue(EstadoPostulacion.Nuevo);
 
+        builder.Property(p => p.Puntaje)
+            .HasColumnName("puntaje")
+            .HasColumnType("decimal(5,2)");
+
+        builder.Property(p => p.PuntajeDetalle)
+            .HasColumnName("puntaje_detalle")
+            .HasColumnType("text");
+
+        builder.Property(p => p.EmailConfirmacionEnviado)
+            .HasColumnName("email_confirmacion_enviado")
+            .HasDefaultValue(false);
+
+        builder.Property(p => p.EmailResultadoEnviado)
+            .HasColumnName("email_resultado_enviado")
+            .HasDefaultValue(false);
+
         builder.Property(p => p.CreatedAt)
             .HasDefaultValueSql("NOW()");
 

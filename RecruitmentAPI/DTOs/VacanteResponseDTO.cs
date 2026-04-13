@@ -10,6 +10,8 @@ public class VacanteResponseDTO
     public decimal? SalarioMin { get; set; }
     public decimal? SalarioMax { get; set; }
     public bool EstaActiva { get; set; }
+    public decimal UmbralPuntaje { get; set; }
+    public bool ScreeningActivo { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

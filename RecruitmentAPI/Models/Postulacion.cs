@@ -2,6 +2,7 @@ namespace RecruitmentAPI.Models;
 
 public enum EstadoPostulacion
 {
+    Rechazado = -1,
     Nuevo = 0,
     Entrevista = 1,
     PruebaTecnica = 2,
@@ -18,6 +19,10 @@ public class Postulacion
     public string CvFilePath { get; set; } = string.Empty;
     public EstadoPostulacion Estado { get; set; } = EstadoPostulacion.Nuevo;
     public string? NotasInternas { get; set; }
+    public decimal? Puntaje { get; set; }
+    public string? PuntajeDetalle { get; set; }
+    public bool EmailConfirmacionEnviado { get; set; } = false;
+    public bool EmailResultadoEnviado { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

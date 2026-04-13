@@ -13,6 +13,8 @@ public class PostulacionResponseDTO
     public string VacanteTitulo { get; set; } = string.Empty;
     public EstadoPostulacion Estado { get; set; }
     public string? NotasInternas { get; set; }
+    public decimal? Puntaje { get; set; }
+    public string? PuntajeDetalle { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

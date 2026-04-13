@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { getPostulaciones, updateEstado } from '../../api/postulacionesApi';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { getPostulaciones, getPostulacionesByVacante, updateEstado } from '../../api/postulacionesApi';
 import KanbanColumn from './KanbanColumn';
 import CandidateProfileModal from './CandidateProfileModal';
 
@@ -13,12 +13,30 @@ const COLUMNS = [
 const MAX_TOASTS = 10;
 let toastIdCounter = 0;
 
-export default function KanbanBoard() {
+export default function KanbanBoard({ vacanteId, filterFn, sortFn, onCardsUpdate, onRechazadosChange }) {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const dragId = useRef(null);
+
+  // Compute visible (filtered + sorted) cards
+  const visibleCards = useMemo(() => {
+    let result = filterFn ? cards.filter(filterFn) : [...cards];
+    if (sortFn) result.sort(sortFn);
+    return result;
+  }, [cards, filterFn, sortFn]);
+
+  // Notify parent when visible cards change
+  useEffect(() => {
+    onCardsUpdate?.(visibleCards);
+  }, [visibleCards, onCardsUpdate]);
+
+  // Notify parent of rejected candidates (unfiltered)
+  useEffect(() => {
+    const rechazados = cards.filter((c) => c.estado === -1);
+    onRechazadosChange?.(rechazados);
+  }, [cards, onRechazadosChange]);
 
   const showToast = useCallback((message, type = 'success') => {
     const id = ++toastIdCounter;
@@ -31,12 +49,32 @@ export default function KanbanBoard() {
     }, 3000);
   }, []);
 
+  // Initial fetch
   useEffect(() => {
-    getPostulaciones()
+    const fetchPostulaciones = vacanteId
+      ? getPostulacionesByVacante(vacanteId)
+      : getPostulaciones();
+
+    fetchPostulaciones
       .then((res) => setCards(res.data))
       .catch(() => showToast('Error al cargar postulaciones', 'error'))
       .finally(() => setLoading(false));
-  }, [showToast]);
+  }, [vacanteId, showToast]);
+
+  // Auto-refresh every 30 seconds to catch changes from other users
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const fetchPostulaciones = vacanteId
+        ? getPostulacionesByVacante(vacanteId)
+        : getPostulaciones();
+
+      fetchPostulaciones
+        .then((res) => setCards(res.data))
+        .catch((err) => console.error('Polling error:', err));
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [vacanteId]);
 
   const handleDragStart = useCallback((e, id) => {
     dragId.current = id;
@@ -119,7 +157,7 @@ export default function KanbanBoard() {
             title={title}
             color={color}
             loading={loading}
-            cards={cards.filter((c) => c.estado === estado)}
+            cards={visibleCards.filter((c) => c.estado === estado)}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}

@@ -37,7 +37,6 @@ export default function PublicLayout() {
 
         <nav className="navbar__links">
           <Link to="/" className="nav-link">Inicio</Link>
-          <Link to="/jobs" className="nav-link">Vacantes</Link>
         </nav>
 
         <div className="navbar__actions">

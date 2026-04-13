@@ -37,6 +37,8 @@ public class VacanteService : IVacanteService
             TipoContrato = dto.TipoContrato,
             SalarioMin = dto.SalarioMin,
             SalarioMax = dto.SalarioMax,
+            UmbralPuntaje = dto.UmbralPuntaje ?? 60,
+            ScreeningActivo = dto.ScreeningActivo ?? true,
             Requisitos = dto.Requisitos.Select(r => new Requisito
             {
                 Nombre = r
@@ -60,6 +62,8 @@ public class VacanteService : IVacanteService
         if (dto.SalarioMin.HasValue) vacante.SalarioMin = dto.SalarioMin;
         if (dto.SalarioMax.HasValue) vacante.SalarioMax = dto.SalarioMax;
         if (dto.EstaActiva.HasValue) vacante.EstaActiva = dto.EstaActiva.Value;
+        if (dto.UmbralPuntaje.HasValue) vacante.UmbralPuntaje = dto.UmbralPuntaje.Value;
+        if (dto.ScreeningActivo.HasValue) vacante.ScreeningActivo = dto.ScreeningActivo.Value;
 
         // Handle requisitos replacement
         if (dto.Requisitos != null)
@@ -95,6 +99,8 @@ public class VacanteService : IVacanteService
             SalarioMin = vacante.SalarioMin,
             SalarioMax = vacante.SalarioMax,
             EstaActiva = vacante.EstaActiva,
+            UmbralPuntaje = vacante.UmbralPuntaje,
+            ScreeningActivo = vacante.ScreeningActivo,
             CreatedAt = vacante.CreatedAt,
             UpdatedAt = vacante.UpdatedAt,
             Requisitos = vacante.Requisitos.Select(r => r.Nombre).ToList(),

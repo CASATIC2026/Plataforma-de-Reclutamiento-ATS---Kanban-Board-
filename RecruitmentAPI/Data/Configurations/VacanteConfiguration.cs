@@ -40,6 +40,15 @@ public class VacanteConfiguration : IEntityTypeConfiguration<Vacante>
         builder.Property(v => v.EstaActiva)
             .HasDefaultValue(true);
 
+        builder.Property(v => v.UmbralPuntaje)
+            .HasColumnName("umbral_puntaje")
+            .HasColumnType("decimal(5,2)")
+            .HasDefaultValue(60m);
+
+        builder.Property(v => v.ScreeningActivo)
+            .HasColumnName("screening_activo")
+            .HasDefaultValue(true);
+
         builder.Property(v => v.CreatedAt)
             .HasDefaultValueSql("NOW()");
 

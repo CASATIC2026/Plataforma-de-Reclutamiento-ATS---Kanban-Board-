@@ -10,6 +10,8 @@ public class Vacante
     public decimal? SalarioMin { get; set; }
     public decimal? SalarioMax { get; set; }
     public bool EstaActiva { get; set; } = true;
+    public decimal UmbralPuntaje { get; set; } = 60;
+    public bool ScreeningActivo { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

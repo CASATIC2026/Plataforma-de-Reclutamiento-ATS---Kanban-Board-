@@ -1,3 +1,4 @@
+using System.Text.Json;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Models;
 using RecruitmentAPI.Repositories.Interfaces;
@@ -8,11 +9,22 @@ namespace RecruitmentAPI.Services;
 public class PostulacionService : IPostulacionService
 {
     private readonly IPostulacionRepository _repository;
+    private readonly IVacanteRepository _vacanteRepository;
+    private readonly IScoringService _scoringService;
+    private readonly IEmailService _emailService;
     private readonly IWebHostEnvironment _env;
 
-    public PostulacionService(IPostulacionRepository repository, IWebHostEnvironment env)
+    public PostulacionService(
+        IPostulacionRepository repository,
+        IVacanteRepository vacanteRepository,
+        IScoringService scoringService,
+        IEmailService emailService,
+        IWebHostEnvironment env)
     {
         _repository = repository;
+        _vacanteRepository = vacanteRepository;
+        _scoringService = scoringService;
+        _emailService = emailService;
         _env = env;
     }
 
@@ -64,6 +76,35 @@ public class PostulacionService : IPostulacionService
         };
 
         var created = await _repository.CreateAsync(postulacion);
+
+        // Load vacante for scoring
+        var vacante = await _vacanteRepository.GetByIdAsync(created.VacanteId);
+        if (vacante != null)
+        {
+            // Run scoring
+            var scoreResult = _scoringService.Score(created, vacante, dto.Carrera, dto.Ubicacion);
+            created.Puntaje = scoreResult.Puntaje;
+            created.PuntajeDetalle = JsonSerializer.Serialize(scoreResult.Detalle);
+
+            // Determine estado: if screening active and score below threshold → Rechazado
+            if (vacante.ScreeningActivo && scoreResult.Puntaje < vacante.UmbralPuntaje)
+            {
+                created.Estado = EstadoPostulacion.Rechazado;
+            }
+
+            // Update postulacion with scores and estado
+            await _repository.UpdateAsync(created);
+
+            // Send confirmation email
+            await _emailService.SendConfirmacionAsync(created, vacante);
+
+            // Send result email only if screening is active
+            if (vacante.ScreeningActivo)
+            {
+                bool apto = created.Estado != EstadoPostulacion.Rechazado;
+                await _emailService.SendResultadoAsync(created, vacante, apto);
+            }
+        }
 
         // Reload with Vacante included
         var withVacante = await _repository.GetByIdAsync(created.Id);
@@ -128,6 +169,8 @@ public class PostulacionService : IPostulacionService
             VacanteTitulo = postulacion.Vacante?.Titulo ?? string.Empty,
             Estado = postulacion.Estado,
             NotasInternas = postulacion.NotasInternas,
+            Puntaje = postulacion.Puntaje,
+            PuntajeDetalle = postulacion.PuntajeDetalle,
             CreatedAt = postulacion.CreatedAt,
             UpdatedAt = postulacion.UpdatedAt,
         };

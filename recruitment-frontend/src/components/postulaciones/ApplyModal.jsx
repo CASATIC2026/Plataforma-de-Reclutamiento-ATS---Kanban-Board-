@@ -7,8 +7,25 @@ const ALLOWED_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
+const SALVADORAN_DEPARTMENTS = [
+  'Ahuachapán',
+  'Santa Ana',
+  'Sonsonate',
+  'Chalatenango',
+  'La Libertad',
+  'San Salvador',
+  'Cuscatlán',
+  'La Paz',
+  'San Vicente',
+  'Cabañas',
+  'Morazán',
+  'La Unión',
+  'Usulután',
+  'San Miguel',
+];
+
 export default function ApplyModal({ job, onClose, onSuccess }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', carrera: '', ubicacion: '' });
   const [cvFile, setCvFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [errors, setErrors] = useState({});
@@ -65,6 +82,8 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     formData.append('Telefono', form.phone.trim());
     formData.append('VacanteId', job.id);
     if (cvFile) formData.append('CvFile', cvFile);
+    if (form.carrera.trim()) formData.append('Carrera', form.carrera.trim());
+    if (form.ubicacion) formData.append('Ubicacion', form.ubicacion);
 
     try {
       await createPostulacion(formData);
@@ -147,6 +166,40 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
                   onChange={setField('email')}
                 />
                 <span className="form-error">{errors.email || ''}</span>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="apply-carrera">
+                    Habilidades técnicas (opcional)
+                  </label>
+                  <input
+                    id="apply-carrera"
+                    className="form-input"
+                    placeholder="Ej: React, TypeScript, Git"
+                    value={form.carrera}
+                    onChange={setField('carrera')}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="apply-ubicacion">
+                    Departamento (opcional)
+                  </label>
+                  <select
+                    id="apply-ubicacion"
+                    className="form-input"
+                    value={form.ubicacion}
+                    onChange={setField('ubicacion')}
+                  >
+                    <option value="">Selecciona un departamento...</option>
+                    {SALVADORAN_DEPARTMENTS.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="form-group">

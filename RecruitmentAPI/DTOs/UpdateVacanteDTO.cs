@@ -12,4 +12,8 @@ public class UpdateVacanteDTO
 
     // null = don't touch requisitos. Empty list = clear them. List with items = replace them.
     public List<string>? Requisitos { get; set; }
+
+    // Screening configuration
+    public decimal? UmbralPuntaje { get; set; }
+    public bool? ScreeningActivo { get; set; }
 }

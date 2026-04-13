@@ -1,0 +1,282 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+
+3 0 obj
+<< /Type /Page /Parent 2 0 R /Resources 4 0 R /MediaBox [0 0 612 792] /Contents 5 0 R >>
+endobj
+
+4 0 obj
+<< /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> >> >>
+endobj
+
+5 0 obj
+<< /Length 3200 >>
+stream
+BT
+/F2 24 Tf
+50 750 Td
+(CARLOS ANDRES RIVERA PEREZ) Tj
+ET
+
+BT
+/F1 11 Tf
+50 730 Td
+(Senior Frontend Developer | React Specialist | 5+ Years Experience) Tj
+ET
+
+BT
+/F1 10 Tf
+50 715 Td
+(San Salvador, El Salvador) Tj
+ET
+
+BT
+/F1 10 Tf
+50 700 Td
+(Email: carlos.rivera.test@tempmail.io | Phone: +503 7853-4529) Tj
+ET
+
+BT
+/F2 14 Tf
+50 670 Td
+(PROFESSIONAL SUMMARY) Tj
+ET
+
+BT
+/F1 10 Tf
+50 650 Td
+(Experienced Senior Frontend Developer with 5+ years of professional experience building high-performance) Tj
+ET
+
+BT
+/F1 10 Tf
+50 635 Td
+(web applications using React, TypeScript, and modern JavaScript. Expert in component design, state management,) Tj
+ET
+
+BT
+/F1 10 Tf
+50 620 Td
+(and performance optimization. Proven track record of delivering scalable solutions for enterprise and startup) Tj
+ET
+
+BT
+/F1 10 Tf
+50 605 Td
+(environments. Passionate about clean code, best practices, and mentoring junior developers.) Tj
+ET
+
+BT
+/F2 14 Tf
+50 575 Td
+(TECHNICAL SKILLS) Tj
+ET
+
+BT
+/F1 10 Tf
+50 555 Td
+(Core Languages: JavaScript (Expert), TypeScript (Advanced), HTML5, CSS3) Tj
+ET
+
+BT
+/F1 10 Tf
+50 540 Td
+(Frontend Frameworks: React 19 (Expert), React Router, React Hooks, Context API, Redux) Tj
+ET
+
+BT
+/F1 10 Tf
+50 525 Td
+(Styling: Tailwind CSS (Expert), SASS/SCSS, CSS-in-JS, Responsive Design) Tj
+ET
+
+BT
+/F1 10 Tf
+50 510 Td
+(Tools & Testing: Git (Advanced), GitHub, Webpack, Vite, Jest, React Testing Library, Vitest) Tj
+ET
+
+BT
+/F1 10 Tf
+50 495 Td
+(Build Tools: Vite, Webpack, npm, yarn, ESLint, Prettier) Tj
+ET
+
+BT
+/F1 10 Tf
+50 480 Td
+(Other: REST APIs, GraphQL basics, Figma collaboration, Agile/Scrum) Tj
+ET
+
+BT
+/F2 14 Tf
+50 450 Td
+(PROFESSIONAL EXPERIENCE) Tj
+ET
+
+BT
+/F2 11 Tf
+50 430 Td
+(Senior Frontend Developer) Tj
+ET
+
+BT
+/F1 10 Tf
+420 430 Td
+(2023 - 2026) Tj
+ET
+
+BT
+/F1 10 Tf
+50 415 Td
+(TechStartup SV, San Salvador) Tj
+ET
+
+BT
+/F1 10 Tf
+50 400 Td
+(- Led frontend architecture migration from class components to React Hooks, reducing bundle size by 40%) Tj
+ET
+
+BT
+/F1 10 Tf
+50 385 Td
+(- Designed and implemented reusable component library (20+ components) with TypeScript and Tailwind CSS) Tj
+ET
+
+BT
+/F1 10 Tf
+50 370 Td
+(- Mentored 3 junior developers, conducting code reviews and establishing best practices) Tj
+ET
+
+BT
+/F1 10 Tf
+50 355 Td
+(- Improved application performance by 35% through code splitting and lazy loading optimization) Tj
+ET
+
+BT
+/F2 11 Tf
+50 330 Td
+(Frontend Developer) Tj
+ET
+
+BT
+/F1 10 Tf
+420 330 Td
+(2021 - 2023) Tj
+ET
+
+BT
+/F1 10 Tf
+50 315 Td
+(DigitalAgency, San Salvador) Tj
+ET
+
+BT
+/F1 10 Tf
+50 300 Td
+(- Developed responsive web applications for 15+ clients across various industries) Tj
+ET
+
+BT
+/F1 10 Tf
+50 285 Td
+(- Implemented pixel-perfect designs using Figma specifications and modern CSS practices) Tj
+ET
+
+BT
+/F1 10 Tf
+50 270 Td
+(- Integrated REST APIs and managed client state with Redux and Context API) Tj
+ET
+
+BT
+/F2 11 Tf
+50 245 Td
+(Junior Frontend Developer) Tj
+ET
+
+BT
+/F1 10 Tf
+420 245 Td
+(2020 - 2021) Tj
+ET
+
+BT
+/F1 10 Tf
+50 230 Td
+(Startup Incubator, San Salvador) Tj
+ET
+
+BT
+/F1 10 Tf
+50 215 Td
+(- Built initial web presence for 8 pre-seed startups using React and Next.js) Tj
+ET
+
+BT
+/F1 10 Tf
+50 200 Td
+(- Collaborated with designers and backend developers in agile sprint cycles) Tj
+ET
+
+BT
+/F2 14 Tf
+50 170 Td
+(EDUCATION) Tj
+ET
+
+BT
+/F1 10 Tf
+50 150 Td
+(Bachelor of Science in Computer Science, Universidad Centroamericana Jose Simeon Canas, 2020) Tj
+ET
+
+BT
+/F1 10 Tf
+50 135 Td
+(Specialized Courses: Advanced React Patterns, TypeScript Mastery, Web Performance Optimization) Tj
+ET
+
+BT
+/F2 14 Tf
+50 105 Td
+(CERTIFICATIONS) Tj
+ET
+
+BT
+/F1 10 Tf
+50 85 Td
+(- React Advanced Course (freeCodeCamp, 2023)) Tj
+ET
+
+BT
+/F1 10 Tf
+50 70 Td
+(- Git & GitHub Professional (Platzi, 2022)) Tj
+ET
+
+endstream
+endobj
+
+xref
+0 6
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000204 00000 n
+0000000324 00000 n
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3674
+%%EOF

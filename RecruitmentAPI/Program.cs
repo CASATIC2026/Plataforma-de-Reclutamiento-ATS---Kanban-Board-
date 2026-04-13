@@ -25,6 +25,11 @@ builder.Services.AddScoped<IVacanteService, VacanteService>();
 builder.Services.AddScoped<IPostulacionService, PostulacionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Screening and Email services
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.AddTransient<IScoringService, ScoringService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 // JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(options =>

@@ -11,4 +11,8 @@ public class CreateVacanteDTO
 
     // The recruiter sends requirements as a simple list of strings
     public List<string> Requisitos { get; set; } = new();
+
+    // Screening configuration
+    public decimal? UmbralPuntaje { get; set; }    // defaults to 60 in model
+    public bool? ScreeningActivo { get; set; }      // defaults to true in model
 }

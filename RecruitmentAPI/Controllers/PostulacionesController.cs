@@ -47,6 +47,7 @@ public class PostulacionesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Authorize]
     [HttpGet("{id}/cv")]
     public async Task<IActionResult> GetCv(Guid id)
     {

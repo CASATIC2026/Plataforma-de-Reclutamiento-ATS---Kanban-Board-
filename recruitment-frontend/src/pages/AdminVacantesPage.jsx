@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getVacantes, createVacante, deleteVacante, updateVacante } from '../api/vacantesApi';
 
 export default function AdminVacantesPage() {
+  const navigate = useNavigate();
   const [vacantes, setVacantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -14,9 +16,12 @@ export default function AdminVacantesPage() {
     salarioMin: '',
     salarioMax: '',
     requisitos: [],
+    umbralPuntaje: 60,
+    screeningActivo: true,
   });
   const [requisitoInput, setRequisitoInput] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchVacantes = async () => {
     try {
@@ -71,6 +76,8 @@ export default function AdminVacantesPage() {
       ...formData,
       salarioMin: formData.salarioMin ? Number(formData.salarioMin) : null,
       salarioMax: formData.salarioMax ? Number(formData.salarioMax) : null,
+      umbralPuntaje: Number(formData.umbralPuntaje),
+      screeningActivo: formData.screeningActivo,
     };
 
     try {
@@ -98,6 +105,8 @@ export default function AdminVacantesPage() {
       salarioMin: '',
       salarioMax: '',
       requisitos: [],
+      umbralPuntaje: 60,
+      screeningActivo: true,
     });
     setRequisitoInput('');
     setEditingId(null);
@@ -112,6 +121,8 @@ export default function AdminVacantesPage() {
       salarioMin: vacante.salarioMin || '',
       salarioMax: vacante.salarioMax || '',
       requisitos: vacante.requisitos || [],
+      umbralPuntaje: vacante.umbralPuntaje ?? 60,
+      screeningActivo: vacante.screeningActivo ?? true,
     });
     setEditingId(vacante.id);
     setShowForm(true);
@@ -126,6 +137,19 @@ export default function AdminVacantesPage() {
       console.error('Error deleting vacante:', error);
     }
   };
+
+  // Filter vacantes by search query
+  const filteredVacantes = vacantes.filter((v) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      v.titulo.toLowerCase().includes(query) ||
+      v.descripcion.toLowerCase().includes(query) ||
+      v.ubicacion.toLowerCase().includes(query) ||
+      v.tipoContrato.toLowerCase().includes(query) ||
+      (v.requisitos && v.requisitos.some((r) => r.toLowerCase().includes(query)))
+    );
+  });
 
   const activeCount = vacantes.filter((v) => v.estaActiva).length;
   const totalApplicants = vacantes.reduce((sum, v) => sum + (v.postulacionesCount || 0), 0);
@@ -396,6 +420,58 @@ export default function AdminVacantesPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Screening Configuration */}
+                <details className="space-y-2 p-4 bg-[#f2f3ff]/50 rounded-xl border border-[#dae2fd]">
+                  <summary className="cursor-pointer font-bold text-[#464555] uppercase tracking-widest text-xs">
+                    ⚙️ Configuración de Screening
+                  </summary>
+                  <div className="space-y-4 mt-4">
+                    {/* Toggle Screening Active */}
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm text-[#464555] font-semibold">
+                        Activar screening automático
+                      </label>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="screeningActivo"
+                          checked={formData.screeningActivo}
+                          onChange={(e) =>
+                            setFormData({ ...formData, screeningActivo: e.target.checked })
+                          }
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#3525cd]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3525cd]" />
+                      </label>
+                    </div>
+
+                    {/* Threshold Score */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
+                        Umbral de Aprobación (0-100)
+                      </label>
+                      <input
+                        type="number"
+                        name="umbralPuntaje"
+                        min="0"
+                        max="100"
+                        value={formData.umbralPuntaje}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            umbralPuntaje: Math.max(0, Math.min(100, Number(e.target.value))),
+                          })
+                        }
+                        className="w-full bg-white border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+                        placeholder="60"
+                      />
+                      <p className="text-xs text-[#464555]">
+                        Candidatos con puntaje menor serán marcados como rechazados automáticamente.
+                      </p>
+                    </div>
+                  </div>
+                </details>
               </form>
 
               {/* Form Footer */}
@@ -431,9 +507,18 @@ export default function AdminVacantesPage() {
           <div className="px-6 py-4 flex items-center justify-between bg-[#f2f3ff]/50 border-b border-[#c7c4d8]/10">
             <h3 className="font-bold text-[#131b2e]">Listado de Vacantes</h3>
             <div className="flex items-center gap-2">
-              <button className="p-2 text-[#464555] hover:bg-[#eaedff] rounded-lg transition-colors">
-                🔍
-              </button>
+              <div className="relative w-64">
+                <input
+                  type="text"
+                  placeholder="Buscar por título, ubicación, requisito..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-[#c7c4d8] rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#3525cd]/20 transition-all"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
+                  🔍
+                </span>
+              </div>
               <button className="p-2 text-[#464555] hover:bg-[#eaedff] rounded-lg transition-colors">
                 ⬇
               </button>
@@ -446,6 +531,11 @@ export default function AdminVacantesPage() {
             <div className="p-12 text-center text-[#464555]">
               <p className="text-lg">No hay vacantes creadas</p>
               <p className="text-sm mt-2">Crea la primera presionando el botón "Nueva Vacante"</p>
+            </div>
+          ) : filteredVacantes.length === 0 ? (
+            <div className="p-12 text-center text-[#464555]">
+              <p className="text-lg">No se encontraron vacantes</p>
+              <p className="text-sm mt-2">Intenta con otros términos de búsqueda</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -473,10 +563,11 @@ export default function AdminVacantesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#c7c4d8]/5">
-                  {vacantes.map((vacante) => (
+                  {filteredVacantes.map((vacante) => (
                     <tr
                       key={vacante.id}
-                      className="hover:bg-[#f2f3ff]/20 transition-colors group"
+                      onClick={() => navigate(`/admin/vacantes/${vacante.id}/aplicantes`)}
+                      className="hover:bg-[#f2f3ff]/20 transition-colors group cursor-pointer"
                     >
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
@@ -505,14 +596,20 @@ export default function AdminVacantesPage() {
                       <td className="px-6 py-5 text-right">
                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={() => handleEdit(vacante)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(vacante);
+                            }}
                             className="p-2 hover:bg-[#eaedff] rounded-lg text-[#3525cd] transition-colors"
                             title="Editar"
                           >
                             ✎
                           </button>
                           <button
-                            onClick={() => handleDelete(vacante.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(vacante.id);
+                            }}
                             className="p-2 hover:bg-[#ffdad6] rounded-lg text-[#ba1a1a] transition-colors"
                             title="Eliminar"
                           >
@@ -528,11 +625,12 @@ export default function AdminVacantesPage() {
           )}
 
           {/* Pagination */}
-          {vacantes.length > 0 && (
+          {filteredVacantes.length > 0 && (
             <div className="px-6 py-6 border-t border-[#c7c4d8]/10 flex items-center justify-between">
               <span className="text-sm text-[#464555]">
-                Mostrando <span className="font-bold text-[#131b2e]">1 - {vacantes.length}</span> de{' '}
-                {vacantes.length}
+                Mostrando <span className="font-bold text-[#131b2e]">1 - {filteredVacantes.length}</span> de{' '}
+                {filteredVacantes.length}
+                {searchQuery && ` (${vacantes.length} total)`}
               </span>
               <div className="flex items-center gap-1">
                 <button className="p-2 rounded-lg bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed">

@@ -18,12 +18,22 @@ const CONTRACT_FILTERS = [
   { key: 'Prácticas', label: 'Prácticas' },
 ];
 
-const CATEGORY_COLORS = {
-  'Tecnología': '#334CAF',
-  'Diseño': '#9B34AF',
-  'Datos': '#AF5F34',
-  'Gestión': '#2E8B57',
-};
+const SALVADORAN_DEPARTMENTS = [
+  '',
+  'San Salvador',
+  'La Libertad',
+  'Santa Ana',
+  'Cuscatlán',
+  'Usulután',
+  'Sonsonate',
+  'Chalatenango',
+  'Cabañas',
+  'San Vicente',
+  'San Miguel',
+  'Morazán',
+  'La Unión',
+  'Ahuachapán',
+];
 
 function JobCardNew({ job, hovered, setHovered, onClick }) {
   return (
@@ -206,7 +216,7 @@ export default function NewLandingPage() {
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [deptFilter, setDeptFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -256,15 +266,18 @@ export default function NewLandingPage() {
     return jobs.filter((job) => {
       const matchFilter =
         activeFilter === 'Todos' || job.type.toLowerCase().includes(activeFilter.toLowerCase());
+      const matchLocation =
+        !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
       const matchSearch =
         !query ||
         job.title.toLowerCase().includes(query) ||
         job.description.toLowerCase().includes(query) ||
         job.location.toLowerCase().includes(query) ||
+        job.type.toLowerCase().includes(query) ||
         job.requirements.some((r) => r.toLowerCase().includes(query));
-      return matchFilter && matchSearch;
+      return matchFilter && matchLocation && matchSearch;
     });
-  }, [jobs, searchQuery, activeFilter]);
+  }, [jobs, searchQuery, locationFilter, activeFilter]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
@@ -275,7 +288,7 @@ export default function NewLandingPage() {
   // Reset to page 1 when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeFilter, searchQuery]);
+  }, [activeFilter, searchQuery, locationFilter]);
 
   const handleApplyFromDetail = () => {
     setApplyJob(selectedJob);
@@ -288,6 +301,13 @@ export default function NewLandingPage() {
     setCandidatosCount((c) => (c !== null ? c + 1 : 1));
     setTimeout(() => setSuccessMsg(''), 5000);
   };
+
+  const activeJobsCount = jobs.length;
+  const eyebrow = loading
+    ? 'Cargando vacantes...'
+    : error
+    ? 'Sin conexión al servidor'
+    : `${activeJobsCount} vacante${activeJobsCount !== 1 ? 's' : ''} activa${activeJobsCount !== 1 ? 's' : ''}`;
 
   return (
     <div style={{ fontFamily: 'sans-serif', background: '#fff', minHeight: '100vh', overflowX: 'hidden' }}>
@@ -337,6 +357,18 @@ export default function NewLandingPage() {
           }}
         />
 
+        <p
+          style={{
+            color: '#999',
+            fontFamily: "'Jersey 25', sans-serif",
+            fontSize: '14px',
+            margin: '0 0 12px',
+            animation: 'fadeUp 0.7s ease both',
+          }}
+        >
+          {eyebrow}
+        </p>
+
         <h1
           style={{
             color: '#fff',
@@ -380,7 +412,7 @@ export default function NewLandingPage() {
             display: 'flex',
             alignItems: 'center',
             gap: '0',
-            maxWidth: '680px',
+            maxWidth: '900px',
             margin: '0 auto',
             background: 'rgba(217,217,217,0.12)',
             borderRadius: '10px',
@@ -404,12 +436,11 @@ export default function NewLandingPage() {
             }}
           />
           <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.2)' }} />
-          <input
-            value={deptFilter}
-            onChange={(e) => setDeptFilter(e.target.value)}
-            placeholder="Departamento"
+          <select
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
             style={{
-              width: '160px',
+              width: '200px',
               background: 'transparent',
               border: 'none',
               outline: 'none',
@@ -418,8 +449,16 @@ export default function NewLandingPage() {
               fontWeight: 600,
               fontSize: '15px',
               padding: '16px 14px',
+              cursor: 'pointer',
             }}
-          />
+          >
+            <option value="" style={{ background: '#131931', color: '#fff' }}>Todas las ciudades</option>
+            {SALVADORAN_DEPARTMENTS.filter((d) => d).map((dept) => (
+              <option key={dept} value={dept} style={{ background: '#131931', color: '#fff' }}>
+                {dept}
+              </option>
+            ))}
+          </select>
           <button
             style={{
               background: '#CD7B4F',
@@ -500,6 +539,16 @@ export default function NewLandingPage() {
               fontWeight: 700,
               cursor: 'pointer',
               transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              if (activeFilter !== f.key) {
+                e.target.style.background = 'rgba(19, 30, 77, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeFilter !== f.key) {
+                e.target.style.background = '#F4F4F4';
+              }
             }}
           >
             {f.label}
