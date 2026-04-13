@@ -28,11 +28,11 @@ export default function PublicLayout() {
         <div className="navbar__brand">
           <img
             src="/images/logotalentifysv.png"
-            alt="Talentify SV Logo"
+            alt="Talentify sv Logo"
             className="navbar__logo-img"
             style={{ height: '48px', width: 'auto' }}
           />
-          <span className="navbar__name">Talentify SV</span>
+          <span className="navbar__name">Talentify sv</span>
         </div>
 
         <nav className="navbar__links">
@@ -42,11 +42,11 @@ export default function PublicLayout() {
         <div className="navbar__actions">
           {isAuthenticated ? (
             <>
-              <span style={{ color: '#131931', fontSize: '0.875rem', fontWeight: 500 }}>
+              <span className="navbar__user-name">
                 {user?.nombre} {user?.apellido}
               </span>
               <Link to="/admin/vacantes" className="admin-link">⚙ Panel Admin</Link>
-              <button className="btn btn--ghost" onClick={handleLogout}>Cerrar Sesión</button>
+              <button className="navbar__logout-btn" onClick={handleLogout}>Cerrar Sesión</button>
             </>
           ) : (
             <>
@@ -65,11 +65,11 @@ export default function PublicLayout() {
             <div className="navbar__brand">
               <img
                 src="/images/logotalentifysv.png"
-                alt="Talentify SV Logo"
+                alt="Talentify sv Logo"
                 className="navbar__logo-img"
                 style={{ height: '48px', width: 'auto' }}
               />
-              <span className="navbar__name">Talentify SV</span>
+              <span className="navbar__name">Talentify sv</span>
             </div>
              <p style={{
           color: "#fff", fontFamily: "'Jersey 25', sans-serif", fontSize: "18px",
@@ -81,7 +81,7 @@ export default function PublicLayout() {
           <div className="footer__links">
             <div className="footer__col">
               <h4>Candidatos</h4>
-              <Link to="/jobs">Buscar empleos</Link>
+              <Link to="/#search-bar">Buscar empleos</Link>
               <Link to="/login?mode=register">Registrarse</Link>
               <a href="#">Recursos</a>
             </div>
@@ -101,7 +101,7 @@ export default function PublicLayout() {
         </div>
 
         <div className="footer__bottom">
-          <p>© 2025 Talentify SV. Todos los derechos reservados.</p>
+          <p>© 2025 Talentify sv. Todos los derechos reservados.</p>
         </div>
       </footer>
     </>

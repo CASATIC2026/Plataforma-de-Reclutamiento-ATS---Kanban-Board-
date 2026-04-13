@@ -6,7 +6,7 @@ import CandidateProfileModal from './CandidateProfileModal';
 const COLUMNS = [
   { estado: 0, title: 'Nuevo',          color: 'bg-teal-light text-teal' },
   { estado: 1, title: 'Entrevista',     color: 'bg-accent-bg text-accent' },
-  { estado: 2, title: 'Prueba Técnica', color: 'bg-navy-lighter text-white' },
+  { estado: 2, title: 'Prueba Técnica', color: 'bg-slate-100 text-slate-900' },
   { estado: 3, title: 'Oferta',         color: 'bg-green-light text-green' },
 ];
 

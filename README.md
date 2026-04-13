@@ -1,6 +1,6 @@
-# Talentify SV — ATS Recruitment Platform
+# Talentify sv — ATS Recruitment Platform
 
-A full-stack Applicant Tracking System (ATS) with a public-facing job board, an admin recruiter portal, and a Kanban-based candidate pipeline.
+A full-stack Applicant Tracking System (ATS) with a public-facing job board, an admin recruiter portal, and a Kanban-based candidate pipeline. Built for the Salvadoran market with Spanish UI, local departments as locations, and modern responsive design.
 
 ---
 
@@ -14,20 +14,35 @@ A full-stack Applicant Tracking System (ATS) with a public-facing job board, an 
 - Admin write operations require authentication; public read endpoints remain open
 - Automatic 401 redirect to login with token cleanup
 
-**Public Job Board**
+**Public Job Board** (Modern responsive design)
 - Browse active job vacancies with search, location, and contract-type filters
-- View job details and skill requirements
+- Dynamic hero tags showing top 8 skills across all jobs
+- "Nueva" badge (🔥) for jobs posted within 2 days
+- Pagination: 6 jobs per page with numbered navigation
+- Fully responsive: desktop, tablet, mobile (300px–900px), all breakpoints tested
 - Submit applications with optional CV upload (drag-and-drop, 5MB limit)
+- Technical skills input (comma-separated) for improved scoring
+- Department selection (14 Salvadoran locations)
 - Auto-refreshes every 30 seconds
 
 **Admin Portal** (Protected — requires login)
 - Create, edit, and delete job vacancies with requirements — modern modal form with stats dashboard
+- **Screening configuration** per vacancy:
+  - Toggle auto-screening on/off
+  - Set custom score threshold (0–100, default 60)
+  - Automatic routing: candidates below threshold marked as Rechazado
 - View all candidate applications per vacancy with detailed table view
 - **Operational Kanban pipeline** — view ALL candidates across all vacancies in one unified board
   - Real-time filters: search by name/email, filter by vacancy, date range (Hoy/Semana/Mes), sort options
   - Pipeline summary: live-updating stage chips showing candidate counts (Nuevo / Entrevista / Prueba Técnica / Oferta)
   - Drag-and-drop card movements with optimistic updates + automatic 30-second polling for multi-user conflict resolution
+  - **Rejected candidates tray** — collapsible section showing auto-screened candidates with "Restore" button
 - Per-vacancy Kanban view — focused pipeline for a single job opening
+- **Auto-scoring system** — three-signal algorithm:
+  - Skill matching (60%): candidate skills vs job requisitos
+  - Location match (25%): candidate location vs job location
+  - Profile completeness (15%): phone + CV + name length
+- **Score badges** on candidate cards: green (≥75), amber (60–74), red (<60)
 - Stacking toast notifications — up to 10 visible at once, each auto-dismisses after 3 seconds
 - Admin stats dashboard: Total Activas, Postulaciones count, Average per vacancy, Active rate percentage
 - Delete applications (removes associated CV file from disk)
@@ -233,6 +248,59 @@ Backend uses interface-based dependency injection throughout:
 - `IVacanteService` / `VacanteService`
 - `IPostulacionService` / `PostulacionService`
 - `IAuthService` / `AuthService`
+
+---
+
+## Responsive Design (NewLandingPage)
+
+The landing page (`/`) implements comprehensive mobile-first responsive design using CSS media queries with three key breakpoints:
+
+**Desktop (900px+)**
+- Full search bar: horizontal layout with location dropdown (200px width) + search button side-by-side
+- Large typography: hero titles 40px, descriptions 18px
+- Standard padding: hero section 80px horizontal
+- Grid: 3-column auto-fill layout (minmax 340px)
+
+**Tablet (680px–900px)**
+- Search bar remains horizontal but more compact
+- Location select width becomes flexible (`auto`)
+- Padding reduces to 24px horizontal
+- Font sizes scale: hero titles → 32px, descriptions → 16px
+- Grid: maintains 3-column layout with tighter gaps (28px → adjusted)
+
+**Mobile (500px–680px)**
+- **Search bar transforms vertical** (flex-direction: column):
+  - Input field spans full width with rounded top
+  - Location select below, full width, no border radius
+  - Search button spans full width with rounded bottom
+  - No divider separator between input and select
+- Single-column grid layout (1fr)
+- Pagination controls wrap with smaller buttons (24–28px)
+- Filter bar label hides; filter buttons adjust padding
+- Padding reduces to 16px horizontal
+
+**Small Mobile (300px–500px)**
+- Minimal padding: 12px horizontal
+- Hero section: 40px vertical padding
+- Font sizes: hero titles 24px, descriptions 13px
+- Pagination buttons: 24px × 24px with 11px font
+- All gaps reduced for compact display
+- Single column grid with 12px card gaps
+
+**Key Implementation Details:**
+- No horizontal overflow (overflow-x: hidden on root)
+- All fixed widths (200px select, 32px buttons) become responsive
+- Search bar button width changes from fixed padding to `width: 100%` on mobile
+- Job cards maintain aspect ratio with `minHeight` scaling
+- Media queries use `!important` flag to override inline styles
+- Pagination controls wrap with adjusted gap and flex-wrap: wrap
+
+**Tested & Fixed Issues:**
+- ✅ Brand name/user text mounting at 590px
+- ✅ Search bar buttons disappearing
+- ✅ White blank bar appearing on right side at 300px
+- ✅ Overflow caused by fixed element widths
+- ✅ Filter bar overflow on small screens
 
 ---
 

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useOutletContext, useLocation } from 'react-router-dom';
 import { getVacantes } from '../api/vacantesApi';
 import { getPostulaciones } from '../api/postulacionesApi';
 import { mapVacante } from '../utils/vacanteHelpers';
@@ -38,6 +38,7 @@ const SALVADORAN_DEPARTMENTS = [
 function JobCardNew({ job, hovered, setHovered, onClick }) {
   return (
     <div
+      className="job-card"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -208,6 +209,8 @@ function JobCardNew({ job, hovered, setHovered, onClick }) {
 
 export default function NewLandingPage() {
   const { setLive } = useOutletContext();
+  const location = useLocation();
+  const searchInputRef = useRef(null);
 
   const [jobs, setJobs] = useState([]);
   const [candidatosCount, setCandidatosCount] = useState(null);
@@ -260,6 +263,16 @@ export default function NewLandingPage() {
     return () => clearInterval(interval);
   }, [loadData]);
 
+  // Handle hash navigation to search bar
+  useEffect(() => {
+    if (location.hash === '#search-bar' && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [location.hash]);
+
   // Apply all active filters
   const filteredJobs = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -311,18 +324,72 @@ export default function NewLandingPage() {
 
   return (
     <div style={{ fontFamily: 'sans-serif', background: '#fff', minHeight: '100vh', overflowX: 'hidden' }}>
-      {/* Google Fonts */}
+      {/* Google Fonts + Responsive Styles */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Maven+Pro:wght@400;700&family=Jersey+25&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Maven+Pro:wght@400;700&family=Jersey+25&family=Playwrite+IE:wght@400;700&display=swap');
         * { box-sizing: border-box; }
+        html, body { width: 100%; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #CD7B4F; border-radius: 3px; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(24px);} to { opacity:1; transform:translateY(0);} }
         @keyframes pulse { 0%,100% { opacity:0.7; } 50% { opacity:1; } }
+
+        /* Responsive Styles */
+        @media (max-width: 900px) {
+          .hero-section { padding: 60px 24px 40px !important; }
+          .hero-title { font-size: 32px !important; }
+          .hero-subtitle { font-size: 32px !important; }
+          .hero-description { font-size: 16px !important; }
+          .search-bar { gap: 4px !important; }
+          .search-input { font-size: 14px !important; padding: 14px 12px !important; }
+          .search-select { font-size: 13px !important; padding: 14px 8px !important; width: auto !important; flex: 0 1 auto !important; }
+          .search-button { padding: 14px 16px !important; font-size: 14px !important; }
+          .divider-location { display: none !important; }
+        }
+
+        @media (max-width: 680px) {
+          .hero-section { padding: 48px 16px 32px !important; }
+          .hero-title { font-size: 28px !important; }
+          .hero-subtitle { font-size: 28px !important; }
+          .hero-description { font-size: 15px !important; max-width: 100% !important; }
+          .search-bar { flex-direction: column !important; gap: 0 !important; }
+          .search-input { font-size: 14px !important; padding: 12px 12px !important; border-radius: 10px 10px 0 0 !important; }
+          .search-select { font-size: 13px !important; padding: 12px 12px !important; width: 100% !important; border-radius: 0 !important; }
+          .search-button { width: 100% !important; padding: 12px 12px !important; font-size: 13px !important; border-radius: 0 0 10px 10px !important; }
+          .divider-location { display: none !important; }
+          .filter-label { display: none !important; }
+          .job-grid { gap: 16px !important; }
+          .job-card { min-height: 240px !important; padding: 16px 14px 12px !important; }
+          .pagination-controls { gap: 6px !important; }
+          .page-button { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+          .nav-button { padding: 6px 12px !important; font-size: 12px !important; }
+        }
+
+        @media (max-width: 500px) {
+          .hero-section { padding: 40px 12px 24px !important; }
+          .hero-eyebrow { font-size: 12px !important; }
+          .hero-title { font-size: 24px !important; }
+          .hero-subtitle { font-size: 24px !important; }
+          .hero-description { font-size: 13px !important; }
+          .search-bar { border-radius: 8px !important; }
+          .search-input { padding: 10px 10px !important; font-size: 13px !important; }
+          .search-select { padding: 10px 10px !important; font-size: 12px !important; }
+          .search-button { padding: 10px 12px !important; font-size: 12px !important; }
+          .jobs-section { padding: 32px 12px 40px !important; }
+          .filter-section { padding: 12px 12px !important; gap: 8px !important; }
+          .filter-button { padding: 4px 12px !important; font-size: 12px !important; }
+          .job-grid { gap: 12px !important; grid-template-columns: 1fr !important; }
+          .job-card { min-height: 220px !important; padding: 14px 12px 10px !important; }
+          .pagination-controls { flex-wrap: wrap !important; gap: 4px !important; }
+          .page-button { width: 24px !important; height: 24px !important; font-size: 11px !important; padding: 2px !important; }
+          .nav-button { padding: 4px 8px !important; font-size: 11px !important; }
+          .page-info { font-size: 12px !important; }
+        }
       `}</style>
 
       {/* HERO */}
       <section
+        className="hero-section"
         style={{
           background: '#131931',
           padding: '80px 40px 60px',
@@ -358,6 +425,7 @@ export default function NewLandingPage() {
         />
 
         <p
+          className="hero-eyebrow"
           style={{
             color: '#999',
             fontFamily: "'Jersey 25', sans-serif",
@@ -370,6 +438,7 @@ export default function NewLandingPage() {
         </p>
 
         <h1
+          className="hero-title"
           style={{
             color: '#fff',
             fontFamily: "'Kaisei Decol', serif",
@@ -381,6 +450,7 @@ export default function NewLandingPage() {
           Encuentra el trabajo
         </h1>
         <p
+          className="hero-subtitle"
           style={{
             color: '#1F9DB9',
             fontFamily: "'Kaisei Decol', serif",
@@ -393,6 +463,7 @@ export default function NewLandingPage() {
           que mereces
         </p>
         <p
+          className="hero-description"
           style={{
             color: '#fff',
             fontFamily: "'Jersey 25', sans-serif",
@@ -408,6 +479,7 @@ export default function NewLandingPage() {
 
         {/* Search bar */}
         <div
+          className="search-bar"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -421,6 +493,8 @@ export default function NewLandingPage() {
           }}
         >
           <input
+            className="search-input"
+            ref={searchInputRef}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Puesto, ubicación, requisito..."
@@ -435,8 +509,9 @@ export default function NewLandingPage() {
               padding: '16px 18px',
             }}
           />
-          <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.2)' }} />
+          <div className="divider-location" style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.2)' }} />
           <select
+            className="search-select"
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
             style={{
@@ -460,6 +535,7 @@ export default function NewLandingPage() {
             ))}
           </select>
           <button
+            className="search-button"
             style={{
               background: '#CD7B4F',
               border: 'none',
@@ -504,6 +580,7 @@ export default function NewLandingPage() {
 
       {/* FILTER BAR */}
       <div
+        className="filter-section"
         style={{
           background: '#FFF5F5',
           padding: '18px 40px',
@@ -515,6 +592,7 @@ export default function NewLandingPage() {
         }}
       >
         <span
+          className="filter-label"
           style={{
             color: '#5B5959',
             fontFamily: "'Jersey 25', sans-serif",
@@ -526,6 +604,7 @@ export default function NewLandingPage() {
         </span>
         {CONTRACT_FILTERS.map((f) => (
           <button
+            className="filter-button"
             key={f.key}
             onClick={() => setActiveFilter(f.key)}
             style={{
@@ -557,7 +636,7 @@ export default function NewLandingPage() {
       </div>
 
       {/* JOB GRID */}
-      <section style={{ background: '#353535', padding: '48px 40px 60px' }}>
+      <section className="jobs-section" style={{ background: '#353535', padding: '48px 40px 60px' }}>
         {loading ? (
           <p
             style={{
@@ -597,6 +676,7 @@ export default function NewLandingPage() {
         ) : (
           <div>
             <div
+              className="job-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
@@ -621,6 +701,7 @@ export default function NewLandingPage() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div
+                className="pagination-controls"
                 style={{
                   display: 'flex',
                   justifyContent: 'center',
@@ -631,6 +712,7 @@ export default function NewLandingPage() {
               >
                 {/* Previous Button */}
                 <button
+                  className="nav-button"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                   style={{
@@ -654,6 +736,7 @@ export default function NewLandingPage() {
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
+                      className="page-button"
                       key={page}
                       onClick={() => setCurrentPage(page)}
                       style={{
@@ -684,6 +767,7 @@ export default function NewLandingPage() {
 
                 {/* Next Button */}
                 <button
+                  className="nav-button"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                   style={{
@@ -707,6 +791,7 @@ export default function NewLandingPage() {
 
             {/* Info text */}
             <p
+              className="page-info"
               style={{
                 textAlign: 'center',
                 color: '#aaa',

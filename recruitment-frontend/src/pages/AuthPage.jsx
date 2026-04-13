@@ -207,9 +207,9 @@ function LoginForm({ onSwitch, error, loading, onSubmit }) {
       <div className="flex flex-col items-center mb-8">
         <h1
           className="text-3xl font-bold mt-3"
-          style={{ color: '#0f1b3d', fontFamily: "'Playfair Display', serif" }}
+          style={{ color: '#0f1b3d', fontFamily: "'Playwrite IE', serif" }}
         >
-          Talentify SV
+          Talentify sv
         </h1>
         <p className="text-sm mt-1" style={{ color: '#8a8fa3', fontFamily: "'DM Sans', sans-serif" }}>
           Inicia sesión en tu cuenta
@@ -439,7 +439,7 @@ export default function AuthPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Playwrite+IE:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap');
         @keyframes float-0 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -12px); } }
         @keyframes float-1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-6px, 10px); } }
         @keyframes float-2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, 8px); } }

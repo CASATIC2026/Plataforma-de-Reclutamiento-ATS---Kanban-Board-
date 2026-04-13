@@ -8,6 +8,8 @@ export default function AdminVacantesPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -150,6 +152,32 @@ export default function AdminVacantesPage() {
       (v.requisitos && v.requisitos.some((r) => r.toLowerCase().includes(query)))
     );
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredVacantes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedVacantes = filteredVacantes.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo(0, 0);
+    }
+  };
 
   const activeCount = vacantes.filter((v) => v.estaActiva).length;
   const totalApplicants = vacantes.reduce((sum, v) => sum + (v.postulacionesCount || 0), 0);
@@ -512,7 +540,7 @@ export default function AdminVacantesPage() {
                   type="text"
                   placeholder="Buscar por título, ubicación, requisito..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearch(e.target.value)}
                   className="w-full bg-white border border-[#c7c4d8] rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#3525cd]/20 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
@@ -563,7 +591,7 @@ export default function AdminVacantesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#c7c4d8]/5">
-                  {filteredVacantes.map((vacante) => (
+                  {paginatedVacantes.map((vacante) => (
                     <tr
                       key={vacante.id}
                       onClick={() => navigate(`/admin/vacantes/${vacante.id}/aplicantes`)}
@@ -628,18 +656,56 @@ export default function AdminVacantesPage() {
           {filteredVacantes.length > 0 && (
             <div className="px-6 py-6 border-t border-[#c7c4d8]/10 flex items-center justify-between">
               <span className="text-sm text-[#464555]">
-                Mostrando <span className="font-bold text-[#131b2e]">1 - {filteredVacantes.length}</span> de{' '}
-                {filteredVacantes.length}
+                Mostrando <span className="font-bold text-[#131b2e]">{startIndex + 1} - {Math.min(endIndex, filteredVacantes.length)}</span> de{' '}
+                <span className="font-bold text-[#131b2e]">{filteredVacantes.length}</span>
                 {searchQuery && ` (${vacantes.length} total)`}
               </span>
-              <div className="flex items-center gap-1">
-                <button className="p-2 rounded-lg bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed">
+              <div className="flex items-center gap-2">
+                {/* Previous Button */}
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  className={`p-2 rounded-lg transition-colors ${
+                    currentPage === 1
+                      ? 'bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed'
+                      : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff] cursor-pointer'
+                  }`}
+                  title="Página anterior"
+                >
                   ‹
                 </button>
-                <button className="w-10 h-10 rounded-lg bg-[#3525cd] text-white font-bold text-sm">
-                  1
-                </button>
-                <button className="p-2 rounded-lg hover:bg-[#eaedff] text-[#3525cd] transition-colors">
+
+                {/* Page Numbers */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => {
+                        setCurrentPage(page);
+                        window.scrollTo(0, 0);
+                      }}
+                      className={`w-10 h-10 rounded-lg font-bold text-sm transition-colors ${
+                        page === currentPage
+                          ? 'bg-[#3525cd] text-white'
+                          : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff]'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`p-2 rounded-lg transition-colors ${
+                    currentPage === totalPages
+                      ? 'bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed'
+                      : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff] cursor-pointer'
+                  }`}
+                  title="Página siguiente"
+                >
                   ›
                 </button>
               </div>

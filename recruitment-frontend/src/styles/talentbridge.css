@@ -30,7 +30,7 @@
   --clr-urgent:     #CD7B4F;
   --clr-urgent-bg:  #FFF1EB;
 
-  --ff-display:     'Playfair Display', Georgia, serif;
+  --ff-display:     'Playwrite IE', Georgia, serif;
   --ff-body:        'DM Sans', sans-serif;
 
   --radius-sm:   6px;
@@ -121,26 +121,34 @@ em { font-style: italic; color: var(--clr-accent); }
   gap: 32px;
   padding: 0 40px;
   height: 68px;
-  background: rgba(244,242,238,0.92);
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,248,255,0.92) 100%);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--clr-border);
+  border-bottom: 1px solid rgba(205,123,79,0.15);
+  box-shadow: 0 2px 8px rgba(19,25,49,0.06);
 }
 
 .navbar__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-right: auto;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.navbar__brand:hover {
+  opacity: 0.85;
 }
 
 .navbar__logo {
-  width: 36px;
-  height: 36px;
-  background: var(--clr-navy);
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #131931 0%, #1F9DB9 100%);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(205,123,79,0.2);
 }
 
 .logo-icon {
@@ -153,9 +161,9 @@ em { font-style: italic; color: var(--clr-accent); }
 
 .navbar__name {
   font-family: var(--ff-display);
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: var(--clr-navy);
+  color: #131931;
   letter-spacing: -0.01em;
 }
 
@@ -165,18 +173,42 @@ em { font-style: italic; color: var(--clr-accent); }
 }
 
 .nav-link {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--clr-slate);
-  transition: color var(--transition);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #131931;
+  transition: all var(--transition);
   text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  position: relative;
 }
-.nav-link:hover { color: var(--clr-navy); }
+
+.nav-link:hover {
+  color: #CD7B4F;
+  background: rgba(205,123,79,0.08);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #CD7B4F;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.nav-link:hover::after {
+  opacity: 1;
+}
 
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
 .live-badge {
@@ -207,19 +239,58 @@ em { font-style: italic; color: var(--clr-accent); }
 .admin-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
-  background: var(--clr-navy);
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #131931 0%, #1F9DB9 100%);
   color: #fff;
   transition: all var(--transition);
   text-decoration: none;
+  box-shadow: 0 4px 12px rgba(19,25,49,0.2);
+  letter-spacing: 0.3px;
 }
+
 .admin-link:hover {
-  background: var(--clr-navy-light);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(205,123,79,0.25);
+}
+
+.admin-link:active {
+  transform: translateY(0);
+}
+
+.navbar__user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #131931;
+  letter-spacing: 0.3px;
+  padding: 0 8px;
+}
+
+.navbar__logout-btn {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: #fff;
+  color: #CD7B4F;
+  border: 1.5px solid #CD7B4F;
+  transition: all var(--transition);
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+}
+
+.navbar__logout-btn:hover {
+  background: rgba(205,123,79,0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(205,123,79,0.2);
+}
+
+.navbar__logout-btn:active {
+  transform: translateY(0);
 }
 
 
@@ -1109,12 +1180,14 @@ em { font-style: italic; color: var(--clr-accent); }
   display: flex;
   gap: 48px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .footer__col {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  text-align: center;
 }
 
 .footer__col h4 {
@@ -1132,7 +1205,10 @@ em { font-style: italic; color: var(--clr-accent); }
   transition: color var(--transition);
   text-decoration: none;
 }
-.footer__col a:hover { color: rgba(255,255,255,0.9); }
+
+.footer__col a:hover {
+  color: rgba(255,255,255,0.9);
+}
 
 .footer__bottom {
   text-align: center;
