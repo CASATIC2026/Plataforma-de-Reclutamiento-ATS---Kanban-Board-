@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPostulacion } from '../../api/postulacionesApi';
+import { validateName, validateEmail, validatePhone } from '../../utils/validators';
 
 const ALLOWED_TYPES = [
   'application/pdf',
@@ -29,6 +30,8 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
   const [cvFile, setCvFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [errors, setErrors] = useState({});
+  const [hints, setHints] = useState({});
+  const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
@@ -43,7 +46,49 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     };
   }, [onClose]);
 
-  const setField = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  const setField = (field) => (e) => {
+    const value = e.target.value;
+    setForm((f) => ({ ...f, [field]: value }));
+    // Live re-validation for touched fields
+    if (touched[field]) {
+      const { err, hint } = runValidation(field, value);
+      setErrors((errs) => ({ ...errs, [field]: err }));
+      setHints((h) => ({ ...h, [field]: hint }));
+    }
+  };
+
+  const runValidation = (field, value) => {
+    let err = '';
+    let hint = '';
+    switch (field) {
+      case 'name': {
+        const res = validateName(value, 'Nombre completo', 3);
+        err = res.error;
+        break;
+      }
+      case 'email': {
+        const res = validateEmail(value);
+        err = res.error;
+        hint = res.suggestion || '';
+        break;
+      }
+      case 'phone': {
+        const res = validatePhone(value);
+        err = res.error;
+        break;
+      }
+      default:
+        break;
+    }
+    return { err, hint };
+  };
+
+  const handleBlur = (field) => () => {
+    setTouched((t) => ({ ...t, [field]: true }));
+    const { err, hint } = runValidation(field, form[field]);
+    setErrors((errs) => ({ ...errs, [field]: err }));
+    setHints((h) => ({ ...h, [field]: hint }));
+  };
 
   const handleFile = (file) => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -59,22 +104,26 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
   };
 
   const validate = () => {
-    const next = {};
-    if (!form.name.trim() || form.name.trim().length < 3)
-      next.name = 'Ingresa tu nombre completo.';
-    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      next.email = 'Ingresa un correo electrónico válido.';
-    if (!cvFile)
-      next.cv = 'Por favor adjunta tu CV.';
-    setErrors(next);
-    return Object.keys(next).length === 0;
+    const fields = ['name', 'email', 'phone'];
+    const newErrors = {};
+    const newHints = {};
+    fields.forEach((f) => {
+      const { err, hint } = runValidation(f, form[f]);
+      newErrors[f] = err;
+      newHints[f] = hint;
+    });
+    if (!cvFile) newErrors.cv = 'Por favor adjunta tu CV.';
+    setErrors(newErrors);
+    setHints(newHints);
+    setTouched({ name: true, email: true, phone: true });
+    return Object.values(newErrors).every((e) => !e);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    setErrors({});
+    setErrors((errs) => ({ ...errs, submit: '' }));
 
     const formData = new FormData();
     formData.append('NombreCandidato', form.name.trim());
@@ -89,11 +138,16 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
       await createPostulacion(formData);
       setSubmitted(true);
     } catch {
-      setErrors({ submit: 'Hubo un error al enviar tu postulación. Intenta de nuevo.' });
+      setErrors((errs) => ({ ...errs, submit: 'Hubo un error al enviar tu postulación. Intenta de nuevo.' }));
     } finally {
       setLoading(false);
     }
   };
+
+  const isFieldValid = (field) => touched[field] && !errors[field] && form[field].trim();
+
+  const inputClass = (field) =>
+    `form-input${errors[field] ? ' error' : isFieldValid(field) ? ' success' : ''}`;
 
   return (
     <div
@@ -132,10 +186,11 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
                   </label>
                   <input
                     id="apply-name"
-                    className={`form-input${errors.name ? ' error' : ''}`}
+                    className={inputClass('name')}
                     placeholder="Ej. Ana García López"
                     value={form.name}
                     onChange={setField('name')}
+                    onBlur={handleBlur('name')}
                   />
                   <span className="form-error">{errors.name || ''}</span>
                 </div>
@@ -145,11 +200,16 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
                   <input
                     id="apply-phone"
                     type="tel"
-                    className="form-input"
-                    placeholder="+52 55 1234 5678"
+                    className={inputClass('phone')}
+                    placeholder="+503 7777-1234"
                     value={form.phone}
                     onChange={setField('phone')}
+                    onBlur={handleBlur('phone')}
                   />
+                  <span className="form-error">{errors.phone || ''}</span>
+                  {!errors.phone && !form.phone && (
+                    <span className="form-hint">Opcional — mín. 10 dígitos si se ingresa</span>
+                  )}
                 </div>
               </div>
 
@@ -160,12 +220,16 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
                 <input
                   id="apply-email"
                   type="email"
-                  className={`form-input${errors.email ? ' error' : ''}`}
+                  className={inputClass('email')}
                   placeholder="tu@correo.com"
                   value={form.email}
                   onChange={setField('email')}
+                  onBlur={handleBlur('email')}
                 />
                 <span className="form-error">{errors.email || ''}</span>
+                {!errors.email && hints.email && (
+                  <span className="form-hint form-hint--suggestion">{hints.email}</span>
+                )}
               </div>
 
               <div className="form-row">

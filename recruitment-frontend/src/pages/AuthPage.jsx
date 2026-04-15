@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { loginUser, registerUser } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
+import {
+  validateEmail,
+  validatePassword,
+  validateName,
+  getPasswordStrengthLabel,
+} from '../utils/validators';
 
 // ─── Decorative floating circles ───
 const circles = [
@@ -97,9 +103,22 @@ const Icons = {
   ),
 };
 
-// ─── Input field ───
-function InputField({ icon, label, type = 'text', placeholder = '', value, onChange }) {
+// ─── Input field with per-field error/hint support ───
+function InputField({ icon, label, type = 'text', placeholder = '', value, onChange, onBlur, error = '', hint = '' }) {
   const [focused, setFocused] = useState(false);
+
+  const borderColor = error
+    ? '#ef4444'
+    : focused
+    ? '#3B5FE8'
+    : 'transparent';
+
+  const bgColor = error
+    ? '#fff5f5'
+    : focused
+    ? '#eef0f8'
+    : '#f2f3f7';
+
   return (
     <div className="mb-4">
       <label
@@ -111,12 +130,12 @@ function InputField({ icon, label, type = 'text', placeholder = '', value, onCha
       <div
         className="flex items-center rounded-xl px-3 py-2.5 transition-all duration-300"
         style={{
-          backgroundColor: focused ? '#eef0f8' : '#f2f3f7',
-          border: focused ? '2px solid #3B5FE8' : '2px solid transparent',
-          boxShadow: focused ? '0 0 0 3px rgba(59,95,232,0.1)' : 'none',
+          backgroundColor: bgColor,
+          border: `2px solid ${borderColor}`,
+          boxShadow: focused && !error ? '0 0 0 3px rgba(59,95,232,0.1)' : 'none',
         }}
       >
-        <span className="mr-3 text-lg" style={{ color: '#8a8fa3' }}>
+        <span className="mr-3 text-lg" style={{ color: error ? '#ef4444' : '#8a8fa3' }}>
           {icon}
         </span>
         <input
@@ -125,11 +144,21 @@ function InputField({ icon, label, type = 'text', placeholder = '', value, onCha
           value={value}
           onChange={onChange}
           onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onBlur={(e) => { setFocused(false); onBlur && onBlur(e); }}
           className="flex-1 bg-transparent outline-none text-sm"
           style={{ color: '#1a2a5e', fontFamily: "'DM Sans', sans-serif" }}
         />
       </div>
+      {error && (
+        <p className="text-xs mt-1" style={{ color: '#ef4444', fontFamily: "'DM Sans', sans-serif" }}>
+          {error}
+        </p>
+      )}
+      {!error && hint && (
+        <p className="text-xs mt-1" style={{ color: '#3B5FE8', fontFamily: "'DM Sans', sans-serif" }}>
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -178,10 +207,35 @@ function SelectField({ icon, label, options, value, onChange }) {
   );
 }
 
+// ─── Password strength bar ───
+function PasswordStrengthBar({ strength }) {
+  if (strength === 0) return null;
+  const { label, color } = getPasswordStrengthLabel(strength);
+  const bars = [1, 2, 3];
+  return (
+    <div className="flex items-center gap-2 mt-1 mb-3">
+      <div className="flex gap-1 flex-1">
+        {bars.map((level) => (
+          <div
+            key={level}
+            className="h-1.5 flex-1 rounded-full transition-all duration-300"
+            style={{ backgroundColor: level <= strength ? color : '#e5e7eb' }}
+          />
+        ))}
+      </div>
+      <span className="text-xs font-medium" style={{ color, fontFamily: "'DM Sans', sans-serif" }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // ─── Login Form ───
 function LoginForm({ onSwitch, error, loading, onSubmit }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [touched, setTouched] = useState({ email: false, password: false });
+  const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' });
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -189,14 +243,41 @@ function LoginForm({ onSwitch, error, loading, onSubmit }) {
     return () => clearTimeout(t);
   }, []);
 
+  const touch = (field) => () => setTouched((t) => ({ ...t, [field]: true }));
+
+  const validateFields = useCallback(() => {
+    const emailRes = validateEmail(email);
+    const errors = {
+      email: emailRes.error,
+      password: password ? '' : 'La contraseña es requerida.',
+    };
+    setFieldErrors(errors);
+    return !errors.email && !errors.password;
+  }, [email, password]);
+
+  // Validate on blur for individual fields
+  const handleEmailBlur = () => {
+    touch('email')();
+    const res = validateEmail(email);
+    setFieldErrors((e) => ({ ...e, email: res.error }));
+  };
+
+  const handlePasswordBlur = () => {
+    touch('password')();
+    setFieldErrors((e) => ({ ...e, password: password ? '' : 'La contraseña es requerida.' }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setTouched({ email: true, password: true });
+    if (!validateFields()) return;
     onSubmit({ email, password });
   };
 
   return (
     <form
       onSubmit={handleSubmit}
+      noValidate
       className="w-full max-w-sm mx-auto"
       style={{
         opacity: show ? 1 : 0,
@@ -232,14 +313,18 @@ function LoginForm({ onSwitch, error, loading, onSubmit }) {
         placeholder="tu@correo.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        onBlur={handleEmailBlur}
+        error={touched.email ? fieldErrors.email : ''}
       />
       <InputField
         icon={Icons.lock}
         label="Contraseña :"
         type="password"
-        placeholder="••••••"
+        placeholder="••••••••"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        onBlur={handlePasswordBlur}
+        error={touched.password ? fieldErrors.password : ''}
       />
 
       <div className="flex gap-3 mt-8">
@@ -279,6 +364,10 @@ function RegisterForm({ onSwitch, error, loading, onSubmit }) {
     password: '',
     rol: '',
   });
+  const [touched, setTouched] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [emailHint, setEmailHint] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -286,16 +375,68 @@ function RegisterForm({ onSwitch, error, loading, onSubmit }) {
     return () => clearTimeout(t);
   }, []);
 
-  const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+  const set = (key) => (e) => {
+    const value = e.target.value;
+    setForm((f) => ({ ...f, [key]: value }));
+
+    // Live password strength feedback
+    if (key === 'password') {
+      const res = validatePassword(value);
+      setPasswordStrength(res.strength);
+      // Clear error while typing if now valid
+      if (touched[key]) {
+        setFieldErrors((fe) => ({ ...fe, password: res.error }));
+      }
+    }
+  };
+
+  const touch = (field) => () => setTouched((t) => ({ ...t, [field]: true }));
+
+  const validateField = (field, value) => {
+    switch (field) {
+      case 'nombre':
+        return validateName(value, 'Nombre', 2).error;
+      case 'apellido':
+        return validateName(value, 'Apellido', 2).error;
+      case 'email': {
+        const res = validateEmail(value);
+        setEmailHint(res.suggestion || '');
+        return res.error;
+      }
+      case 'password':
+        return validatePassword(value).error;
+      default:
+        return '';
+    }
+  };
+
+  const handleBlur = (field) => () => {
+    touch(field)();
+    const err = validateField(field, form[field]);
+    setFieldErrors((fe) => ({ ...fe, [field]: err }));
+  };
+
+  const validateAll = () => {
+    const fields = ['nombre', 'apellido', 'email', 'password'];
+    const errors = {};
+    fields.forEach((f) => {
+      errors[f] = validateField(f, form[f]);
+    });
+    setFieldErrors(errors);
+    setTouched({ nombre: true, apellido: true, email: true, password: true });
+    return Object.values(errors).every((e) => !e);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateAll()) return;
     onSubmit(form);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
+      noValidate
       className="w-full max-w-md mx-auto"
       style={{
         opacity: show ? 1 : 0,
@@ -322,13 +463,55 @@ function RegisterForm({ onSwitch, error, loading, onSubmit }) {
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        <InputField icon={Icons.person} label="Nombre :" value={form.nombre} onChange={set('nombre')} />
-        <InputField icon={Icons.person} label="Apellido :" value={form.apellido} onChange={set('apellido')} />
+        <InputField
+          icon={Icons.person}
+          label="Nombre :"
+          value={form.nombre}
+          onChange={set('nombre')}
+          onBlur={handleBlur('nombre')}
+          error={touched.nombre ? fieldErrors.nombre : ''}
+        />
+        <InputField
+          icon={Icons.person}
+          label="Apellido :"
+          value={form.apellido}
+          onChange={set('apellido')}
+          onBlur={handleBlur('apellido')}
+          error={touched.apellido ? fieldErrors.apellido : ''}
+        />
       </div>
 
-      <InputField icon={Icons.career} label="Carrera :" value={form.carrera} onChange={set('carrera')} />
-      <InputField icon={Icons.mail} label="Email :" type="email" value={form.email} onChange={set('email')} />
-      <InputField icon={Icons.lock} label="Contraseña :" type="password" value={form.password} onChange={set('password')} />
+      <InputField
+        icon={Icons.career}
+        label="Carrera :"
+        value={form.carrera}
+        onChange={set('carrera')}
+      />
+
+      <InputField
+        icon={Icons.mail}
+        label="Email :"
+        type="email"
+        placeholder="tu@correo.com"
+        value={form.email}
+        onChange={set('email')}
+        onBlur={handleBlur('email')}
+        error={touched.email ? fieldErrors.email : ''}
+        hint={!fieldErrors.email ? emailHint : ''}
+      />
+
+      <InputField
+        icon={Icons.lock}
+        label="Contraseña :"
+        type="password"
+        placeholder="Mín. 8 caracteres"
+        value={form.password}
+        onChange={set('password')}
+        onBlur={handleBlur('password')}
+        error={touched.password ? fieldErrors.password : ''}
+      />
+      <PasswordStrengthBar strength={passwordStrength} />
+
       <SelectField
         icon={Icons.role}
         label="Rol :"
@@ -376,12 +559,10 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, loading: authLoading } = useAuth();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) navigate('/');
   }, [isAuthenticated, navigate]);
 
-  // Don't flash the login form while auth state is loading from localStorage
   if (authLoading) return null;
 
   const changePage = (next) => {
@@ -409,14 +590,6 @@ export default function AuthPage() {
 
   const handleRegister = async (form) => {
     setError('');
-    if (!form.nombre || !form.apellido || !form.email || !form.password) {
-      setError('Por favor completa todos los campos obligatorios.');
-      return;
-    }
-    if (form.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
-      return;
-    }
     setLoading(true);
     try {
       const res = await registerUser({
@@ -484,7 +657,6 @@ export default function AuthPage() {
                 ))}
               </svg>
             </div>
-            {/* Puzzle decoration for register */}
             {page === 'register' && (
               <div className="absolute -top-10 right-0">
                 <svg width="50" height="50" viewBox="0 0 50 50">

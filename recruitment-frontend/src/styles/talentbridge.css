@@ -1020,12 +1020,27 @@ em { font-style: italic; color: var(--clr-accent); }
 .form-input.error,
 .form-textarea.error { border-color: #C0392B; }
 
+.form-input.success,
+.form-textarea.success { border-color: #22c55e; }
+
 .form-textarea { resize: vertical; min-height: 100px; }
 
 .form-error {
   font-size: 0.78rem;
   color: #C0392B;
   min-height: 16px;
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: #6b7280;
+  min-height: 16px;
+  display: block;
+  margin-top: 2px;
+}
+
+.form-hint--suggestion {
+  color: #3B5FE8;
 }
 
 .form-actions { margin-top: 8px; }
