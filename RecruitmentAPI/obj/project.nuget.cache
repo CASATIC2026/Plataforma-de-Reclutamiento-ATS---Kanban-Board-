@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "SExTagPPEQQ=",
+  "dgSpecHash": "92P11ygwvIs=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Grupo B\\Documents\\BM\\PRUEBAS\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
+  "projectFilePath": "C:\\Users\\Grupo B\\Documents\\BM\\GITHUB DEPLOYMENT\\Plataforma-de-Reclutamiento-ATS---Kanban-Board-\\RecruitmentAPI\\RecruitmentAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Grupo B\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Grupo B\\.nuget\\packages\\bouncycastle.cryptography\\2.5.0\\bouncycastle.cryptography.2.5.0.nupkg.sha512",
