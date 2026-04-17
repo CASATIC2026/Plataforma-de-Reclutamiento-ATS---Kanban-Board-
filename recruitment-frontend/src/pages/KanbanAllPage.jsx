@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getVacantes } from '../api/vacantesApi';
-import { updateEstado } from '../api/postulacionesApi';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import RechazadosTray from '../components/kanban/RechazadosTray';
 import CommandBar from '../components/kanban/CommandBar';
+import { useRechazadosRestore } from '../hooks/useRechazadosRestore';
+import Breadcrumb from '../components/common/Breadcrumb';
 
 const STAGE_LABELS = ['Nuevo', 'Entrevista', 'Prueba Técnica', 'Oferta'];
 const STAGE_COLORS = ['#0d9488', '#CD7B4F', '#131931', '#319E85'];
@@ -84,19 +85,7 @@ export default function KanbanAllPage() {
     [filters.sort]
   );
 
-  // Handle restore rejected candidate
-  const handleRestore = useCallback(
-    async (postulacionId) => {
-      try {
-        await updateEstado(postulacionId, 0); // Move to Nuevo
-        // Refresh rechazados list
-        setRechazados((prev) => prev.filter((r) => r.id !== postulacionId));
-      } catch (err) {
-        console.error('Error restoring candidate:', err);
-      }
-    },
-    []
-  );
+  const { handleRestore } = useRechazadosRestore(setRechazados);
 
   // Compute stage counts from visible cards
   const stageCounts = useMemo(
@@ -115,11 +104,12 @@ export default function KanbanAllPage() {
       <div className="max-w-[1600px] mx-auto px-6 py-10">
         {/* Header */}
         <div className="mb-10">
-          <nav className="flex items-center gap-2 text-[#464555] text-xs mb-4">
-            <span>Administración</span>
-            <span>›</span>
-            <span className="text-[#3525cd] font-medium">Pipeline de Candidatos</span>
-          </nav>
+          <Breadcrumb
+            items={[
+              { label: 'Administración' },
+              { label: 'Pipeline de Candidatos' },
+            ]}
+          />
           <h1 className="text-4xl md:text-4xl font-extrabold text-[#131b2e] tracking-tight mb-3">
             Pipeline de Candidatos
           </h1>

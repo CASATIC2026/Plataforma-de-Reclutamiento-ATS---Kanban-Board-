@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useOutletContext, useLocation } from 'react-router-dom';
 import { getVacantes } from '../api/vacantesApi';
 import { mapVacante } from '../utils/vacanteHelpers';
+import { ITEMS_PER_PAGE as PAGE_SIZES } from '../constants';
 import JobDetailModal from '../components/vacantes/JobDetailModal';
 import ApplyModal from '../components/postulaciones/ApplyModal';
+import Pagination from '../components/common/Pagination';
 
 const POLL_INTERVAL = 30000;
 
@@ -34,7 +36,8 @@ const SALVADORAN_DEPARTMENTS = [
   'Ahuachapán',
 ];
 
-function JobCardNew({ job, hovered, setHovered, onClick }) {
+function JobCardNew({ job, onClick }) {
+  const [hovered, setHovered] = useState(false);
   return (
     <div
       className="job-card"
@@ -226,11 +229,8 @@ export default function NewLandingPage() {
   const [applyJob, setApplyJob] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Local hover state for cards
-  const [hoveredCard, setHoveredCard] = useState(null);
-
   // Pagination settings
-  const ITEMS_PER_PAGE = 6;
+  const ITEMS_PER_PAGE = PAGE_SIZES.LANDING;
 
   const loadData = useCallback(async () => {
     try {
@@ -259,13 +259,20 @@ export default function NewLandingPage() {
 
   // Handle hash navigation to search bar
   useEffect(() => {
-    if (location.hash === '#search-bar' && searchInputRef.current) {
-      setTimeout(() => {
-        searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        searchInputRef.current?.focus();
-      }, 100);
-    }
+    if (location.hash !== '#search-bar' || !searchInputRef.current) return;
+    const timer = setTimeout(() => {
+      searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      searchInputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
   }, [location.hash]);
+
+  // Auto-dismiss success banner after 5s
+  useEffect(() => {
+    if (!successMsg) return;
+    const timer = setTimeout(() => setSuccessMsg(''), 5000);
+    return () => clearTimeout(timer);
+  }, [successMsg]);
 
   // Apply all active filters
   const filteredJobs = useMemo(() => {
@@ -288,9 +295,14 @@ export default function NewLandingPage() {
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
-  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIdx = startIdx + ITEMS_PER_PAGE;
-  const paginatedJobs = filteredJobs.slice(startIdx, endIdx);
+  const paginatedJobs = useMemo(
+    () =>
+      filteredJobs.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      ),
+    [filteredJobs, currentPage, ITEMS_PER_PAGE]
+  );
 
   // Reset to page 1 when filter changes
   useEffect(() => {
@@ -305,7 +317,6 @@ export default function NewLandingPage() {
   const handleSuccess = () => {
     setApplyJob(null);
     setSuccessMsg('¡Tu postulación fue enviada con éxito!');
-    setTimeout(() => setSuccessMsg(''), 5000);
   };
 
   const activeJobsCount = jobs.length;
@@ -681,106 +692,18 @@ export default function NewLandingPage() {
             >
               {paginatedJobs.map((job, i) => (
                 <div key={job.id} style={{ animation: `fadeUp 0.5s ${i * 0.07}s ease both` }}>
-                  <JobCardNew
-                    job={job}
-                    hovered={hoveredCard === job.id}
-                    setHovered={(val) => setHoveredCard(val ? job.id : null)}
-                    onClick={() => setSelectedJob(job)}
-                  />
+                  <JobCardNew job={job} onClick={() => setSelectedJob(job)} />
                 </div>
               ))}
             </div>
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div
-                className="pagination-controls"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '12px',
-                  marginTop: '48px',
-                }}
-              >
-                {/* Previous Button */}
-                <button
-                  className="nav-button"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  style={{
-                    background: currentPage === 1 ? '#555' : '#CD7B4F',
-                    border: 'none',
-                    color: '#fff',
-                    padding: '8px 16px',
-                    borderRadius: '6px',
-                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                    fontWeight: 600,
-                    transition: 'background 0.2s',
-                    opacity: currentPage === 1 ? 0.6 : 1,
-                  }}
-                  onMouseEnter={(e) => currentPage !== 1 && (e.target.style.background = '#b5673d')}
-                  onMouseLeave={(e) => currentPage !== 1 && (e.target.style.background = '#CD7B4F')}
-                >
-                  ← Anterior
-                </button>
-
-                {/* Page Numbers */}
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      className="page-button"
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      style={{
-                        background: currentPage === page ? '#CD7B4F' : 'transparent',
-                        border: currentPage === page ? 'none' : '1px solid #666',
-                        borderRadius: '6px',
-                        width: '32px',
-                        height: '32px',
-                        color: '#fff',
-                        fontFamily: "'Maven Pro', sans-serif",
-                        fontWeight: 700,
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseEnter={(e) =>
-                        currentPage !== page &&
-                        (e.target.style.background = 'rgba(205,123,79,0.2)')
-                      }
-                      onMouseLeave={(e) =>
-                        currentPage !== page && (e.target.style.background = 'transparent')
-                      }
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Next Button */}
-                <button
-                  className="nav-button"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  style={{
-                    background: currentPage === totalPages ? '#555' : '#CD7B4F',
-                    border: 'none',
-                    color: '#fff',
-                    padding: '8px 16px',
-                    borderRadius: '6px',
-                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                    fontWeight: 600,
-                    transition: 'background 0.2s',
-                    opacity: currentPage === totalPages ? 0.6 : 1,
-                  }}
-                  onMouseEnter={(e) => currentPage !== totalPages && (e.target.style.background = '#b5673d')}
-                  onMouseLeave={(e) => currentPage !== totalPages && (e.target.style.background = '#CD7B4F')}
-                >
-                  Siguiente →
-                </button>
-              </div>
-            )}
+            <Pagination
+              variant="landing"
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
 
             {/* Info text */}
             <p

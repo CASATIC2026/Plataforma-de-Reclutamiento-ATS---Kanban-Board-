@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getVacantes, createVacante, deleteVacante, updateVacante } from '../api/vacantesApi';
 import { useAuth } from '../context/AuthContext';
+import { CONTRACT_TYPES, ITEMS_PER_PAGE } from '../constants';
+import { formatSalaryRange, formatId } from '../utils/vacanteHelpers';
+import Breadcrumb from '../components/common/Breadcrumb';
+import Pagination from '../components/common/Pagination';
 
 export default function AdminVacantesPage() {
   const navigate = useNavigate();
@@ -11,7 +15,7 @@ export default function AdminVacantesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const itemsPerPage = ITEMS_PER_PAGE.ADMIN;
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -27,7 +31,7 @@ export default function AdminVacantesPage() {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchVacantes = async () => {
+  const fetchVacantes = useCallback(async () => {
     try {
       const response = await getVacantes();
       setVacantes(response.data);
@@ -36,11 +40,11 @@ export default function AdminVacantesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchVacantes();
-  }, []);
+  }, [fetchVacantes]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -143,23 +147,26 @@ export default function AdminVacantesPage() {
   };
 
   // Filter vacantes by search query
-  const filteredVacantes = vacantes.filter((v) => {
+  const filteredVacantes = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
-    if (!query) return true;
-    return (
+    if (!query) return vacantes;
+    return vacantes.filter((v) => (
       v.titulo.toLowerCase().includes(query) ||
       v.descripcion.toLowerCase().includes(query) ||
       v.ubicacion.toLowerCase().includes(query) ||
       v.tipoContrato.toLowerCase().includes(query) ||
       (v.requisitos && v.requisitos.some((r) => r.toLowerCase().includes(query)))
-    );
-  });
+    ));
+  }, [vacantes, searchQuery]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredVacantes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedVacantes = filteredVacantes.slice(startIndex, endIndex);
+  const paginatedVacantes = useMemo(
+    () => filteredVacantes.slice(startIndex, endIndex),
+    [filteredVacantes, startIndex, endIndex]
+  );
 
   // Reset to page 1 when search changes
   const handleSearch = (value) => {
@@ -167,22 +174,19 @@ export default function AdminVacantesPage() {
     setCurrentPage(1);
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-      window.scrollTo(0, 0);
-    }
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  const activeCount = vacantes.filter((v) => v.estaActiva).length;
-  const totalApplicants = vacantes.reduce((sum, v) => sum + (v.postulacionesCount || 0), 0);
+  const activeCount = useMemo(
+    () => vacantes.filter((v) => v.estaActiva).length,
+    [vacantes]
+  );
+  const totalApplicants = useMemo(
+    () => vacantes.reduce((sum, v) => sum + (v.postulacionesCount || 0), 0),
+    [vacantes]
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#faf8ff] to-[#eaedff]">
@@ -190,11 +194,12 @@ export default function AdminVacantesPage() {
       <div className="max-w-[1200px] mx-auto px-6 py-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <nav className="flex items-center gap-2 text-[#464555] text-xs mb-2">
-              <span>Administración</span>
-              <span>›</span>
-              <span className="text-[#3525cd] font-medium">Vacantes</span>
-            </nav>
+            <Breadcrumb
+              items={[
+                { label: 'Administración' },
+                { label: 'Vacantes' },
+              ]}
+            />
             <h1 className="text-4xl md:text-4xl font-extrabold text-[#131b2e] tracking-tight mb-2">
               Vacantes
             </h1>
@@ -357,13 +362,9 @@ export default function AdminVacantesPage() {
                       onChange={handleFormChange}
                       className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all appearance-none"
                     >
-                      <option>Tiempo completo</option>
-                      <option>Medio tiempo</option>
-                      <option>Freelance</option>
-                      <option>Remoto</option>
-                      <option>Temporal</option>
-                      <option>Prácticas</option>
-                      <option>Por proyecto</option>
+                      {CONTRACT_TYPES.map((type) => (
+                        <option key={type}>{type}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -608,7 +609,7 @@ export default function AdminVacantesPage() {
                           <span className="font-semibold text-[#131b2e]">
                             {vacante.titulo}
                           </span>
-                          <span className="text-xs text-[#464555]">ID: #{vacante.id.slice(0, 8).toUpperCase()}</span>
+                          <span className="text-xs text-[#464555]">ID: #{formatId(vacante.id)}</span>
                         </div>
                       </td>
                       <td className="px-6 py-5 text-sm text-[#464555]">
@@ -620,9 +621,7 @@ export default function AdminVacantesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-5 text-sm font-medium text-[#131b2e]">
-                        {vacante.salarioMin && vacante.salarioMax
-                          ? `$${vacante.salarioMin.toLocaleString()} - $${vacante.salarioMax.toLocaleString()}`
-                          : '-'}
+                        {formatSalaryRange(vacante.salarioMin, vacante.salarioMax)}
                       </td>
                       <td className="px-6 py-5 text-sm font-medium text-[#131b2e]">
                         {vacante.postulacionesCount || 0}
@@ -668,55 +667,11 @@ export default function AdminVacantesPage() {
                 <span className="font-bold text-[#131b2e]">{filteredVacantes.length}</span>
                 {searchQuery && ` (${vacantes.length} total)`}
               </span>
-              <div className="flex items-center gap-2">
-                {/* Previous Button */}
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
-                  className={`p-2 rounded-lg transition-colors ${
-                    currentPage === 1
-                      ? 'bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed'
-                      : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff] cursor-pointer'
-                  }`}
-                  title="Página anterior"
-                >
-                  ‹
-                </button>
-
-                {/* Page Numbers */}
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => {
-                        setCurrentPage(page);
-                        window.scrollTo(0, 0);
-                      }}
-                      className={`w-10 h-10 rounded-lg font-bold text-sm transition-colors ${
-                        page === currentPage
-                          ? 'bg-[#3525cd] text-white'
-                          : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff]'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Next Button */}
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className={`p-2 rounded-lg transition-colors ${
-                    currentPage === totalPages
-                      ? 'bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed'
-                      : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff] cursor-pointer'
-                  }`}
-                  title="Página siguiente"
-                >
-                  ›
-                </button>
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </div>
           )}
         </div>

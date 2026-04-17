@@ -1,3 +1,5 @@
+import { SCORE_THRESHOLDS } from '../constants';
+
 const LOGO_COLORS = [
   { bg: '#1C3A5A', text: '#7EB8E8' },
   { bg: '#2E3A5A', text: '#9BB5E0' },
@@ -12,6 +14,7 @@ const LOGO_COLORS = [
 ];
 
 export function getColorForId(id) {
+  if (!id || typeof id !== 'string') return LOGO_COLORS[0];
   const hash = id.replace(/-/g, '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   return LOGO_COLORS[hash % LOGO_COLORS.length];
 }
@@ -23,14 +26,17 @@ export function getLogoLetters(titulo) {
 }
 
 export function formatSalary(min, max) {
-  if (min && max) return `$${Number(min).toLocaleString('USD')} – $${Number(max).toLocaleString('USD')} USD`;
-  if (min) return `Desde $${Number(min).toLocaleString('USD')} USD`;
-  if (max) return `Hasta $${Number(max).toLocaleString('USD')} USD`;
+  if (min && max) return `$${Number(min).toLocaleString('en-US')} – $${Number(max).toLocaleString('en-US')} USD`;
+  if (min) return `Desde $${Number(min).toLocaleString('en-US')} USD`;
+  if (max) return `Hasta $${Number(max).toLocaleString('en-US')} USD`;
   return 'Salario a convenir';
 }
 
 export function formatRelativeDate(isoString) {
-  const diffDays = Math.floor((new Date() - new Date(isoString)) / (1000 * 60 * 60 * 24));
+  if (!isoString) return '—';
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return '—';
+  const diffDays = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
   if (diffDays === 0) return 'Hoy';
   if (diffDays === 1) return 'Hace 1 día';
   if (diffDays < 7) return `Hace ${diffDays} días`;
@@ -40,6 +46,27 @@ export function formatRelativeDate(isoString) {
 
 export function isRecent(isoString) {
   return (new Date() - new Date(isoString)) < 2 * 24 * 60 * 60 * 1000;
+}
+
+export function getPuntajeStyle(score) {
+  if (score == null) return {};
+  if (score >= SCORE_THRESHOLDS.HIGH) {
+    return { backgroundColor: '#d1fae5', color: '#065f46' };
+  }
+  if (score >= SCORE_THRESHOLDS.MEDIUM) {
+    return { backgroundColor: '#fef3c7', color: '#92400e' };
+  }
+  return { backgroundColor: '#fee2e2', color: '#991b1b' };
+}
+
+export function formatSalaryRange(min, max) {
+  if (!min || !max) return '—';
+  return `$${Number(min).toLocaleString('en-US')} - $${Number(max).toLocaleString('en-US')}`;
+}
+
+export function formatId(id, length = 8) {
+  if (!id) return '—';
+  return String(id).slice(0, length).toUpperCase();
 }
 
 export function mapVacante(v) {

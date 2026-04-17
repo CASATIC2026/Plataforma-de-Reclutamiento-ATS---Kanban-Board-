@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { formatRelativeDate, getColorForId } from '../../utils/vacanteHelpers';
+import { formatRelativeDate, getPuntajeStyle } from '../../utils/vacanteHelpers';
+import CandidateSummary from './CandidateSummary';
 
 export default function RechazadosTray({ rechazados, onRestore }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -32,42 +33,12 @@ export default function RechazadosTray({ rechazados, onRestore }) {
           <div className="overflow-x-auto">
             <div className="flex gap-3 pb-2">
               {rechazados.map((postulacion) => {
-                const vacancyColor = postulacion.vacanteId ? getColorForId(postulacion.vacanteId) : null;
                 return (
                   <div
                     key={postulacion.id}
                     className="flex-shrink-0 w-80 bg-white rounded-lg border border-red-200 p-3 shadow-sm"
                   >
-                    {/* Candidate name */}
-                    <p className="font-semibold text-gray-900 text-sm truncate">
-                      {postulacion.nombreCandidato}
-                    </p>
-
-                    {/* Vacancy pill */}
-                    {vacancyColor ? (
-                      <div
-                        className="text-xs font-medium px-2.5 py-1 rounded-full mt-2 inline-block truncate max-w-full"
-                        style={{
-                          backgroundColor: vacancyColor.bg,
-                          color: vacancyColor.text,
-                        }}
-                        title={postulacion.vacanteTitulo}
-                      >
-                        {postulacion.vacanteTitulo}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-navy font-medium truncate mt-0.5">
-                        {postulacion.vacanteTitulo}
-                      </p>
-                    )}
-
-                    {/* Contact info */}
-                    <div className="mt-2 space-y-0.5">
-                      <p className="text-xs text-gray-500 truncate">{postulacion.email}</p>
-                      {postulacion.telefono && (
-                        <p className="text-xs text-gray-500">{postulacion.telefono}</p>
-                      )}
-                    </div>
+                    <CandidateSummary postulacion={postulacion} />
 
                     {/* Footer: date + score + restore button */}
                     <div className="mt-3 flex items-center justify-between">
@@ -78,10 +49,7 @@ export default function RechazadosTray({ rechazados, onRestore }) {
                         {postulacion.puntaje != null && (
                           <span
                             className="text-xs px-2 py-0.5 rounded-full font-bold"
-                            style={{
-                              backgroundColor: postulacion.puntaje >= 75 ? '#d1fae5' : postulacion.puntaje >= 60 ? '#fef3c7' : '#fee2e2',
-                              color: postulacion.puntaje >= 75 ? '#065f46' : postulacion.puntaje >= 60 ? '#92400e' : '#991b1b',
-                            }}
+                            style={getPuntajeStyle(postulacion.puntaje)}
                           >
                             {Math.round(postulacion.puntaje)}
                           </span>

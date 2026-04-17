@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getVacanteById } from '../api/vacantesApi';
-import { updateEstado } from '../api/postulacionesApi';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import RechazadosTray from '../components/kanban/RechazadosTray';
+import { useRechazadosRestore } from '../hooks/useRechazadosRestore';
+import { formatSalaryRange, formatId } from '../utils/vacanteHelpers';
+import Breadcrumb from '../components/common/Breadcrumb';
 
 export default function VacanteAplicantesPage() {
   const { id } = useParams();
@@ -27,18 +29,7 @@ export default function VacanteAplicantesPage() {
     fetchVacante();
   }, [id]);
 
-  const handleRestore = useCallback(
-    async (postulacionId) => {
-      try {
-        await updateEstado(postulacionId, 0); // Move to Nuevo
-        // Refresh rechazados list
-        setRechazados((prev) => prev.filter((r) => r.id !== postulacionId));
-      } catch (err) {
-        console.error('Error restoring candidate:', err);
-      }
-    },
-    []
-  );
+  const { handleRestore } = useRechazadosRestore(setRechazados);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#faf8ff] to-[#eaedff]">
@@ -56,18 +47,13 @@ export default function VacanteAplicantesPage() {
             <div className="text-[#464555]">Cargando vacante...</div>
           ) : vacante ? (
             <>
-              <nav className="flex items-center gap-2 text-[#464555] text-xs mb-4">
-                <span>Administración</span>
-                <span>›</span>
-                <span
-                  onClick={() => navigate('/admin/vacantes')}
-                  className="cursor-pointer hover:text-[#3525cd]"
-                >
-                  Vacantes
-                </span>
-                <span>›</span>
-                <span className="text-[#3525cd] font-medium">{vacante.titulo}</span>
-              </nav>
+              <Breadcrumb
+                items={[
+                  { label: 'Administración' },
+                  { label: 'Vacantes', onClick: () => navigate('/admin/vacantes') },
+                  { label: vacante.titulo },
+                ]}
+              />
 
               {/* Vacancy Header Card */}
               <div className="bg-white rounded-2xl shadow-sm p-8 mb-10">
@@ -83,7 +69,7 @@ export default function VacanteAplicantesPage() {
                   <div className="text-right">
                     <div className="text-sm text-[#464555] mb-2">ID</div>
                     <div className="font-mono text-[#3525cd] font-semibold">
-                      {vacante.id.slice(0, 8).toUpperCase()}
+                      {formatId(vacante.id)}
                     </div>
                   </div>
                 </div>
@@ -107,9 +93,7 @@ export default function VacanteAplicantesPage() {
                       Rango Salarial
                     </span>
                     <p className="text-[#131b2e] font-semibold mt-2">
-                      {vacante.salarioMin && vacante.salarioMax
-                        ? `$${vacante.salarioMin.toLocaleString()} - $${vacante.salarioMax.toLocaleString()}`
-                        : '-'}
+                      {formatSalaryRange(vacante.salarioMin, vacante.salarioMax)}
                     </p>
                   </div>
                   <div>

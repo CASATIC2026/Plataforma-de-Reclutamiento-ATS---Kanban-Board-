@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { STORAGE_KEYS } from '../constants';
 
 const AuthContext = createContext(null);
 
@@ -9,11 +10,18 @@ export function AuthProvider({ children }) {
 
   // Restore session from localStorage on mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('tb_token');
-    const savedUser = localStorage.getItem('tb_user');
+    const savedToken = localStorage.getItem(STORAGE_KEYS.token);
+    const savedUser = localStorage.getItem(STORAGE_KEYS.user);
     if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setToken(savedToken);
+        setUser(parsedUser);
+      } catch (err) {
+        console.error('Failed to restore user from storage:', err);
+        localStorage.removeItem(STORAGE_KEYS.token);
+        localStorage.removeItem(STORAGE_KEYS.user);
+      }
     }
     setLoading(false);
   }, []);
@@ -22,15 +30,15 @@ export function AuthProvider({ children }) {
     const { token: jwt, ...userData } = authResponse;
     setToken(jwt);
     setUser(userData);
-    localStorage.setItem('tb_token', jwt);
-    localStorage.setItem('tb_user', JSON.stringify(userData));
+    localStorage.setItem(STORAGE_KEYS.token, jwt);
+    localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(userData));
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('tb_token');
-    localStorage.removeItem('tb_user');
+    localStorage.removeItem(STORAGE_KEYS.token);
+    localStorage.removeItem(STORAGE_KEYS.user);
   };
 
   const isAuthenticated = !!token;

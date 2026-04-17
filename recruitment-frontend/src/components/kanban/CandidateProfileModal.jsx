@@ -24,6 +24,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
   const [saveStatus, setSaveStatus] = useState('idle');
   const isFirstRender = useRef(true);
   const saveTimer = useRef(null);
+  const idleTimer = useRef(null);
 
   const ext = postulacion.cvFileName?.split('.').pop()?.toLowerCase();
   const hasCv = Boolean(postulacion.cvFileName);
@@ -86,14 +87,18 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
         const res = await updateNotas(postulacion.id, notas || null);
         onNotasUpdated(res.data);
         setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 2000);
+        clearTimeout(idleTimer.current);
+        idleTimer.current = setTimeout(() => setSaveStatus('idle'), 2000);
       } catch {
         setSaveStatus('error');
       }
     }, 1500);
 
-    return () => clearTimeout(saveTimer.current);
-  }, [notas]); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => {
+      clearTimeout(saveTimer.current);
+      clearTimeout(idleTimer.current);
+    };
+  }, [notas, postulacion.id, onNotasUpdated]);
 
   const handleDownload = () => {
     if (!cvBlobUrl) return;
