@@ -2,10 +2,9 @@ namespace RecruitmentAPI.Models;
 
 public enum RolUsuario
 {
-    Estudiante = 0,
-    Profesor = 1,
-    Administrador = 2,
-    Invitado = 3
+    General = 0,
+    Manager = 1,
+    Administrador = 2
 }
 
 public class Usuario
@@ -16,6 +15,6 @@ public class Usuario
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public string? Carrera { get; set; }
-    public RolUsuario Rol { get; set; } = RolUsuario.Invitado;
+    public RolUsuario Rol { get; set; } = RolUsuario.General;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

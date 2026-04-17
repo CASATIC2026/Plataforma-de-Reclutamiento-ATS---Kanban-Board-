@@ -17,6 +17,7 @@ public class PostulacionesController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "Administrador,Manager")]
     [HttpGet]
     public async Task<ActionResult<List<PostulacionResponseDTO>>> GetAll()
     {
@@ -24,6 +25,7 @@ public class PostulacionesController : ControllerBase
         return Ok(postulaciones);
     }
 
+    [Authorize(Roles = "Administrador,Manager")]
     [HttpGet("{id}")]
     public async Task<ActionResult<PostulacionResponseDTO>> GetById(Guid id)
     {
@@ -32,6 +34,7 @@ public class PostulacionesController : ControllerBase
         return Ok(postulacion);
     }
 
+    [Authorize(Roles = "Administrador,Manager")]
     [HttpGet("vacante/{vacanteId}")]
     public async Task<ActionResult<List<PostulacionResponseDTO>>> GetByVacante(Guid vacanteId)
     {
@@ -47,7 +50,7 @@ public class PostulacionesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador,Manager")]
     [HttpGet("{id}/cv")]
     public async Task<IActionResult> GetCv(Guid id)
     {
@@ -73,7 +76,7 @@ public class PostulacionesController : ControllerBase
         return PhysicalFile(filePath, contentType);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador,Manager")]
     [HttpPatch("{id}/notas")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateNotas(Guid id, [FromBody] UpdateNotasDTO dto)
     {
@@ -82,7 +85,7 @@ public class PostulacionesController : ControllerBase
         return Ok(updated);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador,Manager")]
     [HttpPatch("{id}/estado")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateEstado(Guid id, [FromBody] UpdateEstadoDTO dto)
     {
@@ -95,7 +98,7 @@ public class PostulacionesController : ControllerBase
         return Ok(updated);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {

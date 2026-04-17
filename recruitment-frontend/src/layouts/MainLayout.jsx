@@ -8,7 +8,7 @@ fontLink.rel = 'stylesheet';
 document.head.appendChild(fontLink);
 
 export default function MainLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -97,8 +97,32 @@ export default function MainLayout() {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(19,25,49,0.2)';
               }}
             >
-              📊 Kanban
+              Kanban
             </Link>
+
+            {isAdmin && (
+              <Link
+                to="/admin/usuarios"
+                style={{
+                  color: '#131931',
+                  fontSize: '0.95rem',
+                  fontWeight: '600',
+                  transition: 'all 0.3s',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#CD7B4F';
+                  e.currentTarget.style.background = 'rgba(205,123,79,0.08)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#131931';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Usuarios
+              </Link>
+            )}
 
             <div style={{
               borderLeft: '1.5px solid rgba(205,123,79,0.2)',

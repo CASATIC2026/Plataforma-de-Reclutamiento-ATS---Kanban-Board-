@@ -16,4 +16,7 @@ export const updateNotas = (id, notas) =>
 
 export const getCvUrl = (id) => `/api/postulaciones/${id}/cv`;
 
+export const fetchCvBlob = (id) =>
+  API.get(`/postulaciones/${id}/cv`, { responseType: 'blob' });
+
 export const deletePostulacion = (id) => API.delete(`/postulaciones/${id}`);

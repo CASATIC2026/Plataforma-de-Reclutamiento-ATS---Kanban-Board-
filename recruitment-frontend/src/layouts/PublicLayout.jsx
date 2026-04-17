@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 export default function PublicLayout() {
   const [scrolled, setScrolled] = useState(false);
   const [live, setLive] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isAdminOrManager } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,7 +45,9 @@ export default function PublicLayout() {
               <span className="navbar__user-name">
                 {user?.nombre} {user?.apellido}
               </span>
-              <Link to="/admin/vacantes" className="admin-link">⚙ Panel Admin</Link>
+              {isAdminOrManager && (
+                <Link to="/admin/vacantes" className="admin-link">Panel Admin</Link>
+              )}
               <button className="navbar__logout-btn" onClick={handleLogout}>Cerrar Sesión</button>
             </>
           ) : (
@@ -87,16 +89,22 @@ export default function PublicLayout() {
             </div>
             <div className="footer__col">
               <h4>Empresas</h4>
-              <Link to="/admin/vacantes">Publicar vacante</Link>
+              {isAdminOrManager ? (
+                <Link to="/admin/vacantes">Publicar vacante</Link>
+              ) : (
+                <Link to="/login">Publicar vacante</Link>
+              )}
               <a href="#">Planes</a>
               <a href="#">Contacto</a>
             </div>
-            <div className="footer__col">
-              <h4>Administración</h4>
-              <Link to="/admin/vacantes">Panel Admin</Link>
-              <a href="#">Privacidad</a>
-              <a href="#">Términos</a>
-            </div>
+            {isAdminOrManager && (
+              <div className="footer__col">
+                <h4>Administración</h4>
+                <Link to="/admin/vacantes">Panel Admin</Link>
+                <a href="#">Privacidad</a>
+                <a href="#">Términos</a>
+              </div>
+            )}
           </div>
         </div>
 

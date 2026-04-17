@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { updateNotas, getCvUrl } from '../../api/postulacionesApi';
+import { updateNotas, fetchCvBlob } from '../../api/postulacionesApi';
 import { formatRelativeDate } from '../../utils/vacanteHelpers';
 
 const ESTADO_LABELS = {
@@ -21,16 +21,49 @@ function InfoRow({ label, value }) {
 
 export default function CandidateProfileModal({ postulacion, onClose, onNotasUpdated }) {
   const [notas, setNotas] = useState(postulacion.notasInternas ?? '');
-  const [saveStatus, setSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
+  const [saveStatus, setSaveStatus] = useState('idle');
   const isFirstRender = useRef(true);
   const saveTimer = useRef(null);
 
   const ext = postulacion.cvFileName?.split('.').pop()?.toLowerCase();
   const hasCv = Boolean(postulacion.cvFileName);
   const isPdf = ext === 'pdf';
-  const cvUrl = hasCv ? getCvUrl(postulacion.id) : null;
-
   const estado = ESTADO_LABELS[postulacion.estado] ?? ESTADO_LABELS[0];
+
+  // ─── Fetch CV blob through Axios (includes JWT) ───
+  const [cvBlobUrl, setCvBlobUrl] = useState(null);
+  const [cvLoading, setCvLoading] = useState(false);
+  const [cvError, setCvError] = useState('');
+
+  useEffect(() => {
+    if (!hasCv) return;
+
+    let revoked = false;
+    setCvLoading(true);
+    setCvError('');
+
+    fetchCvBlob(postulacion.id)
+      .then((res) => {
+        if (revoked) return;
+        const url = URL.createObjectURL(res.data);
+        setCvBlobUrl(url);
+      })
+      .catch(() => {
+        if (revoked) return;
+        setCvError('No se pudo cargar el CV.');
+      })
+      .finally(() => {
+        if (!revoked) setCvLoading(false);
+      });
+
+    return () => {
+      revoked = true;
+      setCvBlobUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+    };
+  }, [hasCv, postulacion.id]);
 
   // Close on Escape
   useEffect(() => {
@@ -61,6 +94,16 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
 
     return () => clearTimeout(saveTimer.current);
   }, [notas]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDownload = () => {
+    if (!cvBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = cvBlobUrl;
+    a.download = postulacion.cvFileName || `cv.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -110,16 +153,33 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                 </div>
               )}
 
-              {hasCv && isPdf && (
+              {hasCv && cvLoading && (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                  <div className="w-8 h-8 border-2 border-gray-300 border-t-accent rounded-full animate-spin" />
+                  <p className="text-sm">Cargando CV...</p>
+                </div>
+              )}
+
+              {hasCv && cvError && (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                  <svg className="w-12 h-12 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                      d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm text-red-500">{cvError}</p>
+                </div>
+              )}
+
+              {hasCv && !cvLoading && !cvError && cvBlobUrl && isPdf && (
                 <iframe
-                  src={cvUrl}
+                  src={cvBlobUrl}
                   title="CV del candidato"
                   className="w-full h-full border-0"
                   style={{ minHeight: '400px' }}
                 />
               )}
 
-              {hasCv && !isPdf && (
+              {hasCv && !cvLoading && !cvError && cvBlobUrl && !isPdf && (
                 <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500">
                   <svg className="w-14 h-14 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -131,9 +191,8 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                     </p>
                     <p className="text-xs text-gray-400 mt-1">La previsualización no está disponible para este formato</p>
                   </div>
-                  <a
-                    href={cvUrl}
-                    download
+                  <button
+                    onClick={handleDownload}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy-light transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,17 +200,16 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                     Descargar CV
-                  </a>
+                  </button>
                 </div>
               )}
             </div>
 
             {/* Download link when PDF */}
-            {hasCv && isPdf && (
+            {hasCv && isPdf && cvBlobUrl && (
               <div className="px-5 py-2 border-t border-gray-100 bg-gray-50 flex justify-end">
-                <a
-                  href={cvUrl}
-                  download
+                <button
+                  onClick={handleDownload}
                   className="text-xs text-navy hover:text-navy-light font-medium flex items-center gap-1 transition-colors"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -159,7 +217,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   Descargar
-                </a>
+                </button>
               </div>
             )}
           </div>

@@ -31,7 +31,7 @@ public class VacantesController : ControllerBase
         return Ok(vacante);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     [HttpPost]
     public async Task<ActionResult<VacanteResponseDTO>> Create([FromBody] CreateVacanteDTO dto)
     {
@@ -39,7 +39,7 @@ public class VacantesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     [HttpPut("{id}")]
     public async Task<ActionResult<VacanteResponseDTO>> Update(Guid id, [FromBody] UpdateVacanteDTO dto)
     {
@@ -48,7 +48,7 @@ public class VacantesController : ControllerBase
         return Ok(updated);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {

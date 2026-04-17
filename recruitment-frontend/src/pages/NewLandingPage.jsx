@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useOutletContext, useLocation } from 'react-router-dom';
 import { getVacantes } from '../api/vacantesApi';
-import { getPostulaciones } from '../api/postulacionesApi';
 import { mapVacante } from '../utils/vacanteHelpers';
 import JobDetailModal from '../components/vacantes/JobDetailModal';
 import ApplyModal from '../components/postulaciones/ApplyModal';
@@ -213,7 +212,6 @@ export default function NewLandingPage() {
   const searchInputRef = useRef(null);
 
   const [jobs, setJobs] = useState([]);
-  const [candidatosCount, setCandidatosCount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -236,15 +234,11 @@ export default function NewLandingPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [vacantesRes, postulacionesRes] = await Promise.all([
-        getVacantes(),
-        getPostulaciones(),
-      ]);
+      const vacantesRes = await getVacantes();
       const activeJobs = vacantesRes.data
         .filter((v) => v.estaActiva)
         .map(mapVacante);
       setJobs(activeJobs);
-      setCandidatosCount(postulacionesRes.data.length);
       setLive(true);
       setError('');
     } catch {
@@ -311,7 +305,6 @@ export default function NewLandingPage() {
   const handleSuccess = () => {
     setApplyJob(null);
     setSuccessMsg('¡Tu postulación fue enviada con éxito!');
-    setCandidatosCount((c) => (c !== null ? c + 1 : 1));
     setTimeout(() => setSuccessMsg(''), 5000);
   };
 

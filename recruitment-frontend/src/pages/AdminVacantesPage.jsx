@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getVacantes, createVacante, deleteVacante, updateVacante } from '../api/vacantesApi';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminVacantesPage() {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [vacantes, setVacantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -200,16 +202,18 @@ export default function AdminVacantesPage() {
               Gestiona y supervisa {activeCount} posiciones activas en tu organización.
             </p>
           </div>
-          <button
-            onClick={() => {
-              resetForm();
-              setShowForm(true);
-            }}
-            className="bg-gradient-to-br from-[#3525cd] to-[#4f46e5] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
-          >
-            <span>+</span>
-            Nueva Vacante
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+              }}
+              className="bg-gradient-to-br from-[#3525cd] to-[#4f46e5] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              <span>+</span>
+              Nueva Vacante
+            </button>
+          )}
         </div>
 
         {/* Stats Grid */}
@@ -585,9 +589,11 @@ export default function AdminVacantesPage() {
                     <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555]">
                       Postulaciones
                     </th>
-                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-right">
-                      Acciones
-                    </th>
+                    {isAdmin && (
+                      <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-right">
+                        Acciones
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#c7c4d8]/5">
@@ -621,30 +627,32 @@ export default function AdminVacantesPage() {
                       <td className="px-6 py-5 text-sm font-medium text-[#131b2e]">
                         {vacante.postulacionesCount || 0}
                       </td>
-                      <td className="px-6 py-5 text-right">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(vacante);
-                            }}
-                            className="p-2 hover:bg-[#eaedff] rounded-lg text-[#3525cd] transition-colors"
-                            title="Editar"
-                          >
-                            ✎
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(vacante.id);
-                            }}
-                            className="p-2 hover:bg-[#ffdad6] rounded-lg text-[#ba1a1a] transition-colors"
-                            title="Eliminar"
-                          >
-                            🗑
-                          </button>
-                        </div>
-                      </td>
+                      {isAdmin && (
+                        <td className="px-6 py-5 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(vacante);
+                              }}
+                              className="p-2 hover:bg-[#eaedff] rounded-lg text-[#3525cd] transition-colors"
+                              title="Editar"
+                            >
+                              ✎
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(vacante.id);
+                              }}
+                              className="p-2 hover:bg-[#ffdad6] rounded-lg text-[#ba1a1a] transition-colors"
+                              title="Eliminar"
+                            >
+                              🗑
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

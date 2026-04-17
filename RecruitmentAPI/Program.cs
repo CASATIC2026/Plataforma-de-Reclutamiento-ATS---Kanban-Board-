@@ -51,7 +51,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Administrador"));
+
+    options.AddPolicy("AdminOrManager", policy =>
+        policy.RequireRole("Administrador", "Manager"));
+});
 
 // Controllers
 builder.Services.AddControllers();
@@ -81,7 +88,14 @@ try
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate(); // Ensure all migrations are applied
-    if (!db.Usuarios.Any(u => u.Rol == RecruitmentAPI.Models.RolUsuario.Administrador))
+
+    // Migrate any old Invitado (3) users to General (0)
+    var invitados = db.Usuarios.Where(u => (int)u.Rol == 3).ToList();
+    foreach (var u in invitados) u.Rol = RecruitmentAPI.Models.RolUsuario.General;
+    if (invitados.Any()) { db.SaveChanges(); Console.WriteLine($">> Migrated {invitados.Count} Invitado users to General"); }
+
+    var adminUser = db.Usuarios.FirstOrDefault(u => u.Email == "admin@talentbridge.com");
+    if (adminUser == null)
     {
         db.Usuarios.Add(new RecruitmentAPI.Models.Usuario
         {
@@ -92,7 +106,14 @@ try
             Rol = RecruitmentAPI.Models.RolUsuario.Administrador
         });
         db.SaveChanges();
-        Console.WriteLine(">> Admin seed user created: admin@talentbridge.com");
+        Console.WriteLine(">> Admin seed user created: admin@talentbridge.com / Admin123!");
+    }
+    else
+    {
+        adminUser.Rol = RecruitmentAPI.Models.RolUsuario.Administrador;
+        adminUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!");
+        db.SaveChanges();
+        Console.WriteLine(">> Admin seed user reset: admin@talentbridge.com / Admin123!");
     }
 }
 catch (Exception ex)

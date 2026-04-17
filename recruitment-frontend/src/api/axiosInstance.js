@@ -24,6 +24,11 @@ API.interceptors.response.use(
         window.location.href = '/login';
       }
     }
+    if (error.response?.status === 403) {
+      if (window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/';
+      }
+    }
     return Promise.reject(error);
   }
 );

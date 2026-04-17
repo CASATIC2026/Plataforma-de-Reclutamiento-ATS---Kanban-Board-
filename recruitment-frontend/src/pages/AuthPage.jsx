@@ -512,14 +512,6 @@ function RegisterForm({ onSwitch, error, loading, onSubmit }) {
       />
       <PasswordStrengthBar strength={passwordStrength} />
 
-      <SelectField
-        icon={Icons.role}
-        label="Rol :"
-        options={['Estudiante', 'Profesor', 'Administrador', 'Invitado']}
-        value={form.rol}
-        onChange={set('rol')}
-      />
-
       <div className="flex gap-3 mt-6">
         <button
           type="button"
@@ -557,11 +549,11 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login, isAuthenticated, loading: authLoading } = useAuth();
+  const { login, isAuthenticated, isAdminOrManager, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/');
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated) navigate(isAdminOrManager ? '/admin/vacantes' : '/');
+  }, [isAuthenticated, isAdminOrManager, navigate]);
 
   if (authLoading) return null;
 
@@ -580,7 +572,8 @@ export default function AuthPage() {
     try {
       const res = await loginUser({ email, password });
       login(res.data);
-      navigate('/');
+      const role = res.data.rol;
+      navigate(role === 'Administrador' || role === 'Manager' ? '/admin/vacantes' : '/');
     } catch (err) {
       setError(err.response?.data?.message || 'Error al iniciar sesión.');
     } finally {
@@ -598,7 +591,7 @@ export default function AuthPage() {
         email: form.email,
         password: form.password,
         carrera: form.carrera || null,
-        rol: form.rol || 'Invitado',
+        rol: 'General',
       });
       login(res.data);
       navigate('/');

@@ -20,5 +20,5 @@ public class RegisterDTO
     public string? Carrera { get; set; }
 
     [Required]
-    public string Rol { get; set; } = "Invitado";
+    public string Rol { get; set; } = "General";
 }

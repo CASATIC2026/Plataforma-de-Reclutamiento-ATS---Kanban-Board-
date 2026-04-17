@@ -27,9 +27,11 @@ public class AuthService : IAuthService
         if (await _context.Usuarios.AnyAsync(u => u.Email == dto.Email))
             throw new InvalidOperationException("Ya existe una cuenta con este correo electrónico.");
 
-        // Parse role
+        // Parse role — public registration is always General
         if (!Enum.TryParse<RolUsuario>(dto.Rol, ignoreCase: true, out var rol))
-            rol = RolUsuario.Invitado;
+            rol = RolUsuario.General;
+        if (rol != RolUsuario.General)
+            rol = RolUsuario.General;
 
         var usuario = new Usuario
         {
@@ -70,6 +72,70 @@ public class AuthService : IAuthService
             Email = usuario.Email,
             Rol = usuario.Rol.ToString()
         };
+    }
+
+    public async Task<List<UsuarioResponseDTO>> GetAllUsersAsync()
+    {
+        return await _context.Usuarios
+            .OrderByDescending(u => u.CreatedAt)
+            .Select(u => new UsuarioResponseDTO
+            {
+                Id = u.Id,
+                Nombre = u.Nombre,
+                Apellido = u.Apellido,
+                Email = u.Email,
+                Rol = u.Rol.ToString(),
+                CreatedAt = u.CreatedAt
+            })
+            .ToListAsync();
+    }
+
+    public async Task<UsuarioResponseDTO?> ChangeRolAsync(Guid userId, string newRol)
+    {
+        if (!Enum.TryParse<RolUsuario>(newRol, ignoreCase: true, out var rol))
+            return null;
+
+        var usuario = await _context.Usuarios.FindAsync(userId);
+        if (usuario == null) return null;
+
+        // Prevent demoting the last Administrador
+        if (usuario.Rol == RolUsuario.Administrador && rol != RolUsuario.Administrador)
+        {
+            var adminCount = await _context.Usuarios.CountAsync(u => u.Rol == RolUsuario.Administrador);
+            if (adminCount <= 1)
+                throw new InvalidOperationException("No se puede cambiar el rol del último administrador.");
+        }
+
+        usuario.Rol = rol;
+        await _context.SaveChangesAsync();
+
+        return new UsuarioResponseDTO
+        {
+            Id = usuario.Id,
+            Nombre = usuario.Nombre,
+            Apellido = usuario.Apellido,
+            Email = usuario.Email,
+            Rol = usuario.Rol.ToString(),
+            CreatedAt = usuario.CreatedAt
+        };
+    }
+
+    public async Task<bool> DeleteUserAsync(Guid userId)
+    {
+        var usuario = await _context.Usuarios.FindAsync(userId);
+        if (usuario == null) return false;
+
+        // Prevent deleting the last Administrador
+        if (usuario.Rol == RolUsuario.Administrador)
+        {
+            var adminCount = await _context.Usuarios.CountAsync(u => u.Rol == RolUsuario.Administrador);
+            if (adminCount <= 1)
+                throw new InvalidOperationException("No se puede eliminar al último administrador.");
+        }
+
+        _context.Usuarios.Remove(usuario);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     private string GenerateJwtToken(Usuario usuario)
