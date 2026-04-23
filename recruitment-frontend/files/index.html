@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalentBridge — Plataforma de Empleo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===== MÓDULO: NAVBAR ===== -->
+  <header class="navbar" id="navbar">
+    <div class="navbar__brand">
+      <div class="navbar__logo">
+        <span class="logo-icon">TB</span>
+      </div>
+      <span class="navbar__name">TalentBridge</span>
+    </div>
+    <nav class="navbar__links">
+      <a href="#" class="nav-link">Inicio</a>
+      <a href="#" class="nav-link">Empresas</a>
+      <a href="#" class="nav-link">Recursos</a>
+    </nav>
+    <div class="navbar__actions">
+      <span class="live-badge" id="live-badge" style="display:none;">En vivo</span>
+      <button class="btn btn--ghost">Iniciar Sesión</button>
+      <a href="/admin/vacantes" class="admin-link">⚙ Panel Admin</a>
+    </div>
+  </header>
+
+  <!-- ===== MÓDULO: HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero__bg-shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+      <div class="shape shape--3"></div>
+    </div>
+    <div class="hero__content">
+      <p class="hero__eyebrow" id="hero-eyebrow">Cargando vacantes...</p>
+      <h1 class="hero__title">Encuentra el trabajo<br><em>que mereces</em></h1>
+      <p class="hero__subtitle">Conectamos talento excepcional con las empresas más innovadoras de México y Latinoamérica.</p>
+      <div class="hero__search">
+        <input type="text" id="search-input" class="search-input" placeholder="Puesto, ubicación o requisito..." />
+        <select id="filter-location" class="search-select">
+          <option value="">Todas las ciudades</option>
+          <option value="Ciudad de México">CDMX</option>
+          <option value="Monterrey">Monterrey</option>
+          <option value="Guadalajara">Guadalajara</option>
+          <option value="Querétaro">Querétaro</option>
+          <option value="Remoto">Remoto</option>
+        </select>
+        <button class="btn btn--accent" onclick="filterJobs()">Buscar</button>
+      </div>
+      <div class="hero__tags" id="hero-tags">
+        <!-- Populated by JS from live requisitos -->
+      </div>
+    </div>
+    <div class="hero__stats">
+      <div class="stat"><span class="stat__num" id="stat-vacantes">—</span><span class="stat__label">Vacantes activas</span></div>
+      <div class="stat__divider"></div>
+      <div class="stat"><span class="stat__num">12K+</span><span class="stat__label">Candidatos</span></div>
+      <div class="stat__divider"></div>
+      <div class="stat"><span class="stat__num">89%</span><span class="stat__label">Tasa de éxito</span></div>
+    </div>
+  </section>
+
+  <!-- ===== MÓDULO: FILTROS ===== -->
+  <section class="filters-section" id="filters-section">
+    <div class="container">
+      <div class="filters-bar">
+        <div class="filters-bar__left">
+          <span class="filters-label">Filtrar por:</span>
+          <div class="filter-pills" id="filter-pills">
+            <button class="pill pill--active" data-filter="all">Todos</button>
+            <button class="pill" data-filter="Tiempo completo">Tiempo completo</button>
+            <button class="pill" data-filter="Medio tiempo">Medio tiempo</button>
+            <button class="pill" data-filter="Freelance">Freelance</button>
+            <button class="pill" data-filter="Remoto">Remoto</button>
+            <button class="pill" data-filter="Contrato temporal">Temporal</button>
+            <button class="pill" data-filter="Prácticas">Prácticas</button>
+          </div>
+        </div>
+        <div class="filters-bar__right">
+          <span class="results-count" id="results-count">Cargando...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MÓDULO: LISTADO DE VACANTES ===== -->
+  <main class="jobs-section" id="jobs-section">
+    <div class="container">
+      <div class="jobs-grid" id="jobs-grid">
+        <!-- Loading state shown initially -->
+        <div class="loading-state" style="grid-column:1/-1;">
+          <div class="loading-spinner"></div>
+          <p>Cargando vacantes...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== MÓDULO: MODAL DE DETALLE DE VACANTE ===== -->
+  <div class="modal-overlay" id="job-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <button class="modal__close" id="modal-close" aria-label="Cerrar">&times;</button>
+      <div class="modal__header">
+        <div class="modal__company-logo" id="modal-logo"></div>
+        <div class="modal__meta">
+          <div class="modal__tags-row" id="modal-tags-row"></div>
+          <h2 class="modal__title" id="modal-title"></h2>
+          <p class="modal__company" id="modal-company"></p>
+        </div>
+      </div>
+      <div class="modal__info-grid" id="modal-info-grid"></div>
+      <div class="modal__body" id="modal-body"></div>
+      <div class="modal__footer">
+        <button class="btn btn--accent btn--lg" id="apply-btn">Aplicar a esta vacante</button>
+        <button class="btn btn--ghost" id="modal-close-2">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MÓDULO: MODAL DE FORMULARIO DE APLICACIÓN ===== -->
+  <div class="modal-overlay" id="apply-modal" role="dialog" aria-modal="true" aria-labelledby="apply-modal-title">
+    <div class="modal modal--form">
+      <button class="modal__close" id="apply-modal-close" aria-label="Cerrar">&times;</button>
+      <div class="form-modal__header">
+        <h2 class="modal__title" id="apply-modal-title">Aplicar a la vacante</h2>
+        <p class="form-modal__subtitle" id="apply-modal-subtitle"></p>
+      </div>
+      <form class="apply-form" id="apply-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="field-name">Nombre completo *</label>
+            <input type="text" id="field-name" name="name" class="form-input" placeholder="Ej. Ana García López" required />
+            <span class="form-error" id="error-name"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="field-age">Edad *</label>
+            <input type="number" id="field-age" name="age" class="form-input" placeholder="Ej. 28" min="18" max="70" required />
+            <span class="form-error" id="error-age"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-email">Correo electrónico *</label>
+          <input type="email" id="field-email" name="email" class="form-input" placeholder="tu@correo.com" required />
+          <span class="form-error" id="error-email"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-phone">Teléfono</label>
+          <input type="tel" id="field-phone" name="phone" class="form-input" placeholder="+52 55 1234 5678" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-linkedin">LinkedIn / Portafolio</label>
+          <input type="url" id="field-linkedin" name="linkedin" class="form-input" placeholder="https://linkedin.com/in/tu-perfil" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">CV / Currículum *</label>
+          <div class="dropzone" id="dropzone">
+            <div class="dropzone__icon">📄</div>
+            <p class="dropzone__text">Arrastra tu CV aquí o <span class="dropzone__link">selecciona un archivo</span></p>
+            <p class="dropzone__hint">PDF, DOC, DOCX — máx. 5MB</p>
+            <input type="file" id="cv-input" accept=".pdf,.doc,.docx" class="dropzone__input" />
+          </div>
+          <div class="file-preview" id="file-preview" style="display:none;"></div>
+          <span class="form-error" id="error-cv"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-message">Carta de presentación (opcional)</label>
+          <textarea id="field-message" name="message" class="form-textarea" rows="4" placeholder="Cuéntanos por qué eres el candidato ideal..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn--accent btn--lg btn--full">Enviar Aplicación</button>
+        </div>
+      </form>
+      <!-- Success message (hidden by default) -->
+      <div class="form-success" id="form-success" style="display:none;">
+        <div class="success-icon">✓</div>
+        <h3 class="success-title">¡Aplicación enviada!</h3>
+        <p class="success-text" id="success-text"></p>
+        <button class="btn btn--ghost" id="success-close">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MÓDULO: FOOTER ===== -->
+  <footer class="footer" id="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <div class="navbar__brand">
+          <div class="navbar__logo"><span class="logo-icon">TB</span></div>
+          <span class="navbar__name">TalentBridge</span>
+        </div>
+        <p class="footer__tagline">Conectando talento con oportunidad.</p>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h4>Candidatos</h4>
+          <a href="#">Buscar empleos</a>
+          <a href="#">Mi perfil</a>
+          <a href="#">Recursos</a>
+        </div>
+        <div class="footer__col">
+          <h4>Empresas</h4>
+          <a href="#">Publicar vacante</a>
+          <a href="#">Planes</a>
+          <a href="#">Contacto</a>
+        </div>
+        <div class="footer__col">
+          <h4>Administración</h4>
+          <a href="/admin/vacantes">Panel Admin</a>
+          <a href="#">Privacidad</a>
+          <a href="#">Términos</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>© 2025 TalentBridge. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
