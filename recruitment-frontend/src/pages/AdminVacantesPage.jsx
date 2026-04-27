@@ -168,7 +168,7 @@ export default function AdminVacantesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#faf8ff] to-[#eaedff]">
+    <div className="min-h-screen bg-gradient-to-br from-bg to-accent-bg">
       {/* Header Section */}
       <div className="max-w-[1200px] mx-auto px-6 py-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -179,10 +179,10 @@ export default function AdminVacantesPage() {
                 { label: 'Vacantes' },
               ]}
             />
-            <h1 className="text-4xl md:text-4xl font-extrabold text-[#131b2e] tracking-tight mb-2">
+            <h1 className="text-4xl md:text-4xl font-extrabold text-navy tracking-tight mb-2">
               Vacantes
             </h1>
-            <p className="text-[#464555]">
+            <p className="text-slate">
               Gestiona y supervisa {activeCount} posiciones activas en tu organización.
             </p>
           </div>
@@ -192,7 +192,7 @@ export default function AdminVacantesPage() {
                 resetForm();
                 setShowForm(true);
               }}
-              className="bg-gradient-to-br from-[#3525cd] to-[#4f46e5] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+              className="bg-gradient-to-br from-navy to-navy-light text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
             >
               <span>+</span>
               Nueva Vacante
@@ -203,11 +203,11 @@ export default function AdminVacantesPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
           <div className="bg-white p-6 rounded-2xl border-none shadow-sm flex flex-col justify-between">
-            <span className="text-[#464555] text-xs font-semibold uppercase tracking-wider">
+            <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Total Activas
             </span>
             <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-3xl font-black text-[#131b2e]">{activeCount}</span>
+              <span className="text-3xl font-black text-navy">{activeCount}</span>
               <span className="text-xs text-green-600 font-bold">
                 de {vacantes.length}
               </span>
@@ -215,30 +215,30 @@ export default function AdminVacantesPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border-none shadow-sm">
-            <span className="text-[#464555] text-xs font-semibold uppercase tracking-wider">
+            <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Postulaciones
             </span>
             <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-3xl font-black text-[#131b2e]">{totalApplicants}</span>
-              <span className="text-[#3525cd]">↑</span>
+              <span className="text-3xl font-black text-navy">{totalApplicants}</span>
+              <span className="text-navy">↑</span>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl border-none shadow-sm">
-            <span className="text-[#464555] text-xs font-semibold uppercase tracking-wider">
+            <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Promedio
             </span>
             <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-3xl font-black text-[#131b2e]">
+              <span className="text-3xl font-black text-navy">
                 {vacantes.length > 0 ? Math.round(totalApplicants / vacantes.length) : 0}
               </span>
-              <span className="text-xs text-[#464555]">por vacante</span>
+              <span className="text-xs text-slate">por vacante</span>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#3525cd] to-[#4f46e5] text-white p-6 rounded-2xl border-none shadow-xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-navy to-navy-light text-white p-6 rounded-2xl border-none shadow-xl relative overflow-hidden">
             <div className="relative z-10">
-              <span className="text-[#e2dfff] text-xs font-semibold uppercase tracking-wider">
+              <span className="text-accent-bg text-xs font-semibold uppercase tracking-wider">
                 Tasa Activas
               </span>
               <div className="flex items-baseline gap-2 mt-2">
@@ -267,8 +267,8 @@ export default function AdminVacantesPage() {
 
         {/* Data Table Container */}
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm">
-          <div className="px-6 py-4 flex items-center justify-between bg-[#f2f3ff]/50 border-b border-[#c7c4d8]/10">
-            <h3 className="font-bold text-[#131b2e]">Listado de Vacantes</h3>
+          <div className="px-6 py-4 flex items-center justify-between bg-accent-bg/50 border-b border-border/10">
+            <h3 className="font-bold text-navy">Listado de Vacantes</h3>
             <div className="flex items-center gap-2">
               <div className="relative w-64">
                 <input
@@ -276,27 +276,27 @@ export default function AdminVacantesPage() {
                   placeholder="Buscar por título, ubicación, requisito..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full bg-white border border-[#c7c4d8] rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#3525cd]/20 transition-all"
+                  className="w-full bg-white border border-border rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20 transition-all"
                 />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate">
                   🔍
                 </span>
               </div>
-              <button className="p-2 text-[#464555] hover:bg-[#eaedff] rounded-lg transition-colors">
+              <button className="p-2 text-slate hover:bg-accent-bg rounded-lg transition-colors">
                 ⬇
               </button>
             </div>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-[#464555]">Cargando vacantes...</div>
+            <div className="p-8 text-center text-slate">Cargando vacantes...</div>
           ) : vacantes.length === 0 ? (
-            <div className="p-12 text-center text-[#464555]">
+            <div className="p-12 text-center text-slate">
               <p className="text-lg">No hay vacantes creadas</p>
               <p className="text-sm mt-2">Crea la primera presionando el botón "Nueva Vacante"</p>
             </div>
           ) : filteredVacantes.length === 0 ? (
-            <div className="p-12 text-center text-[#464555]">
+            <div className="p-12 text-center text-slate">
               <p className="text-lg">No se encontraron vacantes</p>
               <p className="text-sm mt-2">Intenta con otros términos de búsqueda</p>
             </div>
@@ -304,56 +304,56 @@ export default function AdminVacantesPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#f2f3ff]/30 border-b border-[#c7c4d8]/10">
-                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555]">
+                  <tr className="bg-accent-bg/30 border-b border-border/10">
+                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Título
                     </th>
-                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555]">
+                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Ubicación
                     </th>
-                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555]">
+                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Contrato
                     </th>
-                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555]">
+                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Salario
                     </th>
-                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555]">
+                    <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Postulaciones
                     </th>
                     {isAdmin && (
-                      <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-right">
+                      <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-right">
                         Acciones
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#c7c4d8]/5">
+                <tbody className="divide-y divide-border/5">
                   {paginatedVacantes.map((vacante) => (
                     <tr
                       key={vacante.id}
                       onClick={() => navigate(`/admin/vacantes/${vacante.id}/aplicantes`)}
-                      className="hover:bg-[#f2f3ff]/20 transition-colors group cursor-pointer"
+                      className="hover:bg-accent-bg/20 transition-colors group cursor-pointer"
                     >
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-[#131b2e]">
+                          <span className="font-semibold text-navy">
                             {vacante.titulo}
                           </span>
-                          <span className="text-xs text-[#464555]">ID: #{formatId(vacante.id)}</span>
+                          <span className="text-xs text-slate">ID: #{formatId(vacante.id)}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-sm text-[#464555]">
+                      <td className="px-6 py-5 text-sm text-slate">
                         {vacante.ubicacion}
                       </td>
                       <td className="px-6 py-5">
-                        <span className="px-3 py-1 text-[10px] font-bold uppercase bg-[#e2dfff] text-[#3525cd] rounded-full">
+                        <span className="px-3 py-1 text-[10px] font-bold uppercase bg-accent-bg text-navy rounded-full">
                           {vacante.tipoContrato}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-sm font-medium text-[#131b2e]">
+                      <td className="px-6 py-5 text-sm font-medium text-navy">
                         {formatSalaryRange(vacante.salarioMin, vacante.salarioMax)}
                       </td>
-                      <td className="px-6 py-5 text-sm font-medium text-[#131b2e]">
+                      <td className="px-6 py-5 text-sm font-medium text-navy">
                         {vacante.postulacionesCount || 0}
                       </td>
                       {isAdmin && (
@@ -364,7 +364,7 @@ export default function AdminVacantesPage() {
                                 e.stopPropagation();
                                 handleEdit(vacante);
                               }}
-                              className="p-2 hover:bg-[#eaedff] rounded-lg text-[#3525cd] transition-colors"
+                              className="p-2 hover:bg-accent-bg rounded-lg text-navy transition-colors"
                               title="Editar"
                             >
                               ✎
@@ -374,7 +374,7 @@ export default function AdminVacantesPage() {
                                 e.stopPropagation();
                                 handleDelete(vacante.id);
                               }}
-                              className="p-2 hover:bg-[#ffdad6] rounded-lg text-[#ba1a1a] transition-colors"
+                              className="p-2 hover:bg-danger-bg rounded-lg text-danger transition-colors"
                               title="Eliminar"
                             >
                               🗑
@@ -391,10 +391,10 @@ export default function AdminVacantesPage() {
 
           {/* Pagination */}
           {filteredVacantes.length > 0 && (
-            <div className="px-6 py-6 border-t border-[#c7c4d8]/10 flex items-center justify-between">
-              <span className="text-sm text-[#464555]">
-                Mostrando <span className="font-bold text-[#131b2e]">{startIndex + 1} - {Math.min(endIndex, filteredVacantes.length)}</span> de{' '}
-                <span className="font-bold text-[#131b2e]">{filteredVacantes.length}</span>
+            <div className="px-6 py-6 border-t border-border/10 flex items-center justify-between">
+              <span className="text-sm text-slate">
+                Mostrando <span className="font-bold text-navy">{startIndex + 1} - {Math.min(endIndex, filteredVacantes.length)}</span> de{' '}
+                <span className="font-bold text-navy">{filteredVacantes.length}</span>
                 {searchQuery && ` (${vacantes.length} total)`}
               </span>
               <Pagination

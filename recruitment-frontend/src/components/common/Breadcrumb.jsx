@@ -2,7 +2,7 @@ export default function Breadcrumb({ items }) {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex items-center gap-2 text-[#464555] text-xs mb-4"
+      className="flex items-center gap-2 text-slate text-xs mb-4"
     >
       {items.map((item, idx) => {
         const isLast = idx === items.length - 1;
@@ -12,12 +12,12 @@ export default function Breadcrumb({ items }) {
               <button
                 type="button"
                 onClick={item.onClick}
-                className="cursor-pointer hover:text-[#3525cd] transition-colors"
+                className="cursor-pointer hover:text-navy transition-colors"
               >
                 {item.label}
               </button>
             ) : (
-              <span className={isLast ? 'text-[#3525cd] font-medium' : ''}>
+              <span className={isLast ? 'text-navy font-medium' : ''}>
                 {item.label}
               </span>
             )}

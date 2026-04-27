@@ -46,17 +46,17 @@ export default function VacanteFormModal({
   return (
     <div className="fixed inset-0 z-40 flex items-end md:items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-[#131b2e]/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-navy/40 backdrop-blur-sm"
         onClick={onClose}
       />
       <div className="relative bg-white shadow-2xl flex flex-col max-w-2xl w-full max-h-screen rounded-2xl overflow-hidden">
         {/* Form Header */}
-        <div className="p-8 border-b border-[#c7c4d8]/10 flex justify-between items-center bg-[#faf8ff]">
+        <div className="p-8 border-b border-border/10 flex justify-between items-center bg-bg">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-[#131b2e]">
+            <h2 className="text-2xl font-extrabold tracking-tight text-navy">
               {editingId ? 'Editar Vacante' : 'Nueva Vacante'}
             </h2>
-            <p className="text-[#464555] text-sm">
+            <p className="text-slate text-sm">
               {editingId
                 ? 'Actualiza la información de la posición.'
                 : 'Completa la información técnica de la posición.'}
@@ -65,7 +65,7 @@ export default function VacanteFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 hover:bg-[#eaedff] rounded-full text-[#464555] transition-colors"
+            className="p-2 hover:bg-accent-bg rounded-full text-slate transition-colors"
           >
             ✕
           </button>
@@ -77,7 +77,7 @@ export default function VacanteFormModal({
           <div className="space-y-2">
             <label
               htmlFor="vac-titulo"
-              className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+              className="text-xs font-bold uppercase tracking-widest text-slate"
             >
               Título del Puesto
             </label>
@@ -88,7 +88,7 @@ export default function VacanteFormModal({
               value={formData.titulo}
               onChange={handleFormChange}
               required
-              className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+              className="w-full bg-accent-bg border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
               placeholder="Ej: Senior Product Designer"
             />
           </div>
@@ -97,7 +97,7 @@ export default function VacanteFormModal({
           <div className="space-y-2">
             <label
               htmlFor="vac-descripcion"
-              className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+              className="text-xs font-bold uppercase tracking-widest text-slate"
             >
               Descripción
             </label>
@@ -108,7 +108,7 @@ export default function VacanteFormModal({
               onChange={handleFormChange}
               required
               rows="4"
-              className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+              className="w-full bg-accent-bg border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
               placeholder="Estamos buscando un diseñador con visión estratégica..."
             />
           </div>
@@ -118,7 +118,7 @@ export default function VacanteFormModal({
             <div className="space-y-2">
               <label
                 htmlFor="vac-ubicacion"
-                className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+                className="text-xs font-bold uppercase tracking-widest text-slate"
               >
                 Ubicación
               </label>
@@ -129,14 +129,14 @@ export default function VacanteFormModal({
                 value={formData.ubicacion}
                 onChange={handleFormChange}
                 required
-                className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+                className="w-full bg-accent-bg border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
                 placeholder="Ej: San Salvador"
               />
             </div>
             <div className="space-y-2">
               <label
                 htmlFor="vac-tipoContrato"
-                className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+                className="text-xs font-bold uppercase tracking-widest text-slate"
               >
                 Tipo de Contrato
               </label>
@@ -145,7 +145,7 @@ export default function VacanteFormModal({
                 name="tipoContrato"
                 value={formData.tipoContrato}
                 onChange={handleFormChange}
-                className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all appearance-none"
+                className="w-full bg-accent-bg border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all appearance-none"
               >
                 {CONTRACT_TYPES.map((type) => (
                   <option key={type}>{type}</option>
@@ -159,12 +159,12 @@ export default function VacanteFormModal({
             <div className="space-y-2">
               <label
                 htmlFor="vac-salarioMin"
-                className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+                className="text-xs font-bold uppercase tracking-widest text-slate"
               >
                 Salario Mínimo
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate">
                   $
                 </span>
                 <input
@@ -173,7 +173,7 @@ export default function VacanteFormModal({
                   name="salarioMin"
                   value={formData.salarioMin}
                   onChange={handleFormChange}
-                  className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 pl-8 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+                  className="w-full bg-accent-bg border border-border rounded-xl p-3 pl-8 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
                   placeholder="45000"
                 />
               </div>
@@ -181,12 +181,12 @@ export default function VacanteFormModal({
             <div className="space-y-2">
               <label
                 htmlFor="vac-salarioMax"
-                className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+                className="text-xs font-bold uppercase tracking-widest text-slate"
               >
                 Salario Máximo
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate">
                   $
                 </span>
                 <input
@@ -195,7 +195,7 @@ export default function VacanteFormModal({
                   name="salarioMax"
                   value={formData.salarioMax}
                   onChange={handleFormChange}
-                  className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 pl-8 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+                  className="w-full bg-accent-bg border border-border rounded-xl p-3 pl-8 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
                   placeholder="60000"
                 />
               </div>
@@ -206,7 +206,7 @@ export default function VacanteFormModal({
           <div className="space-y-2">
             <label
               htmlFor="vac-requisito"
-              className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+              className="text-xs font-bold uppercase tracking-widest text-slate"
             >
               Requisitos
             </label>
@@ -217,13 +217,13 @@ export default function VacanteFormModal({
                 value={requisitoInput}
                 onChange={(e) => setRequisitoInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="flex-1 bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+                className="flex-1 bg-accent-bg border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
                 placeholder="Ej: 5+ años experiencia"
               />
               <button
                 type="button"
                 onClick={addRequisito}
-                className="px-4 py-3 bg-[#3525cd] text-white rounded-xl font-bold hover:bg-[#2816b8] transition-colors"
+                className="px-4 py-3 bg-navy text-white rounded-xl font-bold hover:bg-navy-light transition-colors"
               >
                 Agregar
               </button>
@@ -234,14 +234,14 @@ export default function VacanteFormModal({
                 {formData.requisitos.map((req, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-3 bg-[#e2dfff] rounded-xl"
+                    className="flex items-center gap-3 p-3 bg-accent-bg rounded-xl"
                   >
-                    <span className="text-[#3525cd]">✓</span>
-                    <span className="text-sm text-[#131b2e]">{req}</span>
+                    <span className="text-navy">✓</span>
+                    <span className="text-sm text-navy">{req}</span>
                     <button
                       type="button"
                       onClick={() => removeRequisito(index)}
-                      className="ml-auto text-[#464555] hover:text-[#131b2e] font-bold"
+                      className="ml-auto text-slate hover:text-navy font-bold"
                     >
                       ✕
                     </button>
@@ -252,15 +252,15 @@ export default function VacanteFormModal({
           </div>
 
           {/* Screening Configuration */}
-          <details className="space-y-2 p-4 bg-[#f2f3ff]/50 rounded-xl border border-[#dae2fd]">
-            <summary className="cursor-pointer font-bold text-[#464555] uppercase tracking-widest text-xs">
+          <details className="space-y-2 p-4 bg-accent-bg/50 rounded-xl border border-border">
+            <summary className="cursor-pointer font-bold text-slate uppercase tracking-widest text-xs">
               ⚙️ Configuración de Screening
             </summary>
             <div className="space-y-4 mt-4">
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="vac-screeningActivo"
-                  className="text-sm text-[#464555] font-semibold"
+                  className="text-sm text-slate font-semibold"
                 >
                   Activar screening automático
                 </label>
@@ -275,14 +275,14 @@ export default function VacanteFormModal({
                     }
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#3525cd]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3525cd]" />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-navy/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-navy" />
                 </label>
               </div>
 
               <div className="space-y-2">
                 <label
                   htmlFor="vac-umbralPuntaje"
-                  className="text-xs font-bold uppercase tracking-widest text-[#464555]"
+                  className="text-xs font-bold uppercase tracking-widest text-slate"
                 >
                   Umbral de Aprobación (0-100)
                 </label>
@@ -299,10 +299,10 @@ export default function VacanteFormModal({
                       umbralPuntaje: Math.max(0, Math.min(100, Number(e.target.value))),
                     })
                   }
-                  className="w-full bg-white border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+                  className="w-full bg-white border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
                   placeholder="60"
                 />
-                <p className="text-xs text-[#464555]">
+                <p className="text-xs text-slate">
                   Candidatos con puntaje menor serán marcados como rechazados automáticamente.
                 </p>
               </div>
@@ -311,12 +311,12 @@ export default function VacanteFormModal({
         </form>
 
         {/* Form Footer */}
-        <div className="p-8 border-t border-[#c7c4d8]/10 bg-[#faf8ff] sticky bottom-0 flex gap-4">
+        <div className="p-8 border-t border-border/10 bg-bg sticky bottom-0 flex gap-4">
           <button
             type="submit"
             onClick={onSubmit}
             disabled={submitLoading}
-            className="flex-1 bg-gradient-to-br from-[#3525cd] to-[#4f46e5] text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-[#4f46e5]/20 transition-all disabled:opacity-50"
+            className="flex-1 bg-gradient-to-br from-navy to-navy-light text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-navy-light/20 transition-all disabled:opacity-50"
           >
             {submitLoading
               ? editingId
@@ -329,7 +329,7 @@ export default function VacanteFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3 border border-[#c7c4d8] text-[#464555] rounded-xl font-bold hover:bg-[#faf8ff] transition-all"
+            className="px-6 py-3 border border-border text-slate rounded-xl font-bold hover:bg-bg transition-all"
           >
             Cancelar
           </button>

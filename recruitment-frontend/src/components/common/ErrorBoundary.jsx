@@ -29,12 +29,12 @@ export default class ErrorBoundary extends Component {
       >
         <div className="text-center px-6" style={{ maxWidth: '560px' }}>
           <h1
-            className="font-extrabold tracking-tight"
-            style={{ fontSize: 'clamp(4rem, 10vw, 6rem)', color: '#131931', lineHeight: 1 }}
+            className="font-extrabold tracking-tight text-navy"
+            style={{ fontSize: 'clamp(4rem, 10vw, 6rem)', lineHeight: 1 }}
           >
             Algo salió mal
           </h1>
-          <p className="text-base mt-4" style={{ color: '#131931' }}>
+          <p className="text-base mt-4 text-navy">
             Ocurrió un error inesperado al renderizar esta vista.
           </p>
           <p className="text-sm mt-2" style={{ color: '#8a8fa3' }}>
@@ -42,18 +42,7 @@ export default class ErrorBoundary extends Component {
           </p>
           {this.state.error?.message && (
             <pre
-              style={{
-                marginTop: '20px',
-                padding: '12px 14px',
-                background: '#fff',
-                border: '1px solid #e2dfff',
-                borderRadius: '10px',
-                color: '#ba1a1a',
-                fontSize: '12px',
-                textAlign: 'left',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-              }}
+              className="mt-5 p-3 bg-white rounded-lg border border-accent-bg text-danger text-xs text-left whitespace-pre-wrap break-words"
             >
               {this.state.error.message}
             </pre>
@@ -61,12 +50,10 @@ export default class ErrorBoundary extends Component {
           <button
             type="button"
             onClick={this.handleReload}
-            className="inline-block mt-8 px-8 py-3 rounded-full text-white text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95"
+            className="inline-block mt-8 px-8 py-3 rounded-full text-white text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border-none"
             style={{
-              background: 'linear-gradient(135deg, #131931 0%, #1F9DB9 100%)',
+              background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-gold) 100%)',
               boxShadow: '0 4px 12px rgba(19,25,49,0.2)',
-              border: 'none',
-              cursor: 'pointer',
             }}
           >
             Volver al inicio

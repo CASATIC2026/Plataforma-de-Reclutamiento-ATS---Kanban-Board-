@@ -1,2 +1,73 @@
 @import "tailwindcss";
+
+/* ============================================================
+   DESIGN TOKENS — registered with Tailwind 4 via @theme.
+   Each --color-* / --font-* generates both a CSS variable
+   AND a matching Tailwind utility (bg-navy, text-accent,
+   font-display, etc.). Single source of truth.
+============================================================ */
+@theme {
+  /* Surfaces */
+  --color-bg:        #FFF5F5;
+  --color-surface:   #FFFFFF;
+  --color-surface-2: #F4F4F4;
+  --color-border:    #D2D1D1;
+
+  /* Brand */
+  --color-navy:       #131931;
+  --color-navy-light: #1a2040;
+  --color-slate:      #464646;
+  --color-muted:      #7A8C98;
+
+  --color-accent:       #CD7B4F;
+  --color-accent-lt:    #b5673d;
+  --color-accent-light: #b5673d; /* alias used by hover:text-accent-light */
+  --color-accent-bg:    #FFF1EB;
+
+  --color-gold:       #1F9DB9;
+  --color-gold-bg:    #F0F9FC;
+  --color-teal:       #1F9DB9; /* alias used by bg-teal / text-teal */
+  --color-teal-light: #F0F9FC; /* alias used by bg-teal-light */
+
+  --color-green:       #319E85;
+  --color-green-bg:    #E8F5F0;
+  --color-green-light: #E8F5F0; /* alias used by bg-green-light */
+
+  --color-urgent:     #CD7B4F;
+  --color-urgent-bg:  #FFF1EB;
+
+  /* Gray scale — preserves the custom values from the
+     deleted tailwind.config.js (50 maps to brand bg, 200 to
+     surface-2, 400 to border, 500 to muted, 600 to slate). */
+  --color-gray-50:  #FFF5F5;
+  --color-gray-100: #F9F9F9;
+  --color-gray-200: #F4F4F4;
+  --color-gray-300: #E8E8E8;
+  --color-gray-400: #D2D1D1;
+  --color-gray-500: #7A8C98;
+  --color-gray-600: #464646;
+  --color-gray-700: #333333;
+  --color-gray-800: #1a1a1a;
+  --color-gray-900: #000000;
+
+  /* Score badges (consumed by getPuntajeStyle) */
+  --color-score-high-bg: #d1fae5;
+  --color-score-high-fg: #065f46;
+  --color-score-mid-bg:  #fef3c7;
+  --color-score-mid-fg:  #92400e;
+  --color-score-low-bg:  #fee2e2;
+  --color-score-low-fg:  #991b1b;
+
+  /* Danger (admin red — promoted to design system) */
+  --color-danger:    #ba1a1a;
+  --color-danger-bg: #ffdad6;
+
+  /* Typography */
+  --font-display: 'Playwrite IE', Georgia, serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-maven:   'Maven Pro', sans-serif;
+  --font-kaiser:  'Kaisei Decol', serif;
+  --font-jersey:  'Jersey 25', sans-serif;
+}
+
 @import "./styles/talentbridge.css";

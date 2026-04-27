@@ -7,7 +7,12 @@ import { useRechazadosRestore } from '../hooks/useRechazadosRestore';
 import Breadcrumb from '../components/common/Breadcrumb';
 
 const STAGE_LABELS = ['Nuevo', 'Entrevista', 'Prueba Técnica', 'Oferta'];
-const STAGE_COLORS = ['#0d9488', '#CD7B4F', '#131931', '#319E85'];
+const STAGE_COLORS = [
+  'var(--color-teal)',
+  'var(--color-accent)',
+  'var(--color-navy)',
+  'var(--color-green)',
+];
 
 export default function KanbanAllPage() {
   // Filter state
@@ -100,7 +105,7 @@ export default function KanbanAllPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#faf8ff] to-[#eaedff]">
+    <div className="min-h-screen bg-gradient-to-br from-bg to-accent-bg">
       <div className="max-w-[1600px] mx-auto px-6 py-10">
         {/* Header */}
         <div className="mb-10">
@@ -110,10 +115,10 @@ export default function KanbanAllPage() {
               { label: 'Pipeline de Candidatos' },
             ]}
           />
-          <h1 className="text-4xl md:text-4xl font-extrabold text-[#131b2e] tracking-tight mb-3">
+          <h1 className="text-4xl md:text-4xl font-extrabold text-navy tracking-tight mb-3">
             Pipeline de Candidatos
           </h1>
-          <p className="text-[#464555] max-w-2xl">
+          <p className="text-slate max-w-2xl">
             Vista operacional en tiempo real de todos los candidatos en el proceso de selección.
             Arrastra tarjetas para cambiar el estado de los candidatos.
           </p>
@@ -127,7 +132,7 @@ export default function KanbanAllPage() {
           {stageCounts.map(({ estado, label, color, count }) => (
             <div
               key={estado}
-              className="bg-white rounded-xl shadow-sm p-5 border border-[#c7c4d8]/10"
+              className="bg-white rounded-xl shadow-sm p-5 border border-border/10"
             >
               <div className="flex items-center gap-3">
                 <div
@@ -135,10 +140,10 @@ export default function KanbanAllPage() {
                   style={{ backgroundColor: color }}
                 />
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#464555]">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate">
                     {label}
                   </p>
-                  <p className="text-2xl font-black text-[#131b2e] mt-1">{count}</p>
+                  <p className="text-2xl font-black text-navy mt-1">{count}</p>
                 </div>
               </div>
             </div>

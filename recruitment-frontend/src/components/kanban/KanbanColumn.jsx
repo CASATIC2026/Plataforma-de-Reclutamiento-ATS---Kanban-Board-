@@ -23,7 +23,7 @@ export default function KanbanColumn({
         <span
           className="text-xs font-bold px-2 py-0.5 rounded-full"
           style={color.includes('text-white')
-            ? { backgroundColor: '#fff', color: '#131931' }
+            ? { backgroundColor: '#fff', color: 'var(--color-navy)' }
             : { backgroundColor: 'rgba(255,255,255,0.3)' }
           }
         >

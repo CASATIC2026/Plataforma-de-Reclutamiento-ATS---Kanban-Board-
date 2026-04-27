@@ -161,7 +161,7 @@ export default function NewLandingPage() {
       <section
         className="hero-section"
         style={{
-          background: '#131931',
+          background: 'var(--color-navy)',
           padding: '80px 40px 60px',
           textAlign: 'center',
           position: 'relative',
@@ -222,7 +222,7 @@ export default function NewLandingPage() {
         <p
           className="hero-subtitle"
           style={{
-            color: '#1F9DB9',
+            color: 'var(--color-gold)',
             fontFamily: "'Kaisei Decol', serif",
             fontSize: '40px',
             fontWeight: 700,
@@ -297,9 +297,9 @@ export default function NewLandingPage() {
               cursor: 'pointer',
             }}
           >
-            <option value="" style={{ background: '#131931', color: '#fff' }}>Todas las ciudades</option>
+            <option value="" style={{ background: 'var(--color-navy)', color: '#fff' }}>Todas las ciudades</option>
             {SALVADORAN_DEPARTMENTS.filter((d) => d).map((dept) => (
-              <option key={dept} value={dept} style={{ background: '#131931', color: '#fff' }}>
+              <option key={dept} value={dept} style={{ background: 'var(--color-navy)', color: '#fff' }}>
                 {dept}
               </option>
             ))}
@@ -307,7 +307,7 @@ export default function NewLandingPage() {
           <button
             className="search-button"
             style={{
-              background: '#CD7B4F',
+              background: 'var(--color-accent)',
               border: 'none',
               padding: '16px 24px',
               color: '#fff',
@@ -317,8 +317,8 @@ export default function NewLandingPage() {
               cursor: 'pointer',
               transition: 'background 0.2s',
             }}
-            onMouseEnter={(e) => (e.target.style.background = '#b5673d')}
-            onMouseLeave={(e) => (e.target.style.background = '#CD7B4F')}
+            onMouseEnter={(e) => (e.target.style.background = 'var(--color-accent-lt)')}
+            onMouseLeave={(e) => (e.target.style.background = 'var(--color-accent)')}
             onClick={() =>
               document.getElementById('jobs-section')?.scrollIntoView({ behavior: 'smooth' })
             }
@@ -352,7 +352,7 @@ export default function NewLandingPage() {
       <div
         className="filter-section"
         style={{
-          background: '#FFF5F5',
+          background: 'var(--color-bg)',
           padding: '18px 40px',
           display: 'flex',
           alignItems: 'center',

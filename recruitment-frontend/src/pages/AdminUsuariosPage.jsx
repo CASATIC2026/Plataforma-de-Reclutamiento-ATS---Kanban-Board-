@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const ROLES = ['General', 'Manager', 'Administrador'];
 
 const ROLE_COLORS = {
-  Administrador: { bg: '#eaedff', text: '#3525cd' },
+  Administrador: { bg: 'var(--color-accent-bg)', text: 'var(--color-navy)' },
   Manager: { bg: '#e0f2fe', text: '#0369a1' },
   General: { bg: '#f3f4f6', text: '#6b7280' },
 };
@@ -87,7 +87,7 @@ export default function AdminUsuariosPage() {
       <div>
         <h1
           className="text-3xl font-extrabold tracking-tight"
-          style={{ color: '#131b2e', fontFamily: "'DM Sans', sans-serif" }}
+          style={{ color: 'var(--color-navy)', fontFamily: "'DM Sans', sans-serif" }}
         >
           Gestión de Usuarios
         </h1>
@@ -127,7 +127,7 @@ export default function AdminUsuariosPage() {
       {/* Table */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#3525cd] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" />
         </div>
       ) : usuarios.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
@@ -138,19 +138,19 @@ export default function AdminUsuariosPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-left">
+                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-left">
                   Nombre
                 </th>
-                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-left">
+                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-left">
                   Email
                 </th>
-                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-left">
+                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-left">
                   Rol
                 </th>
-                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-left">
+                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-left">
                   Registrado
                 </th>
-                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-[#464555] text-right">
+                <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-right">
                   Acciones
                 </th>
               </tr>
@@ -161,10 +161,10 @@ export default function AdminUsuariosPage() {
                 return (
                   <tr
                     key={user.id}
-                    className="border-b border-gray-50 hover:bg-[#fafafa] transition-colors group"
+                    className="border-b border-gray-50 hover:bg-gray-100 transition-colors group"
                   >
                     <td className="px-6 py-4">
-                      <p className="text-sm font-semibold text-[#131b2e]">
+                      <p className="text-sm font-semibold text-navy">
                         {user.nombre} {user.apellido}
                       </p>
                     </td>
@@ -176,7 +176,7 @@ export default function AdminUsuariosPage() {
                         value={user.rol}
                         onChange={(e) => handleRolChange(user.id, e.target.value)}
                         disabled={saving === user.id}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#3525cd]"
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy"
                         style={{
                           backgroundColor: colors.bg,
                           color: colors.text,
@@ -194,7 +194,7 @@ export default function AdminUsuariosPage() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleDelete(user.id, `${user.nombre} ${user.apellido}`)}
-                        className="p-2 hover:bg-[#ffdad6] rounded-lg text-[#ba1a1a] transition-colors opacity-0 group-hover:opacity-100"
+                        className="p-2 hover:bg-danger-bg rounded-lg text-danger transition-colors opacity-0 group-hover:opacity-100"
                         title="Eliminar usuario"
                       >
                         🗑

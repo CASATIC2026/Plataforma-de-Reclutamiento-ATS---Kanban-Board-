@@ -51,12 +51,12 @@ export function isRecent(isoString) {
 export function getPuntajeStyle(score) {
   if (score == null) return {};
   if (score >= SCORE_THRESHOLDS.HIGH) {
-    return { backgroundColor: '#d1fae5', color: '#065f46' };
+    return { backgroundColor: 'var(--color-score-high-bg)', color: 'var(--color-score-high-fg)' };
   }
   if (score >= SCORE_THRESHOLDS.MEDIUM) {
-    return { backgroundColor: '#fef3c7', color: '#92400e' };
+    return { backgroundColor: 'var(--color-score-mid-bg)', color: 'var(--color-score-mid-fg)' };
   }
-  return { backgroundColor: '#fee2e2', color: '#991b1b' };
+  return { backgroundColor: 'var(--color-score-low-bg)', color: 'var(--color-score-low-fg)' };
 }
 
 export function formatSalaryRange(min, max) {

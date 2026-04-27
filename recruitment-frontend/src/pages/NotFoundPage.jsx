@@ -9,11 +9,11 @@ export default function NotFoundPage() {
       <div className="text-center px-6">
         <h1
           className="font-extrabold tracking-tight"
-          style={{ fontSize: 'clamp(6rem, 15vw, 10rem)', color: '#131931', lineHeight: 1 }}
+          style={{ fontSize: 'clamp(6rem, 15vw, 10rem)', color: 'var(--color-navy)', lineHeight: 1 }}
         >
           404
         </h1>
-        <p className="text-xl font-semibold mt-4" style={{ color: '#131931' }}>
+        <p className="text-xl font-semibold mt-4" style={{ color: 'var(--color-navy)' }}>
           Página no encontrada
         </p>
         <p className="text-sm mt-2" style={{ color: '#8a8fa3' }}>
@@ -23,7 +23,7 @@ export default function NotFoundPage() {
           to="/"
           className="inline-block mt-8 px-8 py-3 rounded-full text-white text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95"
           style={{
-            background: 'linear-gradient(135deg, #131931 0%, #1F9DB9 100%)',
+            background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-gold) 100%)',
             boxShadow: '0 4px 12px rgba(19,25,49,0.2)',
           }}
         >

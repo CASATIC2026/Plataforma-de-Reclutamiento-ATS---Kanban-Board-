@@ -137,8 +137,8 @@ export default function KanbanBoard({ vacanteId, filterFn, sortFn, onCardsUpdate
             key={t.id}
             className="mb-2 px-5 py-3 rounded-lg shadow-lg text-sm font-semibold"
             style={{
-              backgroundColor: t.type === 'error' ? '#ef4444' : '#d1fae5',
-              color: t.type === 'error' ? '#fff' : '#131931',
+              backgroundColor: t.type === 'error' ? '#ef4444' : 'var(--color-score-high-bg)',
+              color: t.type === 'error' ? '#fff' : 'var(--color-navy)',
               border: t.type === 'error' ? '1px solid #dc2626' : '1px solid #6ee7b7',
               animation: 'fadeUp 0.25s ease',
             }}

@@ -15,7 +15,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
   }, [searchLocal, filters, setFilters]);
 
   return (
-    <div className="sticky top-0 z-30 bg-white rounded-xl shadow-sm p-4 mb-6 border border-[#c7c4d8]/10">
+    <div className="sticky top-0 z-30 bg-white rounded-xl shadow-sm p-4 mb-6 border border-border/10">
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
         {/* Search Input */}
         <div className="flex-1 min-w-[200px]">
@@ -24,7 +24,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
             placeholder="Buscar por nombre o email..."
             value={searchLocal}
             onChange={(e) => setSearchLocal(e.target.value)}
-            className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
+            className="w-full bg-accent-bg border border-border rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
           />
         </div>
 
@@ -33,7 +33,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
           <select
             value={filters.vacanteId || ''}
             onChange={(e) => setFilters({ ...filters, vacanteId: e.target.value || null })}
-            className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all appearance-none"
+            className="w-full bg-accent-bg border border-border rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all appearance-none"
           >
             <option value="">Todas las vacantes</option>
             {vacantes.map((v) => (
@@ -49,7 +49,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
           <select
             value={filters.fecha}
             onChange={(e) => setFilters({ ...filters, fecha: e.target.value })}
-            className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all appearance-none"
+            className="w-full bg-accent-bg border border-border rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all appearance-none"
           >
             <option value="todos">Todos</option>
             <option value="hoy">Hoy</option>
@@ -63,7 +63,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
           <select
             value={filters.sort}
             onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
-            className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all appearance-none"
+            className="w-full bg-accent-bg border border-border rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all appearance-none"
           >
             <option value="reciente">Recientes primero</option>
             <option value="nombre">Nombre A-Z</option>
@@ -81,7 +81,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
                 sort: 'reciente',
               })
             }
-            className="px-4 py-2.5 text-sm font-semibold text-[#ba1a1a] hover:bg-red-50 rounded-lg transition-colors"
+            className="px-4 py-2.5 text-sm font-semibold text-danger hover:bg-red-50 rounded-lg transition-colors"
           >
             Limpiar filtros
           </button>

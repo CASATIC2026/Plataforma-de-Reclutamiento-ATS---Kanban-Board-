@@ -18,8 +18,8 @@ function JobCardNew({ job, onClick }) {
         }
       }}
       style={{
-        background: hovered ? '#1a2040' : '#F4F4F4',
-        border: `1.5px solid ${hovered ? '#CD7B4F' : '#131931'}`,
+        background: hovered ? 'var(--color-navy-light)' : 'var(--color-surface-2)',
+        border: `1.5px solid ${hovered ? 'var(--color-accent)' : 'var(--color-navy)'}`,
         borderRadius: '12px',
         padding: '22px 20px 18px 20px',
         boxShadow: hovered ? '0 8px 32px rgba(205,123,79,0.18)' : '0 4px 8px rgba(0,0,0,0.1)',
@@ -43,7 +43,7 @@ function JobCardNew({ job, onClick }) {
       >
         <div
           style={{
-            background: hovered ? '#CD7B4F' : '#131931',
+            background: hovered ? 'var(--color-accent)' : 'var(--color-navy)',
             borderRadius: '8px',
             padding: '4px 12px',
             transition: 'background 0.25s',
@@ -147,7 +147,7 @@ function JobCardNew({ job, onClick }) {
         </div>
       </div>
 
-      <div style={{ height: '1px', background: hovered ? '#334' : '#D2D1D1', margin: '4px 0' }} />
+      <div style={{ height: '1px', background: hovered ? '#334' : 'var(--color-border)', margin: '4px 0' }} />
 
       <p
         style={{
@@ -171,7 +171,7 @@ function JobCardNew({ job, onClick }) {
         <button
           type="button"
           style={{
-            background: '#319E85',
+            background: 'var(--color-green)',
             border: '1px solid #BDBDBD',
             borderRadius: '8px',
             padding: '6px 16px',
@@ -183,7 +183,7 @@ function JobCardNew({ job, onClick }) {
             transition: 'background 0.2s',
           }}
           onMouseEnter={(e) => (e.target.style.background = '#267a68')}
-          onMouseLeave={(e) => (e.target.style.background = '#319E85')}
+          onMouseLeave={(e) => (e.target.style.background = 'var(--color-green)')}
         >
           Ver detalles
         </button>

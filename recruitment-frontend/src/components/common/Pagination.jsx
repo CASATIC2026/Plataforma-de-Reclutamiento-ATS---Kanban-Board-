@@ -10,8 +10,8 @@ function AdminPagination({ currentPage, totalPages, onPageChange }) {
         disabled={currentPage === 1}
         className={`p-2 rounded-lg transition-colors ${
           currentPage === 1
-            ? 'bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed'
-            : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff] cursor-pointer'
+            ? 'bg-bg text-slate opacity-50 cursor-not-allowed'
+            : 'bg-bg text-navy hover:bg-accent-bg cursor-pointer'
         }`}
         title="Página anterior"
         aria-label="Página anterior"
@@ -30,8 +30,8 @@ function AdminPagination({ currentPage, totalPages, onPageChange }) {
             }}
             className={`w-10 h-10 rounded-lg font-bold text-sm transition-colors ${
               page === currentPage
-                ? 'bg-[#3525cd] text-white'
-                : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff]'
+                ? 'bg-navy text-white'
+                : 'bg-bg text-navy hover:bg-accent-bg'
             }`}
             aria-current={page === currentPage ? 'page' : undefined}
           >
@@ -46,8 +46,8 @@ function AdminPagination({ currentPage, totalPages, onPageChange }) {
         disabled={currentPage === totalPages}
         className={`p-2 rounded-lg transition-colors ${
           currentPage === totalPages
-            ? 'bg-[#f2f3ff] text-[#464555] opacity-50 cursor-not-allowed'
-            : 'bg-[#f2f3ff] text-[#3525cd] hover:bg-[#eaedff] cursor-pointer'
+            ? 'bg-bg text-slate opacity-50 cursor-not-allowed'
+            : 'bg-bg text-navy hover:bg-accent-bg cursor-pointer'
         }`}
         title="Página siguiente"
         aria-label="Página siguiente"
@@ -78,7 +78,7 @@ function LandingPagination({ currentPage, totalPages, onPageChange }) {
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
         style={{
-          background: currentPage === 1 ? '#555' : '#CD7B4F',
+          background: currentPage === 1 ? '#555' : 'var(--color-accent)',
           border: 'none',
           color: '#fff',
           padding: '8px 16px',
@@ -88,8 +88,8 @@ function LandingPagination({ currentPage, totalPages, onPageChange }) {
           transition: 'background 0.2s',
           opacity: currentPage === 1 ? 0.6 : 1,
         }}
-        onMouseEnter={(e) => currentPage !== 1 && (e.target.style.background = '#b5673d')}
-        onMouseLeave={(e) => currentPage !== 1 && (e.target.style.background = '#CD7B4F')}
+        onMouseEnter={(e) => currentPage !== 1 && (e.target.style.background = 'var(--color-accent-lt)')}
+        onMouseLeave={(e) => currentPage !== 1 && (e.target.style.background = 'var(--color-accent)')}
       >
         ← Anterior
       </button>
@@ -103,7 +103,7 @@ function LandingPagination({ currentPage, totalPages, onPageChange }) {
             onClick={() => onPageChange(page)}
             aria-current={page === currentPage ? 'page' : undefined}
             style={{
-              background: currentPage === page ? '#CD7B4F' : 'transparent',
+              background: currentPage === page ? 'var(--color-accent)' : 'transparent',
               border: currentPage === page ? 'none' : '1px solid #666',
               borderRadius: '6px',
               width: '32px',
@@ -134,7 +134,7 @@ function LandingPagination({ currentPage, totalPages, onPageChange }) {
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
         style={{
-          background: currentPage === totalPages ? '#555' : '#CD7B4F',
+          background: currentPage === totalPages ? '#555' : 'var(--color-accent)',
           border: 'none',
           color: '#fff',
           padding: '8px 16px',
@@ -144,8 +144,8 @@ function LandingPagination({ currentPage, totalPages, onPageChange }) {
           transition: 'background 0.2s',
           opacity: currentPage === totalPages ? 0.6 : 1,
         }}
-        onMouseEnter={(e) => currentPage !== totalPages && (e.target.style.background = '#b5673d')}
-        onMouseLeave={(e) => currentPage !== totalPages && (e.target.style.background = '#CD7B4F')}
+        onMouseEnter={(e) => currentPage !== totalPages && (e.target.style.background = 'var(--color-accent-lt)')}
+        onMouseLeave={(e) => currentPage !== totalPages && (e.target.style.background = 'var(--color-accent)')}
       >
         Siguiente →
       </button>

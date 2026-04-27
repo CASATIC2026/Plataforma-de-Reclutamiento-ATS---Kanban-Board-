@@ -23,7 +23,7 @@ function AdminFallback() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#464555',
+        color: 'var(--color-slate)',
         fontFamily: "'DM Sans', sans-serif",
         fontSize: '14px',
       }}

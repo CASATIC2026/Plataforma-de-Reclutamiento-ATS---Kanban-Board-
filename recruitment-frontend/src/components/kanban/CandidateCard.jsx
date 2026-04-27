@@ -11,8 +11,9 @@ export default function CandidateCard({ postulacion, onDragStart, onCardClick })
       draggable
       onDragStart={(e) => onDragStart(e, postulacion.id)}
       onClick={() => onCardClick?.(postulacion)}
-      style={isOferta ? { borderLeft: '4px solid #319E85' } : {}}
-      className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm cursor-pointer hover:shadow-md hover:border-accent transition-all select-none"
+      className={`bg-white rounded-lg border border-gray-200 p-3 shadow-sm cursor-pointer hover:shadow-md hover:border-accent transition-all select-none ${
+        isOferta ? 'border-l-4 border-l-green' : ''
+      }`}
     >
       <CandidateSummary postulacion={postulacion} />
 

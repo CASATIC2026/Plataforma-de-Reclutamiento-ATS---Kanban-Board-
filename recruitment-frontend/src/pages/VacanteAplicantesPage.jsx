@@ -32,19 +32,19 @@ export default function VacanteAplicantesPage() {
   const { handleRestore } = useRechazadosRestore(setRechazados);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#faf8ff] to-[#eaedff]">
+    <div className="min-h-screen bg-gradient-to-br from-bg to-accent-bg">
       <div className="max-w-[1400px] mx-auto px-6 py-10">
         {/* Breadcrumb */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/admin/vacantes')}
-            className="flex items-center gap-2 text-[#3525cd] hover:text-[#2816b8] font-semibold mb-6 transition-colors"
+            className="flex items-center gap-2 text-navy hover:text-navy-light font-semibold mb-6 transition-colors"
           >
             ← Volver a Vacantes
           </button>
 
           {loading ? (
-            <div className="text-[#464555]">Cargando vacante...</div>
+            <div className="text-slate">Cargando vacante...</div>
           ) : vacante ? (
             <>
               <Breadcrumb
@@ -59,16 +59,16 @@ export default function VacanteAplicantesPage() {
               <div className="bg-white rounded-2xl shadow-sm p-8 mb-10">
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <h1 className="text-4xl font-extrabold text-[#131b2e] mb-2">
+                    <h1 className="text-4xl font-extrabold text-navy mb-2">
                       {vacante.titulo}
                     </h1>
-                    <p className="text-[#464555] text-lg">
+                    <p className="text-slate text-lg">
                       {vacante.postulacionesCount || 0} aplicante{vacante.postulacionesCount !== 1 ? 's' : ''}
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-[#464555] mb-2">ID</div>
-                    <div className="font-mono text-[#3525cd] font-semibold">
+                    <div className="text-sm text-slate mb-2">ID</div>
+                    <div className="font-mono text-navy font-semibold">
                       {formatId(vacante.id)}
                     </div>
                   </div>
@@ -77,27 +77,27 @@ export default function VacanteAplicantesPage() {
                 {/* Vacancy Details Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#464555]">
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate">
                       Ubicación
                     </span>
-                    <p className="text-[#131b2e] font-semibold mt-2">{vacante.ubicacion}</p>
+                    <p className="text-navy font-semibold mt-2">{vacante.ubicacion}</p>
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#464555]">
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate">
                       Tipo de Contrato
                     </span>
-                    <p className="text-[#131b2e] font-semibold mt-2">{vacante.tipoContrato}</p>
+                    <p className="text-navy font-semibold mt-2">{vacante.tipoContrato}</p>
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#464555]">
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate">
                       Rango Salarial
                     </span>
-                    <p className="text-[#131b2e] font-semibold mt-2">
+                    <p className="text-navy font-semibold mt-2">
                       {formatSalaryRange(vacante.salarioMin, vacante.salarioMax)}
                     </p>
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#464555]">
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate">
                       Estado
                     </span>
                     <p className="mt-2">
@@ -116,15 +116,15 @@ export default function VacanteAplicantesPage() {
 
                 {/* Requisitos */}
                 {vacante.requisitos && vacante.requisitos.length > 0 && (
-                  <div className="mt-8 pt-8 border-t border-[#c7c4d8]/10">
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#464555]">
+                  <div className="mt-8 pt-8 border-t border-border/10">
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate">
                       Requisitos
                     </span>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {vacante.requisitos.map((req, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-1 bg-[#e2dfff] text-[#3525cd] text-xs font-semibold rounded-full"
+                          className="px-3 py-1 bg-accent-bg text-navy text-xs font-semibold rounded-full"
                         >
                           ✓ {req}
                         </span>
@@ -136,7 +136,7 @@ export default function VacanteAplicantesPage() {
 
               {/* Kanban Section */}
               <div className="bg-white rounded-2xl shadow-sm p-8">
-                <h2 className="text-2xl font-extrabold text-[#131b2e] mb-8">
+                <h2 className="text-2xl font-extrabold text-navy mb-8">
                   Pipeline de Candidatos
                 </h2>
                 <KanbanBoard vacanteId={id} onRechazadosChange={setRechazados} />
@@ -146,7 +146,7 @@ export default function VacanteAplicantesPage() {
               </div>
             </>
           ) : (
-            <div className="text-[#ba1a1a] bg-red-50 p-6 rounded-lg">
+            <div className="text-danger bg-red-50 p-6 rounded-lg">
               Vacante no encontrada
             </div>
           )}

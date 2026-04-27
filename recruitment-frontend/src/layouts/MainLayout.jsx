@@ -44,7 +44,7 @@ export default function MainLayout() {
               }}
             />
             <span style={{
-              color: '#131931',
+              color: 'var(--color-navy)',
               fontSize: '1.2rem',
               fontWeight: 'bold',
               letterSpacing: '-0.01em',
@@ -56,7 +56,7 @@ export default function MainLayout() {
             <Link
               to="/admin/vacantes"
               style={{
-                color: '#131931',
+                color: 'var(--color-navy)',
                 fontSize: '0.95rem',
                 fontWeight: '600',
                 transition: 'all 0.3s',
@@ -64,11 +64,11 @@ export default function MainLayout() {
                 borderRadius: '8px',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#CD7B4F';
+                e.currentTarget.style.color = 'var(--color-accent)';
                 e.currentTarget.style.background = 'rgba(205,123,79,0.08)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#131931';
+                e.currentTarget.style.color = 'var(--color-navy)';
                 e.currentTarget.style.background = 'transparent';
               }}
             >
@@ -78,7 +78,7 @@ export default function MainLayout() {
             <Link
               to="/admin/kanban"
               style={{
-                background: 'linear-gradient(135deg, #131931 0%, #1F9DB9 100%)',
+                background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-gold) 100%)',
                 color: 'white',
                 padding: '8px 18px',
                 borderRadius: '8px',
@@ -104,7 +104,7 @@ export default function MainLayout() {
               <Link
                 to="/admin/usuarios"
                 style={{
-                  color: '#131931',
+                  color: 'var(--color-navy)',
                   fontSize: '0.95rem',
                   fontWeight: '600',
                   transition: 'all 0.3s',
@@ -112,11 +112,11 @@ export default function MainLayout() {
                   borderRadius: '8px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#CD7B4F';
+                  e.currentTarget.style.color = 'var(--color-accent)';
                   e.currentTarget.style.background = 'rgba(205,123,79,0.08)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#131931';
+                  e.currentTarget.style.color = 'var(--color-navy)';
                   e.currentTarget.style.background = 'transparent';
                 }}
               >
@@ -132,7 +132,7 @@ export default function MainLayout() {
               gap: '12px',
             }}>
               <span style={{
-                color: '#131931',
+                color: 'var(--color-navy)',
                 fontSize: '0.9rem',
                 fontWeight: '600',
                 letterSpacing: '0.3px',
@@ -144,11 +144,11 @@ export default function MainLayout() {
                 onClick={handleLogout}
                 style={{
                   background: '#fff',
-                  border: '1.5px solid #CD7B4F',
+                  border: '1.5px solid var(--color-accent)',
                   borderRadius: '8px',
                   padding: '8px 18px',
                   fontSize: '0.85rem',
-                  color: '#CD7B4F',
+                  color: 'var(--color-accent)',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s',

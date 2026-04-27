@@ -5,34 +5,44 @@
 
 /* ============================================================
    [1] VARIABLES & RESET
+   Color + font tokens are defined in src/index.css under @theme
+   so Tailwind utilities (bg-navy, text-accent, font-display, …)
+   resolve to the same hex values. The aliases below keep the
+   legacy --clr-* / --ff-* names working for all the existing
+   var(--clr-*) references in this file.
 ============================================================ */
 :root {
-  --clr-bg:         #FFF5F5;
-  --clr-surface:    #FFFFFF;
-  --clr-surface-2:  #F4F4F4;
-  --clr-border:     #D2D1D1;
+  /* Surface aliases */
+  --clr-bg:         var(--color-bg);
+  --clr-surface:    var(--color-surface);
+  --clr-surface-2:  var(--color-surface-2);
+  --clr-border:     var(--color-border);
 
-  --clr-navy:       #131931;
-  --clr-navy-light: #1a2040;
-  --clr-slate:      #464646;
-  --clr-muted:      #7A8C98;
+  /* Brand aliases */
+  --clr-navy:       var(--color-navy);
+  --clr-navy-light: var(--color-navy-light);
+  --clr-slate:      var(--color-slate);
+  --clr-muted:      var(--color-muted);
 
-  --clr-accent:     #CD7B4F;
-  --clr-accent-lt:  #b5673d;
-  --clr-accent-bg:  #FFF1EB;
+  --clr-accent:     var(--color-accent);
+  --clr-accent-lt:  var(--color-accent-lt);
+  --clr-accent-bg:  var(--color-accent-bg);
 
-  --clr-gold:       #1F9DB9;
-  --clr-gold-bg:    #F0F9FC;
+  --clr-gold:       var(--color-gold);
+  --clr-gold-bg:    var(--color-gold-bg);
 
-  --clr-green:      #319E85;
-  --clr-green-bg:   #E8F5F0;
+  --clr-green:      var(--color-green);
+  --clr-green-bg:   var(--color-green-bg);
 
-  --clr-urgent:     #CD7B4F;
-  --clr-urgent-bg:  #FFF1EB;
+  --clr-urgent:     var(--color-urgent);
+  --clr-urgent-bg:  var(--color-urgent-bg);
 
-  --ff-display:     'Playwrite IE', Georgia, serif;
-  --ff-body:        'DM Sans', sans-serif;
+  /* Font aliases */
+  --ff-display:     var(--font-display);
+  --ff-body:        var(--font-body);
 
+  /* Non-Tailwind tokens (kept here, intentionally outside @theme
+     so they don't override Tailwind's default rounded-*/shadow-*) */
   --radius-sm:   6px;
   --radius-md:   12px;
   --radius-lg:   20px;
@@ -143,7 +153,7 @@ em { font-style: italic; color: var(--clr-accent); }
 .navbar__logo {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #131931 0%, #1F9DB9 100%);
+  background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-gold) 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -163,7 +173,7 @@ em { font-style: italic; color: var(--clr-accent); }
   font-family: var(--ff-display);
   font-size: 1.35rem;
   font-weight: 700;
-  color: #131931;
+  color: var(--color-navy);
   letter-spacing: -0.01em;
 }
 
@@ -175,7 +185,7 @@ em { font-style: italic; color: var(--clr-accent); }
 .nav-link {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #131931;
+  color: var(--color-navy);
   transition: all var(--transition);
   text-decoration: none;
   padding: 6px 14px;
@@ -184,7 +194,7 @@ em { font-style: italic; color: var(--clr-accent); }
 }
 
 .nav-link:hover {
-  color: #CD7B4F;
+  color: var(--color-accent);
   background: rgba(205,123,79,0.08);
 }
 
@@ -195,7 +205,7 @@ em { font-style: italic; color: var(--clr-accent); }
   left: 14px;
   right: 14px;
   height: 2px;
-  background: #CD7B4F;
+  background: var(--color-accent);
   border-radius: 2px;
   opacity: 0;
   transition: opacity var(--transition);
@@ -244,7 +254,7 @@ em { font-style: italic; color: var(--clr-accent); }
   font-weight: 700;
   padding: 8px 16px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #131931 0%, #1F9DB9 100%);
+  background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-gold) 100%);
   color: #fff;
   transition: all var(--transition);
   text-decoration: none;
@@ -264,7 +274,7 @@ em { font-style: italic; color: var(--clr-accent); }
 .navbar__user-name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #131931;
+  color: var(--color-navy);
   letter-spacing: 0.3px;
   padding: 0 8px;
 }
@@ -275,8 +285,8 @@ em { font-style: italic; color: var(--clr-accent); }
   padding: 8px 18px;
   border-radius: 8px;
   background: #fff;
-  color: #CD7B4F;
-  border: 1.5px solid #CD7B4F;
+  color: var(--color-accent);
+  border: 1.5px solid var(--color-accent);
   transition: all var(--transition);
   text-decoration: none;
   cursor: pointer;
@@ -301,7 +311,7 @@ em { font-style: italic; color: var(--clr-accent); }
   position: relative;
   overflow: hidden;
   padding: 80px 40px 60px;
-  background: linear-gradient(155deg, #131931 0%, #1a2040 60%, #1F9DB9 100%);
+  background: linear-gradient(155deg, var(--color-navy) 0%, var(--color-navy-light) 60%, var(--color-gold) 100%);
   color: #fff;
   font-family: var(--ff-body);
 }
