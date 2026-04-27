@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getVacantes, createVacante, deleteVacante, updateVacante } from '../api/vacantesApi';
 import { useAuth } from '../context/AuthContext';
-import { CONTRACT_TYPES, ITEMS_PER_PAGE } from '../constants';
+import { ITEMS_PER_PAGE } from '../constants';
 import { formatSalaryRange, formatId } from '../utils/vacanteHelpers';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Pagination from '../components/common/Pagination';
+import ConfirmModal from '../components/common/ConfirmModal';
+import VacanteFormModal from '../components/vacantes/VacanteFormModal';
 
 export default function AdminVacantesPage() {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ export default function AdminVacantesPage() {
   const [requisitoInput, setRequisitoInput] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   const fetchVacantes = useCallback(async () => {
     try {
@@ -45,36 +48,6 @@ export default function AdminVacantesPage() {
   useEffect(() => {
     fetchVacantes();
   }, [fetchVacantes]);
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const addRequisito = () => {
-    const trimmed = requisitoInput.trim();
-    if (trimmed && !formData.requisitos.includes(trimmed)) {
-      setFormData({
-        ...formData,
-        requisitos: [...formData.requisitos, trimmed],
-      });
-      setRequisitoInput('');
-    }
-  };
-
-  const removeRequisito = (index) => {
-    setFormData({
-      ...formData,
-      requisitos: formData.requisitos.filter((_, i) => i !== index),
-    });
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addRequisito();
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -136,13 +109,19 @@ export default function AdminVacantesPage() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar esta vacante y todas sus postulaciones?')) return;
+  const handleDelete = (id) => {
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
     try {
-      await deleteVacante(id);
+      await deleteVacante(pendingDeleteId);
       await fetchVacantes();
     } catch (error) {
       console.error('Error deleting vacante:', error);
+    } finally {
+      setPendingDeleteId(null);
     }
   };
 
@@ -274,266 +253,17 @@ export default function AdminVacantesPage() {
           </div>
         </div>
 
-        {/* Form Modal / Slide-over */}
-        {showForm && (
-          <div className="fixed inset-0 z-40 flex items-end md:items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-[#131b2e]/40 backdrop-blur-sm"
-              onClick={() => setShowForm(false)}
-            />
-            <div className="relative bg-white shadow-2xl flex flex-col max-w-2xl w-full max-h-screen rounded-2xl overflow-hidden">
-              {/* Form Header */}
-              <div className="p-8 border-b border-[#c7c4d8]/10 flex justify-between items-center bg-[#faf8ff]">
-                <div>
-                  <h2 className="text-2xl font-extrabold tracking-tight text-[#131b2e]">
-                    {editingId ? 'Editar Vacante' : 'Nueva Vacante'}
-                  </h2>
-                  <p className="text-[#464555] text-sm">
-                    {editingId
-                      ? 'Actualiza la información de la posición.'
-                      : 'Completa la información técnica de la posición.'}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="p-2 hover:bg-[#eaedff] rounded-full text-[#464555] transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Form Body */}
-              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-6">
-                {/* Title */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                    Título del Puesto
-                  </label>
-                  <input
-                    type="text"
-                    name="titulo"
-                    value={formData.titulo}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                    placeholder="Ej: Senior Product Designer"
-                  />
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                    Descripción
-                  </label>
-                  <textarea
-                    name="descripcion"
-                    value={formData.descripcion}
-                    onChange={handleFormChange}
-                    required
-                    rows="4"
-                    className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                    placeholder="Estamos buscando un diseñador con visión estratégica..."
-                  />
-                </div>
-
-                {/* Location & Contract Type */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                      Ubicación
-                    </label>
-                    <input
-                      type="text"
-                      name="ubicacion"
-                      value={formData.ubicacion}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                      placeholder="Ej: San Salvador"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                      Tipo de Contrato
-                    </label>
-                    <select
-                      name="tipoContrato"
-                      value={formData.tipoContrato}
-                      onChange={handleFormChange}
-                      className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all appearance-none"
-                    >
-                      {CONTRACT_TYPES.map((type) => (
-                        <option key={type}>{type}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Salary Range */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                      Salario Mínimo
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
-                        $
-                      </span>
-                      <input
-                        type="number"
-                        name="salarioMin"
-                        value={formData.salarioMin}
-                        onChange={handleFormChange}
-                        className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 pl-8 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                        placeholder="45000"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                      Salario Máximo
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#464555]">
-                        $
-                      </span>
-                      <input
-                        type="number"
-                        name="salarioMax"
-                        value={formData.salarioMax}
-                        onChange={handleFormChange}
-                        className="w-full bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 pl-8 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                        placeholder="60000"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                    Requisitos
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={requisitoInput}
-                      onChange={(e) => setRequisitoInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      className="flex-1 bg-[#f2f3ff] border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                      placeholder="Ej: 5+ años experiencia"
-                    />
-                    <button
-                      type="button"
-                      onClick={addRequisito}
-                      className="px-4 py-3 bg-[#3525cd] text-white rounded-xl font-bold hover:bg-[#2816b8] transition-colors"
-                    >
-                      Agregar
-                    </button>
-                  </div>
-
-                  {formData.requisitos.length > 0 && (
-                    <div className="space-y-2 mt-3">
-                      {formData.requisitos.map((req, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-3 p-3 bg-[#e2dfff] rounded-xl"
-                        >
-                          <span className="text-[#3525cd]">✓</span>
-                          <span className="text-sm text-[#131b2e]">{req}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeRequisito(index)}
-                            className="ml-auto text-[#464555] hover:text-[#131b2e] font-bold"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Screening Configuration */}
-                <details className="space-y-2 p-4 bg-[#f2f3ff]/50 rounded-xl border border-[#dae2fd]">
-                  <summary className="cursor-pointer font-bold text-[#464555] uppercase tracking-widest text-xs">
-                    ⚙️ Configuración de Screening
-                  </summary>
-                  <div className="space-y-4 mt-4">
-                    {/* Toggle Screening Active */}
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm text-[#464555] font-semibold">
-                        Activar screening automático
-                      </label>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="screeningActivo"
-                          checked={formData.screeningActivo}
-                          onChange={(e) =>
-                            setFormData({ ...formData, screeningActivo: e.target.checked })
-                          }
-                          className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#3525cd]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3525cd]" />
-                      </label>
-                    </div>
-
-                    {/* Threshold Score */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-[#464555]">
-                        Umbral de Aprobación (0-100)
-                      </label>
-                      <input
-                        type="number"
-                        name="umbralPuntaje"
-                        min="0"
-                        max="100"
-                        value={formData.umbralPuntaje}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            umbralPuntaje: Math.max(0, Math.min(100, Number(e.target.value))),
-                          })
-                        }
-                        className="w-full bg-white border border-[#dae2fd] rounded-xl p-3 focus:ring-2 focus:ring-[#3525cd]/20 focus:border-transparent outline-none transition-all"
-                        placeholder="60"
-                      />
-                      <p className="text-xs text-[#464555]">
-                        Candidatos con puntaje menor serán marcados como rechazados automáticamente.
-                      </p>
-                    </div>
-                  </div>
-                </details>
-              </form>
-
-              {/* Form Footer */}
-              <div className="p-8 border-t border-[#c7c4d8]/10 bg-[#faf8ff] sticky bottom-0 flex gap-4">
-                <button
-                  type="submit"
-                  onClick={handleSubmit}
-                  disabled={submitLoading}
-                  className="flex-1 bg-gradient-to-br from-[#3525cd] to-[#4f46e5] text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-[#4f46e5]/20 transition-all disabled:opacity-50"
-                >
-                  {submitLoading
-                    ? editingId
-                      ? 'Actualizando...'
-                      : 'Creando...'
-                    : editingId
-                    ? 'Actualizar Vacante'
-                    : 'Crear Vacante'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-6 py-3 border border-[#c7c4d8] text-[#464555] rounded-xl font-bold hover:bg-[#faf8ff] transition-all"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <VacanteFormModal
+          isOpen={showForm}
+          editingId={editingId}
+          formData={formData}
+          setFormData={setFormData}
+          requisitoInput={requisitoInput}
+          setRequisitoInput={setRequisitoInput}
+          submitLoading={submitLoading}
+          onSubmit={handleSubmit}
+          onClose={() => setShowForm(false)}
+        />
 
         {/* Data Table Container */}
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm">
@@ -676,6 +406,17 @@ export default function AdminVacantesPage() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={pendingDeleteId !== null}
+        title="Eliminar vacante"
+        message="¿Eliminar esta vacante y todas sus postulaciones? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 }

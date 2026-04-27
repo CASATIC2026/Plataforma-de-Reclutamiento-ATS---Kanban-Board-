@@ -286,7 +286,16 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
                 ) : (
                   <div
                     className={`dropzone${dragging ? ' drag-over' : ''}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Seleccionar o arrastrar archivo de CV"
                     onClick={() => fileInputRef.current?.click()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                     onDragLeave={() => setDragging(false)}
                     onDrop={(e) => {
