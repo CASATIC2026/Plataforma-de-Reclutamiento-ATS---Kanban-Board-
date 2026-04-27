@@ -28,7 +28,8 @@ function JobCardNew({ job, onClick }) {
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
-        minHeight: '260px',
+        height: '340px',
+        boxSizing: 'border-box',
       }}
     >
       <div
@@ -36,8 +37,8 @@ function JobCardNew({ job, onClick }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          flexWrap: 'wrap',
           gap: '8px',
+          minWidth: 0,
         }}
       >
         <div
@@ -46,14 +47,22 @@ function JobCardNew({ job, onClick }) {
             borderRadius: '8px',
             padding: '4px 12px',
             transition: 'background 0.25s',
+            flex: '1 1 auto',
+            minWidth: 0,
+            overflow: 'hidden',
           }}
         >
           <span
+            title={job.title}
             style={{
               color: '#fff',
               fontFamily: "'Maven Pro', sans-serif",
               fontWeight: 700,
               fontSize: '14px',
+              display: 'block',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {job.title}
@@ -65,6 +74,8 @@ function JobCardNew({ job, onClick }) {
             fontFamily: 'sans-serif',
             fontSize: '11px',
             fontWeight: 700,
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
           }}
         >
           {job.type}
@@ -146,6 +157,11 @@ function JobCardNew({ job, onClick }) {
           lineHeight: '1.5',
           flex: 1,
           margin: 0,
+          display: '-webkit-box',
+          WebkitLineClamp: 4,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}
       >
         {job.description}

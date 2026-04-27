@@ -404,6 +404,7 @@ export default function NewLandingPage() {
           </button>
         ))}
       </div>
+      
 
       {/* JOB GRID */}
       <section className="jobs-section" style={{ background: '#353535', padding: '48px 40px 60px' }}>
