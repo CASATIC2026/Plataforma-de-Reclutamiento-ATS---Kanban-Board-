@@ -13,12 +13,12 @@ public class RegisterDTO
     [Required, EmailAddress, MaxLength(200)]
     public string Email { get; set; } = string.Empty;
 
-    [Required, MinLength(6)]
+    [Required, MinLength(8), MaxLength(100)]
     public string Password { get; set; } = string.Empty;
 
     [MaxLength(200)]
     public string? Carrera { get; set; }
 
-    [Required]
+    [Required, MaxLength(100)]
     public string Rol { get; set; } = "General";
 }

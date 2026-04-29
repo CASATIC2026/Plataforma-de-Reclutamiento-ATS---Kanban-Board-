@@ -8,6 +8,9 @@ namespace RecruitmentAPI.Services;
 
 public class PostulacionService : IPostulacionService
 {
+    private static readonly HashSet<string> AllowedExtensions = new() { ".pdf", ".doc", ".docx" };
+    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+
     private readonly IPostulacionRepository _repository;
     private readonly IVacanteRepository _vacanteRepository;
     private readonly IScoringService _scoringService;
@@ -54,7 +57,15 @@ public class PostulacionService : IPostulacionService
 
         if (dto.CvFile != null && dto.CvFile.Length > 0)
         {
-            var extension = Path.GetExtension(dto.CvFile.FileName);
+            // Validate file extension
+            var extension = Path.GetExtension(dto.CvFile.FileName).ToLowerInvariant();
+            if (!AllowedExtensions.Contains(extension))
+                throw new InvalidOperationException($"File type '{extension}' is not allowed. Allowed types: {string.Join(", ", AllowedExtensions)}");
+
+            // Validate file size (5 MB max)
+            if (dto.CvFile.Length > MaxFileSizeBytes)
+                throw new InvalidOperationException($"File size exceeds 5 MB limit. Actual size: {dto.CvFile.Length / (1024 * 1024)} MB");
+
             cvFileName = $"{Guid.NewGuid()}{extension}";
 
             var storageDir = Path.Combine(_env.ContentRootPath, "Storage", "CVs");

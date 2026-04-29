@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { STORAGE_KEYS } from '../constants';
 
+// Determine API base URL: use environment variable if set, otherwise use relative path (Vite proxy in dev)
+const apiUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: apiUrl,
 });
 
 // Attach JWT token to every request if available

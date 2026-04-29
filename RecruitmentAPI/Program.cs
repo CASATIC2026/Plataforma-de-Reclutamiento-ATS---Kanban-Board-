@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentAPI.Data;
@@ -8,13 +9,28 @@ using RecruitmentAPI.Repositories.Interfaces;
 using RecruitmentAPI.Services;
 using RecruitmentAPI.Services.Interfaces;
 
+// Load .env file if it exists (for development)
+var envFilePath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envFilePath))
+{
+    foreach (var line in File.ReadAllLines(envFilePath))
+    {
+        if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+        var parts = line.Split('=', 2);
+        if (parts.Length == 2)
+            Environment.SetEnvironmentVariable(parts[0].Trim(), parts[1].Trim());
+    }
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // --- SERVICES REGISTRATION ---
 
-// Database
+// Database — read connection string from environment variable for security
+var dbConnection = Environment.GetEnvironmentVariable("DB_CONNECTION")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(dbConnection));
 
 // Repository layer
 builder.Services.AddScoped<IVacanteRepository, VacanteRepository>();
@@ -30,8 +46,10 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddTransient<IScoringService, ScoringService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-// JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"]!;
+// JWT Authentication — read key from environment variable for security
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
+    ?? builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT_KEY environment variable or Jwt:Key config is required");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,12 +78,25 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Administrador", "Manager"));
 });
 
-// Controllers
+// Controllers with request size limits (6 MB max for file uploads)
 builder.Services.AddControllers();
+builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = 6_000_000);
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// CORS — read allowed origin from environment variable
+var allowedOrigin = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN") ?? "http://localhost:5173";
+builder.Services.AddCors(options =>
+    options.AddPolicy("Default", policy =>
+        policy.WithOrigins(allowedOrigin)
+              .AllowAnyHeader()
+              .AllowAnyMethod()));
+
+// Kestrel limits
+builder.WebHost.ConfigureKestrel(k =>
+    k.Limits.MaxRequestBodySize = 6_000_000); // 6 MB
 
 var app = builder.Build();
 
@@ -78,6 +109,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("Default");
+
+// Security headers middleware
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -94,26 +137,31 @@ try
     foreach (var u in invitados) u.Rol = RecruitmentAPI.Models.RolUsuario.General;
     if (invitados.Any()) { db.SaveChanges(); Console.WriteLine($">> Migrated {invitados.Count} Invitado users to General"); }
 
-    var adminUser = db.Usuarios.FirstOrDefault(u => u.Email == "admin@talentbridge.com");
-    if (adminUser == null)
+    // Only seed admin user if SEED_ADMIN_PASSWORD is provided (security: don't hardcode default passwords)
+    var seedPassword = Environment.GetEnvironmentVariable("SEED_ADMIN_PASSWORD");
+    if (!string.IsNullOrEmpty(seedPassword))
     {
-        db.Usuarios.Add(new RecruitmentAPI.Models.Usuario
+        var adminUser = db.Usuarios.FirstOrDefault(u => u.Email == "admin@talentbridge.com");
+        if (adminUser == null)
         {
-            Nombre = "Admin",
-            Apellido = "TalentBridge",
-            Email = "admin@talentbridge.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-            Rol = RecruitmentAPI.Models.RolUsuario.Administrador
-        });
-        db.SaveChanges();
-        Console.WriteLine(">> Admin seed user created: admin@talentbridge.com / Admin123!");
-    }
-    else
-    {
-        adminUser.Rol = RecruitmentAPI.Models.RolUsuario.Administrador;
-        adminUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!");
-        db.SaveChanges();
-        Console.WriteLine(">> Admin seed user reset: admin@talentbridge.com / Admin123!");
+            db.Usuarios.Add(new RecruitmentAPI.Models.Usuario
+            {
+                Nombre = "Admin",
+                Apellido = "TalentBridge",
+                Email = "admin@talentbridge.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword),
+                Rol = RecruitmentAPI.Models.RolUsuario.Administrador
+            });
+            db.SaveChanges();
+            Console.WriteLine(">> Admin seed user created: admin@talentbridge.com");
+        }
+        else
+        {
+            adminUser.Rol = RecruitmentAPI.Models.RolUsuario.Administrador;
+            adminUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword);
+            db.SaveChanges();
+            Console.WriteLine(">> Admin seed user reset: admin@talentbridge.com");
+        }
     }
 }
 catch (Exception ex)

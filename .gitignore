@@ -1,12 +1,15 @@
- 
 # Backend
 RecruitmentAPI/bin/
 RecruitmentAPI/obj/
 RecruitmentAPI/appsettings.Development.json
+RecruitmentAPI/.env
+RecruitmentAPI/.env.local
 
 # Frontend
 recruitment-frontend/node_modules/
 recruitment-frontend/dist/
+recruitment-frontend/.env
+recruitment-frontend/.env.local
 
 # OS
 .DS_Store

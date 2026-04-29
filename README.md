@@ -110,6 +110,8 @@ Plataforma-de-Reclutamiento-ATS---Kanban-Board-/
 | salario_min | decimal? | Optional |
 | salario_max | decimal? | Optional |
 | esta_activa | bool | Default: true |
+| screening_activo | bool | Auto-screening toggle (default: true) |
+| umbral_puntaje | decimal | Score threshold 0–100 (default: 60) |
 | created_at | DateTime | UTC |
 | updated_at | DateTime | UTC |
 
@@ -142,8 +144,12 @@ Plataforma-de-Reclutamiento-ATS---Kanban-Board-/
 | telefono | string | |
 | cv_file_name | string | UUID-named filename on disk |
 | cv_file_path | string | Absolute path on disk |
-| estado | enum | Nuevo, Entrevista, PruebaTecnica, Oferta |
+| estado | enum | Rechazado (-1), Nuevo (0), Entrevista (1), PruebaTecnica (2), Oferta (3) |
 | notas_internas | string? | Internal recruiter notes (nullable) |
+| puntaje | decimal? | Auto-screening score (0–100, nullable) |
+| puntaje_detalle | string? | JSON breakdown: `{"requisitos":45.0,"ubicacion":25.0,"completeness":15.0}` |
+| email_confirmacion_enviado | bool | Receipt email sent (default: false) |
+| email_resultado_enviado | bool | Result email sent (default: false) |
 | created_at | DateTime | UTC |
 | updated_at | DateTime | UTC |
 
@@ -307,8 +313,8 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 ## Notes
 
 - **JWT Authentication** — Admin write operations (create/update/delete vacantes, update estado/notas, delete postulaciones) require a valid JWT token. Public read endpoints and candidate applications remain open. CV viewing also requires authentication. Token stored in `localStorage` (`tb_token`, `tb_user`), auto-attached via Axios interceptor, 8-hour expiry.
-- **No CORS** — relies on Vite dev proxy; configure CORS headers for non-proxied deployments
-- **No role-based authorization** — any authenticated user can access admin features; role field exists but is not enforced yet
+- **Role-based authorization** — enforced via `[Authorize(Roles = ...)]` on all admin endpoints. VacantesController write ops require Administrador; PostulacionesController read/PATCH require Administrador or Manager.
+- **CORS** — relies on Vite dev proxy in development; production configures via `ALLOWED_ORIGIN` environment variable (patch in progress)
 - CV files are stored on disk under `Storage/CVs/` with UUID-based names; files are deleted when the application is deleted
 - **Polling for multi-user sync** — The operational Kanban board (`/admin/kanban`) auto-refreshes every 30 seconds. This prevents lost updates when multiple recruiters move cards simultaneously on different devices. Last-write-wins conflict resolution: whichever PATCH arrives last to the server is the final state; the 30s poll catches and syncs all conflicting changes across users.
 - **Vacancy color pills** — Each candidate card on the operational Kanban shows a colored pill with the vacancy name. Colors are deterministic per vacancy (based on vacancy ID hash, same as job board) so recruiters instantly recognize which job a candidate applied to.
@@ -318,5 +324,5 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 - Clicking a Kanban card opens `CandidateProfileModal` with candidate data, embedded CV, and internal notes
 - PDF CVs are served inline via `GET /api/postulaciones/{id}/cv`; non-PDF formats trigger a file download
 - Internal notes auto-save with a 1.5s debounce; cards show a "Notas" badge when notes exist
-- 6 EF Core migrations applied (latest: `AddUsuarios`)
-- JWT secret key is hardcoded in `appsettings.json` — use environment variables or secrets manager in production
+- 7 EF Core migrations applied (latest: `AddScreeningAndEmailTracking`)
+- **Security status**: RBAC enforced, JWT validated, SQL injection protected. Known issues being patched: credentials to env vars, rate limiting, file upload validation, DTO validation, security headers. See [PENTESTING.md](PENTESTING.md) for full security audit and remediation plan.
