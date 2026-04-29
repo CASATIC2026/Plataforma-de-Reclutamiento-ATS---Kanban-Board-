@@ -42,7 +42,7 @@
   --ff-body:        var(--font-body);
 
   /* Non-Tailwind tokens (kept here, intentionally outside @theme
-     so they don't override Tailwind's default rounded-*/shadow-*) */
+     so they don't override Tailwind's default rounded and shadow utilities) */
   --radius-sm:   6px;
   --radius-md:   12px;
   --radius-lg:   20px;
