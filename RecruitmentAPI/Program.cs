@@ -50,6 +50,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
     ?? builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("JWT_KEY environment variable or Jwt:Key config is required");
+
+// Inject resolved key back into IConfiguration so services (e.g. AuthService) can read it via _config["Jwt:Key"]
+builder.Configuration["Jwt:Key"] = jwtKey;
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

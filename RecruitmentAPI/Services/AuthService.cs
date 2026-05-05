@@ -140,8 +140,10 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(Usuario usuario)
     {
+        var jwtKey = _config["Jwt:Key"]
+            ?? throw new InvalidOperationException("Jwt:Key configuration is missing");
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
