@@ -8,7 +8,7 @@ A full-stack Applicant Tracking System (ATS) with a public-facing job board, an 
 
 **Authentication & Authorization**
 - JWT Bearer authentication with BCrypt password hashing
-- Register with name, email, password, career field, and role (Estudiante, Profesor, Administrador, Invitado)
+- Register with name, email, password, and career field (public registration always creates a General role account)
 - Login with email and password; 8-hour token expiry
 - Two-panel auth UI with floating animations and glassmorphism design
 - Admin write operations require authentication; public read endpoints remain open
@@ -203,6 +203,23 @@ DELETE /api/postulaciones/{id}         # 🔒 Requires JWT — also deletes CV f
 - Node.js 18+
 - PostgreSQL running on `localhost:5433`
 
+### Environment Variables
+
+Create `RecruitmentAPI/.env`:
+```
+DB_CONNECTION=Host=localhost;Port=5433;Database=recruitment_db;Username=recruitment_user;Password=Recruitment2025!
+JWT_KEY=TalentBridge_SuperSecretKey_2025_MustBeAtLeast32Chars!
+SEED_ADMIN_PASSWORD=Admin123!
+ALLOWED_ORIGIN=http://localhost:5173
+```
+
+Create `recruitment-frontend/.env`:
+```
+VITE_API_URL=http://localhost:5223
+```
+
+> `.env` files are git-ignored. Use `.env.example` in each directory as a template.
+
 ### Database Setup
 
 Create the database and user:
@@ -314,7 +331,7 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 
 - **JWT Authentication** — Admin write operations (create/update/delete vacantes, update estado/notas, delete postulaciones) require a valid JWT token. Public read endpoints and candidate applications remain open. CV viewing also requires authentication. Token stored in `localStorage` (`tb_token`, `tb_user`), auto-attached via Axios interceptor, 8-hour expiry.
 - **Role-based authorization** — enforced via `[Authorize(Roles = ...)]` on all admin endpoints. VacantesController write ops require Administrador; PostulacionesController read/PATCH require Administrador or Manager.
-- **CORS** — relies on Vite dev proxy in development; production configures via `ALLOWED_ORIGIN` environment variable (patch in progress)
+- **CORS** — restricted to `ALLOWED_ORIGIN` environment variable in all environments. Vite proxy used in development (`/api → http://localhost:5223`); set `ALLOWED_ORIGIN` to your frontend domain in production.
 - CV files are stored on disk under `Storage/CVs/` with UUID-based names; files are deleted when the application is deleted
 - **Polling for multi-user sync** — The operational Kanban board (`/admin/kanban`) auto-refreshes every 30 seconds. This prevents lost updates when multiple recruiters move cards simultaneously on different devices. Last-write-wins conflict resolution: whichever PATCH arrives last to the server is the final state; the 30s poll catches and syncs all conflicting changes across users.
 - **Vacancy color pills** — Each candidate card on the operational Kanban shows a colored pill with the vacancy name. Colors are deterministic per vacancy (based on vacancy ID hash, same as job board) so recruiters instantly recognize which job a candidate applied to.
