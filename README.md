@@ -72,6 +72,74 @@ A full-stack Applicant Tracking System (ATS) with a public-facing job board, an 
 
 ---
 
+## RBAC System (Role-Based Access Control)
+
+**Overview:** Talentify SV implements a comprehensive RBAC system with 8 roles, 41 fine-grained permissions, multi-tenant company scoping, and a dedicated platform admin panel. All data is database-backed via EF Core seed scripts — no mocked data.
+
+### Role Hierarchy
+
+| Role | Tier | Scope | Purpose |
+|---|---|---|---|
+| **Candidate** | App | User's own company | Job seeker; view own applications only |
+| **Recruiter** | App | Company | Manage job postings and candidate screening |
+| **Manager** | App | Company | Oversee recruitment funnel, analytics, team activity |
+| **Admin** | Platform | All companies | System administration, user/role management |
+| **Owner** | Platform | All companies | Full system control; immutable role (DB-only assignment) |
+| **Developer** | Platform | N/A | Deployment, feature flag toggles, log access |
+| **DevOps** | Platform | N/A | Infrastructure, pipeline, deployment rollback |
+| **DBA** | Platform | N/A | Audit logs, database metrics, performance monitoring |
+
+### Permission Categories (41 Total)
+
+| Category | Permissions | Role Assignments |
+|---|---|---|
+| **jobs** (7) | `read`, `create`, `update`, `delete`, `approve`, `publish`, `read_all` | Recruiter: create/update/delete; Manager: approve/publish/read_all |
+| **applications** (6) | `create`, `read_own`, `read`, `read_all`, `update_status`, `add_note` | Candidate: create/read_own; Recruiter: read/update_status/add_note; Manager: read_all |
+| **profile** (1) | `update_own` | Candidate |
+| **users** (4) | `read`, `update`, `disable`, `assign_role` | Admin: all; Manager: read only |
+| **companies** (4) | `create`, `read`, `update`, `transfer` | Admin: create/read/update; Owner: transfer |
+| **reports** (1) | `read` | Manager |
+| **roles** (3) | `read`, `create`, `update`, `assign_admin` | Admin: read; Owner: create/update/assign_admin |
+| **audit** (2) | `read`, `export` | Admin: read; Owner: export |
+| **platform** (3) | `access`, `configure`, `billing:read` | Admin: access; Owner: configure/billing:read |
+| **ops** (9) | `deployment:trigger`, `deployment:read_logs`, `deployment:rollback`, `infra:read_metrics`, `infra:configure`, `pipeline:trigger`, `logs:read`, `features:toggle`, `db:read_logs` | Owner: all; Developer: trigger/read_logs/toggle; DevOps: trigger/rollback/infra:*; DBA: audit:read/db:read_logs |
+
+### Permission Checking
+
+**Backend:** All controllers use `[Authorize]` attribute with role checks. Missing permission → 403 Forbidden.
+
+**Frontend:** Use the `usePermission()` hook and `<Can>` component for deny-by-default UI:
+
+```jsx
+import { usePermission } from '../hooks/usePermission';
+import { Can } from '../components/common/Can';
+
+// Hook-based check
+const canCreateJob = usePermission('jobs:create');
+
+// Component-based wrapping
+<Can permission="jobs:create">
+  <button>Publicar Vacante</button>
+</Can>
+
+<Can permission="roles:update" fallback={<p>No tienes permiso</p>}>
+  <RoleEditor />
+</Can>
+```
+
+### Legacy Fallback
+
+Users created before RBAC deployment have permissions derived from their legacy `rol` enum (Estudiante, Profesor, Administrador, Invitado). Once the database seed runs, the `usuario_roles` join table is populated with the appropriate role + company scope; these users get their permissions from the new system, with the enum as a fallback display field.
+
+### Multi-Tenancy
+
+Each `usuario_roles` record scopes a user to a company (`empresa_id`). The JWT includes `company_id` claim; APIs filter cross-tenant visibility based on the user's scoped company.
+
+- **Candidate/Recruiter/Manager:** scoped to their assigned company
+- **Admin/Owner/Developer/DevOps/DBA:** platform-tier, see all companies (no scoping)
+
+---
+
 ## Project Structure
 
 ```
@@ -139,6 +207,7 @@ Plataforma-de-Reclutamiento-ATS---Kanban-Board-/
 |---|---|---|
 | id | UUID | Primary key |
 | vacante_id | UUID (FK) | |
+| usuario_id | UUID (FK) | Authenticated applier (nullable for legacy) |
 | nombre_candidato | string | |
 | email | string | |
 | telefono | string | |
@@ -155,44 +224,203 @@ Plataforma-de-Reclutamiento-ATS---Kanban-Board-/
 
 ---
 
+## RBAC Database Tables
+
+### `empresas` — Multi-tenant Companies
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| nombre | string | Company name |
+| dominio | string | Unique partial index (IS NOT NULL), e.g. "talentifysv.com" |
+| estado | enum | "activa" or "inactiva" (default: "activa") |
+| created_at | DateTime | UTC |
+
+### `roles` — RBAC Role Definitions
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| nombre | string | Unique, e.g. "Candidate", "Owner" |
+| ambito | string | "app_tier" (scoped to company) or "platform_tier" (global) |
+| es_inmutable | bool | If true, cannot be edited/deleted (e.g., Owner role) |
+| created_at | DateTime | UTC |
+
+### `permisos` — Fine-grained Permission Definitions
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| nombre | string | Unique, e.g. "jobs:create", "audit:read" |
+| descripcion | string? | Human-readable description |
+| categoria | string? | Category for grouping, e.g. "jobs", "audit" |
+| created_at | DateTime | UTC |
+
+### `rol_permisos` — Role-Permission Mappings
+| Column | Type | Notes |
+|---|---|---|
+| rol_id | UUID (FK) | → roles, cascade delete |
+| permiso_id | UUID (FK) | → permisos, cascade delete |
+
+**Composite PK:** (rol_id, permiso_id)
+
+### `usuario_roles` — User Role Assignments (Multi-tenant Scope)
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| usuario_id | UUID (FK) | → usuarios, cascade delete |
+| rol_id | UUID (FK) | → roles, cascade delete |
+| empresa_id | UUID (FK) | → empresas, nullable (NULL = platform-tier only) |
+| asignado_por | UUID (FK) | → usuarios, who assigned this role (nullable) |
+| asignado_en | DateTime | When assigned (default: NOW()) |
+
+**Index:** (usuario_id, empresa_id) for scoped queries
+
+### `audit_log` — Audit Trail
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| usuario_id | UUID (FK)? | → usuarios, nullable, SetNull on delete |
+| accion | string | e.g. "CREATE_VACANTE", "UPDATE_ESTADO" |
+| recurso | string? | Resource identifier, e.g. "vacantes:123abc" |
+| resultado | string | "Allowed" or "Denied" (default: "Allowed") |
+| ip | string? | Client IP address |
+| detalles | string? | JSON details, e.g. `{"campo":"estado","valor_antiguo":"Nuevo","valor_nuevo":"Entrevista"}` |
+| created_at | DateTime | UTC |
+
+**Indexes:** created_at, (usuario_id, created_at)
+
+### `feature_flags` — Feature Toggle Configuration
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| nombre | string | Unique flag name, e.g. "screening_automatico" |
+| descripcion | string? | Human-readable description |
+| esta_activo | bool | Flag state (default: false) |
+| modificado_por | UUID (FK)? | → usuarios, last modifier |
+| modified_at | DateTime | Last update time (default: NOW()) |
+
+**Index:** nombre (unique)
+
+### `deployment_logs` — Deployment History
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| version | string | Semantic version, e.g. "1.0.0" |
+| disparado_por | UUID (FK)? | → usuarios, who triggered deployment |
+| estado | string | "Running", "Success", "Failed", "RolledBack" (default: "Running") |
+| duracion_segundos | int? | Execution duration in seconds |
+| notas | string? | Deployment notes or error messages |
+| created_at | DateTime | UTC |
+
+**Index:** created_at
+
+---
+
 ## API Endpoints
 
+### Authentication
 ```
-# Authentication
 POST   /api/auth/register              # Create account (201 or 409 if email exists)
 POST   /api/auth/login                 # Get JWT token (200 or 401)
+                                       # Response: {token, user{...}, permissions[], companyId}
+```
 
-# Vacancies
-GET    /api/vacantes                   # Public
-GET    /api/vacantes/{id}              # Public
-POST   /api/vacantes                   # 🔒 Requires JWT
-PUT    /api/vacantes/{id}              # 🔒 Requires JWT
-DELETE /api/vacantes/{id}              # 🔒 Requires JWT — cascades to requisitos & postulaciones
+### Vacancies
+```
+GET    /api/vacantes                   # Public list
+GET    /api/vacantes/{id}              # Public detail
+POST   /api/vacantes                   # 🔒 jobs:create
+PUT    /api/vacantes/{id}              # 🔒 jobs:update
+DELETE /api/vacantes/{id}              # 🔒 jobs:delete (cascades to requisitos & postulaciones)
+```
 
-# Applications
+### Applications
+```
 GET    /api/postulaciones              # Public
 GET    /api/postulaciones/{id}         # Public
 GET    /api/postulaciones/vacante/{id} # Public
-POST   /api/postulaciones              # Public (candidates apply with CV)
-GET    /api/postulaciones/{id}/cv      # 🔒 Requires JWT (inline PDF, attachment for others)
-PATCH  /api/postulaciones/{id}/estado  # 🔒 Requires JWT
-PATCH  /api/postulaciones/{id}/notas   # 🔒 Requires JWT
-DELETE /api/postulaciones/{id}         # 🔒 Requires JWT — also deletes CV file
+POST   /api/postulaciones              # Public (candidate apply with CV)
+GET    /api/postulaciones/{id}/cv      # 🔒 applications:read
+PATCH  /api/postulaciones/{id}/estado  # 🔒 applications:update_status
+PATCH  /api/postulaciones/{id}/notas   # 🔒 applications:add_note
+DELETE /api/postulaciones/{id}         # 🔒 applications:read_all (also deletes CV file)
+```
+
+### Candidate Dashboard
+```
+GET    /api/candidato/postulaciones    # 🔒 applications:read_own
+                                       # Returns only user's own applications
+```
+
+### Multi-Tenant Companies
+```
+GET    /api/empresas                   # 🔒 companies:read
+POST   /api/empresas                   # 🔒 companies:create
+PUT    /api/empresas/{id}              # 🔒 companies:update
+DELETE /api/empresas/{id}              # 🔒 companies:update (soft delete)
+```
+
+### RBAC Roles & Permissions
+```
+GET    /api/roles                      # 🔒 roles:read
+POST   /api/roles                      # 🔒 roles:create
+PATCH  /api/roles/{id}/permisos        # 🔒 roles:update (blocked if EsInmutable=true)
+POST   /api/roles/assign               # 🔒 users:assign_role
+                                       # Body: {usuarioId, rolNombre, empresaId?}
+```
+
+### Audit Logs
+```
+GET    /api/audit                      # 🔒 audit:read
+                                       # Query params: from, to, usuarioId, resultado, page, pageSize
+```
+
+### Feature Flags
+```
+GET    /api/feature-flags              # 🔒 features:toggle
+PATCH  /api/feature-flags/{id}/toggle  # 🔒 features:toggle
+```
+
+### Analytics
+```
+GET    /api/analytics/pipeline         # 🔒 reports:read
+GET    /api/analytics/time-to-hire     # 🔒 reports:read
+GET    /api/analytics/sources          # 🔒 reports:read
+GET    /api/analytics/team             # 🔒 reports:read (also requires users:read)
+```
+
+### Operations (Deployments, Infrastructure, Logs)
+```
+GET    /api/ops/deployments            # 🔒 deployment:read_logs
+POST   /api/ops/deploy                 # 🔒 deployment:trigger
+POST   /api/ops/rollback/{id}          # 🔒 deployment:rollback
+GET    /api/platform/overview          # 🔒 platform:access
 ```
 
 ---
 
 ## Frontend Routes
 
-| Route | Page | Auth | Description |
-|---|---|---|---|
-| `/` | NewLandingPage | Public | Modern landing page with job listings |
-| `/jobs` | PublicVacantesPage | Public | Classic job board with 30s polling |
-| `/login` | AuthPage | Public | Login / Register (`?mode=register`) |
-| `/admin/vacantes` | AdminVacantesPage | 🔒 Protected | Manage vacancies (create/edit/delete) |
-| `/admin/vacantes/:id/aplicantes` | VacanteAplicantesPage | 🔒 Protected | Per-vacancy applicant Kanban + details |
-| `/admin/postulaciones` | AdminPostulacionesPage | 🔒 Protected | (Hidden) Applications view |
-| `/admin/kanban` | KanbanAllPage | 🔒 Protected | Operational dashboard: all candidates, filters, live counts, 30s polling |
+| Route | Page | Guard | Permission | Description |
+|---|---|---|---|---|
+| `/` | NewLandingPage | Public | — | Landing page + job listings |
+| `/jobs` | PublicVacantesPage | Public | — | Job board with 30s polling |
+| `/login` | AuthPage | Public | — | Login / Register |
+| `/dashboard` | CandidateDashboard | 🔒 Authenticated | `applications:read_own` | Candidate's personal Kanban (own applications only) |
+| **Admin Routes** (via MainLayout) |
+| `/admin/dashboard` | RecruiterDashboard | 🔒 Authenticated | `jobs:create` | Recruiter stats & recent activity |
+| `/admin/vacantes` | AdminVacantesPage | 🔒 Authenticated | `jobs:create` | Manage vacancies (CRUD) |
+| `/admin/vacantes/:id/aplicantes` | VacanteAplicantesPage | 🔒 Authenticated | `jobs:read_all` | Per-vacancy candidate Kanban |
+| `/admin/kanban` | KanbanAllPage | 🔒 Authenticated | `jobs:read_all` | Operational Kanban: all candidates, filters, 30s polling |
+| `/admin/analytics` | ManagerAnalytics | 🔒 Authenticated | `reports:read` | Pipeline funnel, time-to-hire, source stats, team activity |
+| `/admin/usuarios` | AdminUsuariosPage | 🔒 Authenticated | `Administrador` role | User management (admin-only) |
+| **Platform Admin Routes** (via PlatformLayout) |
+| `/platform` | PlatformOverview | 🔒 Authenticated | `platform:access` | System stats, company list, health indicator |
+| `/platform/companies` | PlatformCompanies | 🔒 Authenticated | `companies:read` | Multi-tenant company CRUD |
+| `/platform/users` | PlatformUsers | 🔒 Authenticated | `users:read` | Cross-tenant user management & role assignment |
+| `/platform/roles` | PlatformRoles | 🔒 Authenticated | `roles:read` | Role definitions + permission mapping (editable for Owner only) |
+| `/platform/audit` | PlatformAudit | 🔒 Authenticated | `audit:read` | Audit log viewer with filters + CSV export |
+| `/platform/config` | PlatformConfig | 🔒 Authenticated | `platform:configure` | Feature flags, SMTP config, global settings (Owner-only) |
+| `/platform/ops` | PlatformOps | 🔒 Authenticated | `deployment:trigger` OR `infra:read_metrics` OR `db:read_logs` | Deployments, infrastructure, feature flags, database logs |
+| `*` | NotFoundPage | Public | — | 404 page |
 
 ---
 
