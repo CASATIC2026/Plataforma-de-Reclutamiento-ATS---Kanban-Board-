@@ -31,4 +31,8 @@ public class Postulacion
 
     // Navigation property
     public Vacante Vacante { get; set; } = null!;
+
+    // Optional link to authenticated user who applied
+    public Guid? UsuarioId { get; set; }
+    public Usuario? Usuario { get; set; }
 }

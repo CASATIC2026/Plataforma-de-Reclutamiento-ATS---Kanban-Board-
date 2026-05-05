@@ -20,4 +20,10 @@ public class Vacante
 
     // Navigation property — one vacante has MANY postulaciones
     public List<Postulacion> Postulaciones { get; set; } = new();
+
+    // RBAC / multi-tenant
+    public Guid? EmpresaId { get; set; }
+    public Empresa? Empresa { get; set; }
+    public Guid? CreadoPor { get; set; }
+    public Usuario? CreadoPorUsuario { get; set; }
 }

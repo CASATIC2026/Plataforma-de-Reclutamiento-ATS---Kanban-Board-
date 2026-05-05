@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePermission } from '../hooks/usePermission';
 
 // Import Playwrite IE font
 const fontLink = document.createElement('link');
@@ -10,6 +11,8 @@ document.head.appendChild(fontLink);
 export default function MainLayout() {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const canViewAnalytics = usePermission('reports:read');
+  const canAccessPlatform = usePermission('platform:access');
 
   const handleLogout = () => {
     logout();
@@ -53,6 +56,15 @@ export default function MainLayout() {
           </Link>
 
           <div className="flex gap-6 items-center">
+            <Link
+              to="/admin/dashboard"
+              style={{ color: 'var(--color-navy)', fontSize: '0.95rem', fontWeight: '600', transition: 'all 0.3s', padding: '6px 14px', borderRadius: '8px' }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(205,123,79,0.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-navy)'; e.currentTarget.style.background = 'transparent'; }}
+            >
+              Dashboard
+            </Link>
+
             <Link
               to="/admin/vacantes"
               style={{
@@ -100,27 +112,34 @@ export default function MainLayout() {
               Kanban
             </Link>
 
+            {canViewAnalytics && (
+              <Link to="/admin/analytics"
+                style={{ color: 'var(--color-navy)', fontSize: '0.95rem', fontWeight: '600', transition: 'all 0.3s', padding: '6px 14px', borderRadius: '8px' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(205,123,79,0.08)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-navy)'; e.currentTarget.style.background = 'transparent'; }}
+              >
+                Analíticas
+              </Link>
+            )}
+
             {isAdmin && (
               <Link
                 to="/admin/usuarios"
-                style={{
-                  color: 'var(--color-navy)',
-                  fontSize: '0.95rem',
-                  fontWeight: '600',
-                  transition: 'all 0.3s',
-                  padding: '6px 14px',
-                  borderRadius: '8px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                  e.currentTarget.style.background = 'rgba(205,123,79,0.08)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--color-navy)';
-                  e.currentTarget.style.background = 'transparent';
-                }}
+                style={{ color: 'var(--color-navy)', fontSize: '0.95rem', fontWeight: '600', transition: 'all 0.3s', padding: '6px 14px', borderRadius: '8px' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(205,123,79,0.08)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-navy)'; e.currentTarget.style.background = 'transparent'; }}
               >
                 Usuarios
+              </Link>
+            )}
+
+            {canAccessPlatform && (
+              <Link to="/platform"
+                style={{ color: 'var(--color-navy)', fontSize: '0.95rem', fontWeight: '600', transition: 'all 0.3s', padding: '6px 14px', borderRadius: '8px' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(205,123,79,0.08)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-navy)'; e.currentTarget.style.background = 'transparent'; }}
+              >
+                Platform
               </Link>
             )}
 

@@ -15,6 +15,16 @@ public class AppDbContext : DbContext
     public DbSet<Postulacion> Postulaciones => Set<Postulacion>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
 
+    // RBAC tables
+    public DbSet<Empresa> Empresas => Set<Empresa>();
+    public DbSet<Rol> Roles => Set<Rol>();
+    public DbSet<Permiso> Permisos => Set<Permiso>();
+    public DbSet<RolPermiso> RolPermisos => Set<RolPermiso>();
+    public DbSet<UsuarioRol> UsuarioRoles => Set<UsuarioRol>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<FeatureFlag> FeatureFlags => Set<FeatureFlag>();
+    public DbSet<DeploymentLog> DeploymentLogs => Set<DeploymentLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

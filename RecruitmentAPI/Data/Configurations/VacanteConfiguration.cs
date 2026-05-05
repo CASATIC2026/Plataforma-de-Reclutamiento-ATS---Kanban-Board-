@@ -55,6 +55,16 @@ public class VacanteConfiguration : IEntityTypeConfiguration<Vacante>
         builder.Property(v => v.UpdatedAt)
             .HasDefaultValueSql("NOW()");
 
+        builder.HasOne(v => v.Empresa)
+            .WithMany(e => e.Vacantes)
+            .HasForeignKey(v => v.EmpresaId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(v => v.CreadoPorUsuario)
+            .WithMany()
+            .HasForeignKey(v => v.CreadoPor)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Relationship: one vacante → many requisitos
         builder.HasMany(v => v.Requisitos)
             .WithOne(r => r.Vacante)

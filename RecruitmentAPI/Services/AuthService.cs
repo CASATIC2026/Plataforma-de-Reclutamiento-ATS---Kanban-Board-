@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentAPI.Data;
@@ -23,11 +24,9 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDTO> RegisterAsync(RegisterDTO dto)
     {
-        // Check if email already exists
         if (await _context.Usuarios.AnyAsync(u => u.Email == dto.Email))
             throw new InvalidOperationException("Ya existe una cuenta con este correo electrónico.");
 
-        // Parse role — public registration is always General
         if (!Enum.TryParse<RolUsuario>(dto.Rol, ignoreCase: true, out var rol))
             rol = RolUsuario.General;
         if (rol != RolUsuario.General)
@@ -46,13 +45,17 @@ public class AuthService : IAuthService
         _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();
 
+        var permissions = await LoadPermissionsAsync(usuario);
+
         return new AuthResponseDTO
         {
-            Token = GenerateJwtToken(usuario),
+            Token = GenerateJwtToken(usuario, permissions),
             Nombre = usuario.Nombre,
             Apellido = usuario.Apellido,
             Email = usuario.Email,
-            Rol = usuario.Rol.ToString()
+            Rol = usuario.Rol.ToString(),
+            Permissions = permissions,
+            CompanyId = usuario.EmpresaId?.ToString()
         };
     }
 
@@ -64,13 +67,17 @@ public class AuthService : IAuthService
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
             return null;
 
+        var permissions = await LoadPermissionsAsync(usuario);
+
         return new AuthResponseDTO
         {
-            Token = GenerateJwtToken(usuario),
+            Token = GenerateJwtToken(usuario, permissions),
             Nombre = usuario.Nombre,
             Apellido = usuario.Apellido,
             Email = usuario.Email,
-            Rol = usuario.Rol.ToString()
+            Rol = usuario.Rol.ToString(),
+            Permissions = permissions,
+            CompanyId = usuario.EmpresaId?.ToString()
         };
     }
 
@@ -98,7 +105,6 @@ public class AuthService : IAuthService
         var usuario = await _context.Usuarios.FindAsync(userId);
         if (usuario == null) return null;
 
-        // Prevent demoting the last Administrador
         if (usuario.Rol == RolUsuario.Administrador && rol != RolUsuario.Administrador)
         {
             var adminCount = await _context.Usuarios.CountAsync(u => u.Rol == RolUsuario.Administrador);
@@ -125,7 +131,6 @@ public class AuthService : IAuthService
         var usuario = await _context.Usuarios.FindAsync(userId);
         if (usuario == null) return false;
 
-        // Prevent deleting the last Administrador
         if (usuario.Rol == RolUsuario.Administrador)
         {
             var adminCount = await _context.Usuarios.CountAsync(u => u.Rol == RolUsuario.Administrador);
@@ -138,20 +143,67 @@ public class AuthService : IAuthService
         return true;
     }
 
-    private string GenerateJwtToken(Usuario usuario)
+    // Load permissions from new RBAC tables; fall back to legacy role-based mapping
+    private async Task<string[]> LoadPermissionsAsync(Usuario usuario)
+    {
+        var dbPerms = await _context.UsuarioRoles
+            .Where(ur => ur.UsuarioId == usuario.Id)
+            .Include(ur => ur.Rol).ThenInclude(r => r.RolPermisos).ThenInclude(rp => rp.Permiso)
+            .SelectMany(ur => ur.Rol.RolPermisos.Select(rp => rp.Permiso.Nombre))
+            .Distinct()
+            .ToListAsync();
+
+        if (dbPerms.Count > 0)
+            return dbPerms.ToArray();
+
+        // Legacy fallback derived from the enum role
+        return GetLegacyPermissions(usuario.Rol);
+    }
+
+    private static string[] GetLegacyPermissions(RolUsuario rol) => rol switch
+    {
+        RolUsuario.Administrador => new[]
+        {
+            "jobs:read", "jobs:create", "jobs:update", "jobs:delete", "jobs:approve", "jobs:publish", "jobs:read_all",
+            "applications:create", "applications:read_own", "applications:read", "applications:read_all",
+            "applications:update_status", "applications:add_note", "profile:update_own",
+            "users:read", "users:update", "users:disable", "users:assign_role",
+            "companies:create", "companies:read", "companies:update", "companies:transfer",
+            "reports:read", "roles:read", "roles:create", "roles:update", "roles:assign_admin",
+            "audit:read", "audit:export",
+            "platform:access", "platform:configure", "billing:read",
+            "deployment:trigger", "deployment:read_logs", "deployment:rollback",
+            "infra:read_metrics", "infra:configure", "pipeline:trigger",
+            "logs:read", "features:toggle", "db:read_logs"
+        },
+        RolUsuario.Manager => new[]
+        {
+            "jobs:read", "jobs:create", "jobs:update", "jobs:delete", "jobs:approve", "jobs:publish", "jobs:read_all",
+            "applications:create", "applications:read_own", "applications:read", "applications:read_all",
+            "applications:update_status", "applications:add_note", "profile:update_own",
+            "reports:read", "users:read", "companies:read", "platform:access"
+        },
+        _ => new[]
+        {
+            "jobs:read", "applications:create", "applications:read_own", "profile:update_own"
+        }
+    };
+
+    private string GenerateJwtToken(Usuario usuario, string[] permissions)
     {
         var jwtKey = _config["Jwt:Key"]
             ?? throw new InvalidOperationException("Jwt:Key configuration is missing");
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-            new Claim(ClaimTypes.Email, usuario.Email),
-            new Claim(ClaimTypes.Name, $"{usuario.Nombre} {usuario.Apellido}"),
-            new Claim(ClaimTypes.Role, usuario.Rol.ToString())
+            new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new(ClaimTypes.Email, usuario.Email),
+            new(ClaimTypes.Name, $"{usuario.Nombre} {usuario.Apellido}"),
+            new(ClaimTypes.Role, usuario.Rol.ToString()),
+            new("permissions", JsonSerializer.Serialize(permissions)),
+            new("company_id", usuario.EmpresaId?.ToString() ?? "")
         };
 
         var expireMinutes = int.Parse(_config["Jwt:ExpireMinutes"] ?? "480");

@@ -17,4 +17,9 @@ public class Usuario
     public string? Carrera { get; set; }
     public RolUsuario Rol { get; set; } = RolUsuario.General;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // RBAC
+    public Guid? EmpresaId { get; set; }
+    public Empresa? Empresa { get; set; }
+    public ICollection<UsuarioRol> UsuarioRoles { get; set; } = new List<UsuarioRol>();
 }

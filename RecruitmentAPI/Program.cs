@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentAPI.Data;
+using RecruitmentAPI.Models;
 using RecruitmentAPI.Repositories;
 using RecruitmentAPI.Repositories.Interfaces;
 using RecruitmentAPI.Services;
@@ -35,11 +36,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repository layer
 builder.Services.AddScoped<IVacanteRepository, VacanteRepository>();
 builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
+builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<IRolRepository, RolRepository>();
 
 // Service layer
 builder.Services.AddScoped<IVacanteService, VacanteService>();
 builder.Services.AddScoped<IPostulacionService, PostulacionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 
 // Screening and Email services
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
@@ -148,24 +155,194 @@ try
         var adminUser = db.Usuarios.FirstOrDefault(u => u.Email == "admin@talentbridge.com");
         if (adminUser == null)
         {
-            db.Usuarios.Add(new RecruitmentAPI.Models.Usuario
+            adminUser = new Usuario
             {
                 Nombre = "Admin",
                 Apellido = "TalentBridge",
                 Email = "admin@talentbridge.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword),
-                Rol = RecruitmentAPI.Models.RolUsuario.Administrador
-            });
+                Rol = RolUsuario.Administrador
+            };
+            db.Usuarios.Add(adminUser);
             db.SaveChanges();
             Console.WriteLine(">> Admin seed user created: admin@talentbridge.com");
         }
         else
         {
-            adminUser.Rol = RecruitmentAPI.Models.RolUsuario.Administrador;
+            adminUser.Rol = RolUsuario.Administrador;
             adminUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword);
             db.SaveChanges();
             Console.WriteLine(">> Admin seed user reset: admin@talentbridge.com");
         }
+    }
+
+    // ── RBAC SEED ── runs once if no roles exist
+    if (!db.Roles.Any())
+    {
+        Console.WriteLine(">> Seeding RBAC data...");
+
+        // 1. Default company
+        var empresa = new Empresa { Nombre = "Talentify SV Demo", Dominio = "talentifysv.com", Estado = "activa" };
+        db.Empresas.Add(empresa);
+        db.SaveChanges();
+
+        // 2. Assign existing admin user to default company
+        var admin = db.Usuarios.FirstOrDefault(u => u.Rol == RolUsuario.Administrador);
+        if (admin != null) { admin.EmpresaId = empresa.Id; db.SaveChanges(); }
+
+        // 3. Seed all 35 permissions
+        var permissionDefs = new (string Nombre, string Descripcion, string Categoria)[]
+        {
+            ("jobs:read",                 "Ver vacantes",                       "jobs"),
+            ("jobs:create",               "Crear vacantes",                     "jobs"),
+            ("jobs:update",               "Editar vacantes",                    "jobs"),
+            ("jobs:delete",               "Eliminar vacantes",                  "jobs"),
+            ("jobs:approve",              "Aprobar vacantes",                   "jobs"),
+            ("jobs:publish",              "Publicar vacantes",                  "jobs"),
+            ("jobs:read_all",             "Ver todas las vacantes",             "jobs"),
+            ("applications:create",       "Crear postulaciones",                "applications"),
+            ("applications:read_own",     "Ver mis postulaciones",              "applications"),
+            ("applications:read",         "Ver postulaciones de la empresa",    "applications"),
+            ("applications:read_all",     "Ver todas las postulaciones",        "applications"),
+            ("applications:update_status","Cambiar estado de postulaciones",    "applications"),
+            ("applications:add_note",     "Agregar notas internas",             "applications"),
+            ("profile:update_own",        "Editar mi perfil",                   "profile"),
+            ("users:read",                "Ver usuarios",                       "users"),
+            ("users:update",              "Editar usuarios",                    "users"),
+            ("users:disable",             "Deshabilitar usuarios",              "users"),
+            ("users:assign_role",         "Asignar roles a usuarios",           "users"),
+            ("companies:create",          "Crear empresas",                     "companies"),
+            ("companies:read",            "Ver empresas",                       "companies"),
+            ("companies:update",          "Editar empresas",                    "companies"),
+            ("companies:transfer",        "Transferir empresas",                "companies"),
+            ("reports:read",              "Ver analíticas",                     "reports"),
+            ("roles:read",                "Ver roles",                          "roles"),
+            ("roles:create",              "Crear roles",                        "roles"),
+            ("roles:update",              "Editar roles",                       "roles"),
+            ("roles:assign_admin",        "Asignar rol Admin",                  "roles"),
+            ("audit:read",                "Ver auditoría",                      "audit"),
+            ("audit:export",              "Exportar auditoría",                 "audit"),
+            ("platform:access",           "Acceder al panel de plataforma",     "platform"),
+            ("platform:configure",        "Configurar plataforma",              "platform"),
+            ("billing:read",              "Ver facturación",                    "platform"),
+            ("deployment:trigger",        "Disparar despliegues",               "ops"),
+            ("deployment:read_logs",      "Ver logs de despliegue",             "ops"),
+            ("deployment:rollback",       "Hacer rollback",                     "ops"),
+            ("infra:read_metrics",        "Ver métricas de infraestructura",    "ops"),
+            ("infra:configure",           "Configurar infraestructura",         "ops"),
+            ("pipeline:trigger",          "Disparar pipelines CI/CD",           "ops"),
+            ("logs:read",                 "Ver logs del sistema",               "ops"),
+            ("features:toggle",           "Activar/desactivar feature flags",   "ops"),
+            ("db:read_logs",              "Ver logs de base de datos",          "ops"),
+        };
+
+        var permisos = permissionDefs.Select(p => new Permiso
+        {
+            Nombre = p.Nombre, Descripcion = p.Descripcion, Categoria = p.Categoria
+        }).ToList();
+        db.Permisos.AddRange(permisos);
+        db.SaveChanges();
+
+        var permMap = db.Permisos.ToDictionary(p => p.Nombre, p => p.Id);
+
+        // 4. Seed 8 roles with their permissions
+        var roleDefinitions = new Dictionary<string, (string Ambito, bool EsInmutable, string[] Perms)>
+        {
+            ["Candidate"] = ("app_tier", false, new[] {
+                "jobs:read","applications:create","applications:read_own","profile:update_own"
+            }),
+            ["Recruiter"] = ("app_tier", false, new[] {
+                "jobs:read","jobs:create","jobs:update","jobs:delete",
+                "applications:create","applications:read_own","applications:read",
+                "applications:update_status","applications:add_note","profile:update_own"
+            }),
+            ["Manager"] = ("app_tier", false, new[] {
+                "jobs:read","jobs:create","jobs:update","jobs:delete","jobs:approve","jobs:publish","jobs:read_all",
+                "applications:create","applications:read_own","applications:read","applications:read_all",
+                "applications:update_status","applications:add_note","profile:update_own",
+                "reports:read","users:read","companies:read","platform:access"
+            }),
+            ["Admin"] = ("platform_tier", false, new[] {
+                "jobs:read_all","applications:read_all",
+                "users:read","users:update","users:disable","users:assign_role",
+                "companies:create","companies:read","companies:update",
+                "audit:read","roles:read","platform:access"
+            }),
+            ["Owner"] = ("platform_tier", true, new[] {
+                "jobs:read","jobs:create","jobs:update","jobs:delete","jobs:approve","jobs:publish","jobs:read_all",
+                "applications:create","applications:read_own","applications:read","applications:read_all",
+                "applications:update_status","applications:add_note","profile:update_own",
+                "users:read","users:update","users:disable","users:assign_role",
+                "companies:create","companies:read","companies:update","companies:transfer",
+                "reports:read","roles:read","roles:create","roles:update","roles:assign_admin",
+                "audit:read","audit:export",
+                "platform:access","platform:configure","billing:read",
+                "deployment:trigger","deployment:read_logs","deployment:rollback",
+                "infra:read_metrics","infra:configure","pipeline:trigger",
+                "logs:read","features:toggle","db:read_logs"
+            }),
+            ["Developer"] = ("platform_tier", false, new[] {
+                "deployment:trigger","deployment:read_logs","logs:read","features:toggle"
+            }),
+            ["DevOps"] = ("platform_tier", false, new[] {
+                "deployment:trigger","deployment:rollback","infra:read_metrics","infra:configure","pipeline:trigger"
+            }),
+            ["DBA"] = ("platform_tier", false, new[] {
+                "audit:read","db:read_logs"
+            }),
+        };
+
+        foreach (var (nombre, (ambito, esInmutable, perms)) in roleDefinitions)
+        {
+            var rol = new Rol { Nombre = nombre, Ambito = ambito, EsInmutable = esInmutable };
+            db.Roles.Add(rol);
+            db.SaveChanges();
+
+            foreach (var perm in perms)
+            {
+                if (permMap.TryGetValue(perm, out var permId))
+                    db.RolPermisos.Add(new RolPermiso { RolId = rol.Id, PermisoId = permId });
+            }
+            db.SaveChanges();
+        }
+
+        // 5. Assign Owner role to the admin user
+        var ownerRol = db.Roles.FirstOrDefault(r => r.Nombre == "Owner");
+        var adminUsuario = db.Usuarios.FirstOrDefault(u => u.Rol == RolUsuario.Administrador);
+        if (ownerRol != null && adminUsuario != null)
+        {
+            db.UsuarioRoles.Add(new UsuarioRol
+            {
+                UsuarioId = adminUsuario.Id,
+                RolId = ownerRol.Id,
+                EmpresaId = empresa.Id,
+                AsignadoEn = DateTime.UtcNow
+            });
+            db.SaveChanges();
+        }
+
+        // 6. Seed feature flags
+        db.FeatureFlags.AddRange(new[]
+        {
+            new FeatureFlag { Nombre = "screening_automatico",  Descripcion = "Screening automático al recibir postulación", EstaActivo = true },
+            new FeatureFlag { Nombre = "email_notificaciones",  Descripcion = "Enviar emails de confirmación y resultado",   EstaActivo = false },
+            new FeatureFlag { Nombre = "registro_publico",      Descripcion = "Permitir registro público de candidatos",     EstaActivo = true },
+            new FeatureFlag { Nombre = "modo_mantenimiento",    Descripcion = "Modo mantenimiento (bloquea acceso público)", EstaActivo = false },
+        });
+        db.SaveChanges();
+
+        // 7. Seed initial deployment log
+        db.DeploymentLogs.Add(new DeploymentLog
+        {
+            Version = "1.0.0",
+            DisparadoPor = adminUsuario?.Id,
+            Estado = "Success",
+            DuracionSegundos = 45,
+            Notas = "Initial deployment — Talentify SV v1.0.0"
+        });
+        db.SaveChanges();
+
+        Console.WriteLine(">> RBAC seed complete: 8 roles, 41 permissions, 4 feature flags");
     }
 }
 catch (Exception ex)

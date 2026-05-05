@@ -22,6 +22,202 @@ namespace RecruitmentAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("RecruitmentAPI.Models.AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Detalles")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Ip")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Recurso")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Resultado")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Allowed");
+
+                    b.Property<Guid?>("UsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("UsuarioId", "CreatedAt");
+
+                    b.ToTable("audit_log", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.DeploymentLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<Guid?>("DisparadoPor")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("DuracionSegundos")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasDefaultValue("Running");
+
+                    b.Property<string>("Notas")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DisparadoPor");
+
+                    b.ToTable("deployment_logs", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Empresa", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Dominio")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("activa");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Dominio")
+                        .IsUnique()
+                        .HasFilter("dominio IS NOT NULL");
+
+                    b.ToTable("empresas", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.FeatureFlag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("EstaActivo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid?>("ModificadoPor")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("feature_flags", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Permiso", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Categoria")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("permisos", (string)null);
+                });
+
             modelBuilder.Entity("RecruitmentAPI.Models.Postulacion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -92,10 +288,15 @@ namespace RecruitmentAPI.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
+                    b.Property<Guid?>("UsuarioId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("VacanteId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
 
                     b.HasIndex("VacanteId");
 
@@ -129,6 +330,58 @@ namespace RecruitmentAPI.Migrations
                     b.ToTable("requisitos", (string)null);
                 });
 
+            modelBuilder.Entity("RecruitmentAPI.Models.Rol", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Ambito")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("app_tier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<bool>("EsInmutable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.RolPermiso", b =>
+                {
+                    b.Property<Guid>("RolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PermisoId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RolId", "PermisoId");
+
+                    b.HasIndex("PermisoId");
+
+                    b.ToTable("rol_permisos", (string)null);
+                });
+
             modelBuilder.Entity("RecruitmentAPI.Models.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -154,6 +407,9 @@ namespace RecruitmentAPI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<Guid?>("EmpresaId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -172,7 +428,44 @@ namespace RecruitmentAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("EmpresaId");
+
                     b.ToTable("usuarios", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.UsuarioRol", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("AsignadoEn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<Guid?>("AsignadoPor")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("RolId");
+
+                    b.HasIndex("UsuarioId", "EmpresaId");
+
+                    b.ToTable("usuario_roles", (string)null);
                 });
 
             modelBuilder.Entity("RecruitmentAPI.Models.Vacante", b =>
@@ -182,6 +475,9 @@ namespace RecruitmentAPI.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<Guid?>("CreadoPor")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -190,6 +486,9 @@ namespace RecruitmentAPI.Migrations
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("EmpresaId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("EstaActiva")
                         .ValueGeneratedOnAdd()
@@ -236,16 +535,47 @@ namespace RecruitmentAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreadoPor");
+
+                    b.HasIndex("EmpresaId");
+
                     b.ToTable("vacantes", (string)null);
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.AuditLog", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.DeploymentLog", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Usuario", "DisparadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("DisparadoPor")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DisparadoPorUsuario");
                 });
 
             modelBuilder.Entity("RecruitmentAPI.Models.Postulacion", b =>
                 {
+                    b.HasOne("RecruitmentAPI.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("RecruitmentAPI.Models.Vacante", "Vacante")
                         .WithMany("Postulaciones")
                         .HasForeignKey("VacanteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Usuario");
 
                     b.Navigation("Vacante");
                 });
@@ -259,6 +589,104 @@ namespace RecruitmentAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Vacante");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.RolPermiso", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Permiso", "Permiso")
+                        .WithMany("RolPermisos")
+                        .HasForeignKey("PermisoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentAPI.Models.Rol", "Rol")
+                        .WithMany("RolPermisos")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permiso");
+
+                    b.Navigation("Rol");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Usuario", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Empresa", "Empresa")
+                        .WithMany("Usuarios")
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.UsuarioRol", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Empresa", "Empresa")
+                        .WithMany("UsuarioRoles")
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("RecruitmentAPI.Models.Rol", "Rol")
+                        .WithMany("UsuarioRoles")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentAPI.Models.Usuario", "Usuario")
+                        .WithMany("UsuarioRoles")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+
+                    b.Navigation("Rol");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Vacante", b =>
+                {
+                    b.HasOne("RecruitmentAPI.Models.Usuario", "CreadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("CreadoPor")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("RecruitmentAPI.Models.Empresa", "Empresa")
+                        .WithMany("Vacantes")
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreadoPorUsuario");
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Empresa", b =>
+                {
+                    b.Navigation("UsuarioRoles");
+
+                    b.Navigation("Usuarios");
+
+                    b.Navigation("Vacantes");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Permiso", b =>
+                {
+                    b.Navigation("RolPermisos");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Rol", b =>
+                {
+                    b.Navigation("RolPermisos");
+
+                    b.Navigation("UsuarioRoles");
+                });
+
+            modelBuilder.Entity("RecruitmentAPI.Models.Usuario", b =>
+                {
+                    b.Navigation("UsuarioRoles");
                 });
 
             modelBuilder.Entity("RecruitmentAPI.Models.Vacante", b =>

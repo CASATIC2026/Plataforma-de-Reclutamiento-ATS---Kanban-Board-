@@ -41,5 +41,10 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.CreatedAt)
             .HasDefaultValueSql("NOW()");
+
+        builder.HasOne(u => u.Empresa)
+            .WithMany(e => e.Usuarios)
+            .HasForeignKey(u => u.EmpresaId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

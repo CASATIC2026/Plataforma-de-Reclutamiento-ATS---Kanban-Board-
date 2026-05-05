@@ -63,5 +63,10 @@ public class PostulacionConfiguration : IEntityTypeConfiguration<Postulacion>
             .WithMany(v => v.Postulaciones)
             .HasForeignKey(p => p.VacanteId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(p => p.Usuario)
+            .WithMany()
+            .HasForeignKey(p => p.UsuarioId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
