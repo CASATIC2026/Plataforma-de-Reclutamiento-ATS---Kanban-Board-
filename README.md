@@ -342,4 +342,4 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 - PDF CVs are served inline via `GET /api/postulaciones/{id}/cv`; non-PDF formats trigger a file download
 - Internal notes auto-save with a 1.5s debounce; cards show a "Notas" badge when notes exist
 - 7 EF Core migrations applied (latest: `AddScreeningAndEmailTracking`)
-- **Security status**: RBAC enforced, JWT validated, SQL injection protected. Known issues being patched: credentials to env vars, rate limiting, file upload validation, DTO validation, security headers. See [PENTESTING.md](PENTESTING.md) for full security audit and remediation plan.
+- **Security**: All critical and high-severity patches applied — credentials moved to environment variables (`DB_CONNECTION`, `JWT_KEY`), file upload restricted to `.pdf`/`.doc`/`.docx` with 5 MB limit, DTO validation on all public inputs, CORS policy via `ALLOWED_ORIGIN`, security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`), npm dependencies patched to 0 vulnerabilities. See [PENTESTING.md](PENTESTING.md) for the original audit and `SECURITY_QUICKSTART.md` for setup instructions.
