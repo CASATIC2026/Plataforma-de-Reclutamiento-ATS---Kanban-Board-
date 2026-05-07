@@ -20,9 +20,13 @@ A full-stack Applicant Tracking System (ATS) with a public-facing job board, an 
 - "Nueva" badge (🔥) for jobs posted within 2 days
 - Pagination: 6 jobs per page with numbered navigation
 - Fully responsive: desktop, tablet, mobile (300px–900px), all breakpoints tested
-- Submit applications with optional CV upload (drag-and-drop, 5MB limit)
-- Technical skills input (comma-separated) for improved scoring
-- Department selection (14 Salvadoran locations)
+- **4-step structured application form** (modal, no page navigation):
+  - Step 1: Basic info (name, email, phone)
+  - Step 2: Technical skills with proficiency levels (Básico→Experto) + years of experience, soft skills multi-select (max 5), impact statement (30–500 chars)
+  - Step 3: CV drag-and-drop upload (PDF/DOC/DOCX, 5MB), per-vacancy dynamic screening questions (text, multiple choice, boolean, scale 1–5), availability grid (Mon–Sun × Morning/Afternoon/Night)
+  - Step 4: Review summary, GDPR consent, truth attestation, digital signature validation
+- Per-step validation with inline errors; signature must match name from step 1 (case-insensitive)
+- Screening questions fetched dynamically per vacancy from `GET /api/vacantes/{id}/screening-questions`
 - Auto-refreshes every 30 seconds
 
 **Admin Portal** (Protected — requires login)
@@ -217,10 +221,69 @@ Plataforma-de-Reclutamiento-ATS---Kanban-Board-/
 | notas_internas | string? | Internal recruiter notes (nullable) |
 | puntaje | decimal? | Auto-screening score (0–100, nullable) |
 | puntaje_detalle | string? | JSON breakdown: `{"requisitos":45.0,"ubicacion":25.0,"completeness":15.0}` |
+| soft_skills | string? | JSON array of selected soft skill labels |
+| impact_statement | string? | Candidate's self-description (30–500 chars) |
+| application_source | string? | Origin channel (default: "direct") |
+| consent_gdpr | bool | GDPR consent (default: false) |
+| consent_marketing | bool | Marketing comms consent (default: false) |
+| attested_truth | bool | Candidate truth attestation (default: false) |
+| attested_signature | string? | Digital signature (must match nombre_candidato) |
+| completion_time_seconds | int? | Time to complete the form |
 | email_confirmacion_enviado | bool | Receipt email sent (default: false) |
 | email_resultado_enviado | bool | Result email sent (default: false) |
 | created_at | DateTime | UTC |
 | updated_at | DateTime | UTC |
+
+### `candidate_skills` — Structured Skill Records (1:N → postulaciones)
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| postulacion_id | UUID (FK) | Cascade delete |
+| skill_name | string | e.g. "React", "PostgreSQL" |
+| skill_category | string? | e.g. "frontend", "database" |
+| proficiency_level | string | Básico / Intermedio / Avanzado / Experto |
+| years_experience | decimal? | Optional years in this skill |
+| is_verified | bool | Default: false (for future endorsement) |
+| source | string | Default: "self_reported" |
+| created_at | DateTime | UTC |
+
+### `candidate_availability` — Weekly Availability Slots (1:N → postulaciones)
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| postulacion_id | UUID (FK) | Cascade delete |
+| day_of_week | string | Mon / Tue / Wed … |
+| time_slot | string | Mañana / Tarde / Noche |
+| is_available | bool | Default: false |
+| created_at | DateTime | UTC |
+
+**Unique constraint:** (postulacion_id, day_of_week, time_slot)
+
+### `screening_questions` — Per-vacancy Evaluation Questions (1:N → vacantes)
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| vacante_id | UUID (FK) | Cascade delete |
+| question_text | string | The question prompt |
+| question_type | string | `text` / `multiple_choice` / `boolean` / `scale_1_5` |
+| options | string? | JSONB array for multiple_choice options |
+| correct_answer | string? | For auto-scoring |
+| max_score | int | Default: 10 |
+| required | bool | Default: true |
+| orden | int | Sort order (default: 0) |
+| created_at | DateTime | UTC |
+
+### `candidate_screening_responses` — Answers to Screening Questions (1:N → postulaciones)
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID | Primary key |
+| postulacion_id | UUID (FK) | Cascade delete |
+| question_id | UUID (FK) | Cascade delete |
+| response_text | string? | Candidate's answer |
+| auto_score | decimal? | Computed score (future) |
+| created_at | DateTime | UTC |
+
+**Unique constraint:** (postulacion_id, question_id)
 
 ---
 
@@ -337,11 +400,19 @@ DELETE /api/vacantes/{id}              # 🔒 jobs:delete (cascades to requisito
 GET    /api/postulaciones              # Public
 GET    /api/postulaciones/{id}         # Public
 GET    /api/postulaciones/vacante/{id} # Public
-POST   /api/postulaciones              # Public (candidate apply with CV)
+POST   /api/postulaciones              # Public (multipart: CV + JSON-serialised skills/availability/screening)
 GET    /api/postulaciones/{id}/cv      # 🔒 applications:read
 PATCH  /api/postulaciones/{id}/estado  # 🔒 applications:update_status
 PATCH  /api/postulaciones/{id}/notas   # 🔒 applications:add_note
 DELETE /api/postulaciones/{id}         # 🔒 applications:read_all (also deletes CV file)
+```
+
+### Screening Questions
+```
+GET    /api/vacantes/{id}/screening-questions        # Public — returns questions for the vacancy
+POST   /api/vacantes/{id}/screening-questions        # 🔒 jobs:update — add a question
+PUT    /api/vacantes/{id}/screening-questions/{qid}  # 🔒 jobs:update — edit a question
+DELETE /api/vacantes/{id}/screening-questions/{qid}  # 🔒 jobs:update — remove a question
 ```
 
 ### Candidate Dashboard
@@ -569,5 +640,5 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 - Clicking a Kanban card opens `CandidateProfileModal` with candidate data, embedded CV, and internal notes
 - PDF CVs are served inline via `GET /api/postulaciones/{id}/cv`; non-PDF formats trigger a file download
 - Internal notes auto-save with a 1.5s debounce; cards show a "Notas" badge when notes exist
-- 7 EF Core migrations applied (latest: `AddScreeningAndEmailTracking`)
+- 9 EF Core migrations applied (latest: `AddStructuredApplicationData` — adds `candidate_skills`, `candidate_availability`, `screening_questions`, `candidate_screening_responses`, and 8 new columns on `postulaciones`)
 - **Security**: All critical and high-severity patches applied — credentials moved to environment variables (`DB_CONNECTION`, `JWT_KEY`), file upload restricted to `.pdf`/`.doc`/`.docx` with 5 MB limit, DTO validation on all public inputs, CORS policy via `ALLOWED_ORIGIN`, security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`), npm dependencies patched to 0 vulnerabilities. See [PENTESTING.md](PENTESTING.md) for the original audit and `SECURITY_QUICKSTART.md` for setup instructions.
