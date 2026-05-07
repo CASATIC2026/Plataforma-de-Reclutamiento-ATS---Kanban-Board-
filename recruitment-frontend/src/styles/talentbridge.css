@@ -1325,6 +1325,232 @@ em { font-style: italic; color: var(--clr-accent); }
 
 
 /* ============================================================
+   [15] MULTI-STEP APPLY FORM
+============================================================ */
+
+/* Step progress indicator */
+.apply-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px 24px;
+}
+
+.apply-step-indicator__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.apply-step-indicator__circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  background-color: var(--clr-surface-2);
+  color: var(--clr-muted);
+  border: 2px solid var(--clr-border);
+  transition: all var(--transition);
+}
+
+.apply-step-indicator__step.is-active .apply-step-indicator__circle {
+  background-color: var(--clr-accent);
+  color: #fff;
+  border-color: var(--clr-accent);
+  box-shadow: 0 2px 8px rgba(205, 123, 79, 0.3);
+}
+
+.apply-step-indicator__step.is-done .apply-step-indicator__circle {
+  background-color: var(--clr-green);
+  color: #fff;
+  border-color: var(--clr-green);
+}
+
+.apply-step-indicator__label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--clr-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.apply-step-indicator__step.is-active .apply-step-indicator__label {
+  color: var(--clr-accent);
+  font-weight: 600;
+}
+
+.apply-step-indicator__step.is-done .apply-step-indicator__label {
+  color: var(--clr-green);
+}
+
+.apply-step-indicator__line {
+  flex: 1;
+  height: 2px;
+  background-color: var(--clr-border);
+  margin-bottom: 22px;
+  min-width: 20px;
+  transition: background-color var(--transition);
+}
+
+.apply-step-indicator__line.is-done {
+  background-color: var(--clr-green);
+}
+
+/* Multi-step modal size override */
+.modal--apply-multistep { max-width: 720px; }
+
+/* Step section heading */
+.apply-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--clr-navy);
+  margin: 0 0 16px 0;
+}
+
+/* Skills row */
+.skill-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 80px 32px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Soft skill pills */
+.soft-skill-pill {
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--clr-border);
+  background-color: transparent;
+  color: var(--clr-slate);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.soft-skill-pill:hover { border-color: var(--clr-accent); color: var(--clr-accent); }
+
+.soft-skill-pill.is-selected {
+  background-color: var(--clr-accent);
+  color: #fff;
+  border-color: var(--clr-accent);
+}
+
+/* Availability grid */
+.availability-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.availability-cell {
+  padding: 10px 4px;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--clr-slate);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.availability-cell:hover { border-color: var(--clr-accent); }
+
+.availability-cell.is-checked {
+  background-color: var(--clr-green);
+  color: #fff;
+  border-color: var(--clr-green);
+}
+
+/* Scale rating dots */
+.scale-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--clr-border);
+  background: transparent;
+  color: var(--clr-muted);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.scale-dot:hover,
+.scale-dot.is-selected {
+  border-color: var(--clr-accent);
+  background-color: var(--clr-accent);
+  color: #fff;
+}
+
+/* Review summary cards */
+.review-card {
+  padding: 14px 16px;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  background-color: var(--clr-surface-2);
+}
+
+.review-card h4 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--clr-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px 0;
+}
+
+.review-card p {
+  font-size: 14px;
+  color: var(--clr-slate);
+  margin: 0 0 4px 0;
+}
+
+/* Consent checkbox rows */
+.consent-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.consent-row input[type="checkbox"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--clr-accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.consent-row label {
+  font-size: 13px;
+  color: var(--clr-slate);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .skill-row { grid-template-columns: 1fr 110px 70px 28px; gap: 6px; }
+  .availability-grid { grid-template-columns: repeat(4, 1fr); }
+  .modal--apply-multistep { max-width: 100%; }
+  .apply-step-indicator { padding: 0 8px 20px; }
+}
+
+/* ============================================================
    [14] RESPONSIVE
 ============================================================ */
 @media (max-width: 768px) {

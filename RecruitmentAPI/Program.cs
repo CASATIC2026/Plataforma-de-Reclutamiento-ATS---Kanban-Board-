@@ -38,6 +38,7 @@ builder.Services.AddScoped<IVacanteRepository, VacanteRepository>();
 builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 builder.Services.AddScoped<IRolRepository, RolRepository>();
+builder.Services.AddScoped<IScreeningQuestionRepository, ScreeningQuestionRepository>();
 
 // Service layer
 builder.Services.AddScoped<IVacanteService, VacanteService>();
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
+builder.Services.AddScoped<IScreeningQuestionService, ScreeningQuestionService>();
 
 // Screening and Email services
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));

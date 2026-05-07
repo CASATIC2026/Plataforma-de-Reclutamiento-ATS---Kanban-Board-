@@ -26,13 +26,30 @@ public class Postulacion
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    // Structured application data
+    public string? ImpactStatement { get; set; }
+    public string? SoftSkills { get; set; } // JSON array
+    public string? ApplicationSource { get; set; } = "direct";
+    public int? CompletionTimeSeconds { get; set; }
+
+    // Legal/consent fields
+    public bool ConsentGdpr { get; set; } = false;
+    public bool ConsentMarketing { get; set; } = false;
+    public bool AttestedTruth { get; set; } = false;
+    public string? AttestedSignature { get; set; }
+
     // Foreign key to Vacante
     public Guid VacanteId { get; set; }
 
-    // Navigation property
+    // Navigation properties
     public Vacante Vacante { get; set; } = null!;
 
     // Optional link to authenticated user who applied
     public Guid? UsuarioId { get; set; }
     public Usuario? Usuario { get; set; }
+
+    // Structured application relationships
+    public ICollection<CandidateSkill> CandidateSkills { get; set; } = new List<CandidateSkill>();
+    public ICollection<CandidateAvailability> Availabilities { get; set; } = new List<CandidateAvailability>();
+    public ICollection<CandidateScreeningResponse> ScreeningResponses { get; set; } = new List<CandidateScreeningResponse>();
 }

@@ -242,3 +242,96 @@ export function getPasswordStrengthLabel(strength) {
     default: return { label: '', color: '#d1d5db' };
   }
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// validateImpactStatement
+// Returns { valid: bool, error: string }
+// ──────────────────────────────────────────────────────────────────────────────
+export function validateImpactStatement(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return { valid: false, error: 'La declaración de impacto es requerida.' };
+  }
+  if (trimmed.length < 30) {
+    return {
+      valid: false,
+      error: `Debe tener al menos 30 caracteres (${trimmed.length} proporcionados).`,
+    };
+  }
+  if (trimmed.length > 500) {
+    return { valid: false, error: 'No puede superar los 500 caracteres.' };
+  }
+  return { valid: true, error: '' };
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// validateSignature
+// Returns { valid: bool, error: string }
+// Signature must case-insensitively match nombreCandidato
+// ──────────────────────────────────────────────────────────────────────────────
+export function validateSignature(value, nombreCandidato) {
+  const sig = (value || '').trim();
+  const name = (nombreCandidato || '').trim();
+  if (!sig) {
+    return { valid: false, error: 'La firma digital es requerida.' };
+  }
+  if (sig.toLowerCase() !== name.toLowerCase()) {
+    return {
+      valid: false,
+      error: 'La firma debe coincidir exactamente con el nombre ingresado en el paso 1.',
+    };
+  }
+  return { valid: true, error: '' };
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// validateSkills
+// Returns { valid: bool, error: string }
+// At least 1 skill with skillName + proficiencyLevel required
+// ──────────────────────────────────────────────────────────────────────────────
+export function validateSkills(skills) {
+  if (!skills || skills.length === 0) {
+    return { valid: false, error: 'Agrega al menos una habilidad técnica.' };
+  }
+  const valid = skills.some(
+    (s) => s.skillName && s.skillName.trim() && s.proficiencyLevel
+  );
+  if (!valid) {
+    return {
+      valid: false,
+      error: 'Cada habilidad requiere nombre y nivel de dominio.',
+    };
+  }
+  return { valid: true, error: '' };
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// validateSoftSkills
+// Returns { valid: bool, error: string }
+// At least 1 soft skill required
+// ──────────────────────────────────────────────────────────────────────────────
+export function validateSoftSkills(softSkills) {
+  if (!softSkills || softSkills.length === 0) {
+    return { valid: false, error: 'Selecciona al menos una habilidad blanda.' };
+  }
+  return { valid: true, error: '' };
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// validateScreeningResponses
+// Returns { valid: bool, error: string }
+// All required questions must have a non-empty response
+// ──────────────────────────────────────────────────────────────────────────────
+export function validateScreeningResponses(responses, questions) {
+  const required = (questions || []).filter((q) => q.required);
+  for (const q of required) {
+    const resp = (responses || []).find((r) => r.questionId === q.id);
+    if (!resp || !resp.responseText || !resp.responseText.trim()) {
+      return {
+        valid: false,
+        error: 'Responde todas las preguntas requeridas antes de continuar.',
+      };
+    }
+  }
+  return { valid: true, error: '' };
+}

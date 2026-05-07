@@ -1,40 +1,45 @@
-import { useState, useRef, useEffect } from 'react';
-import { createPostulacion } from '../../api/postulacionesApi';
-import { validateName, validateEmail, validatePhone } from '../../utils/validators';
+import { useEffect, useState } from 'react';
+import { createPostulacionStructured } from '../../api/postulacionesApi';
+import {
+  validateName,
+  validateEmail,
+  validatePhone,
+  validateImpactStatement,
+  validateSignature,
+  validateSkills,
+  validateSoftSkills,
+  validateScreeningResponses,
+} from '../../utils/validators';
+import ApplyFormProgress from './ApplyFormProgress';
+import ApplyStep1BasicInfo from './ApplyStep1BasicInfo';
+import ApplyStep2Skills from './ApplyStep2Skills';
+import ApplyStep3Screening from './ApplyStep3Screening';
+import ApplyStep4Review from './ApplyStep4Review';
 
-const ALLOWED_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
-
-const SALVADORAN_DEPARTMENTS = [
-  'Ahuachapán',
-  'Santa Ana',
-  'Sonsonate',
-  'Chalatenango',
-  'La Libertad',
-  'San Salvador',
-  'Cuscatlán',
-  'La Paz',
-  'San Vicente',
-  'Cabañas',
-  'Morazán',
-  'La Unión',
-  'Usulután',
-  'San Miguel',
-];
+const STEPS = ['Información', 'Habilidades', 'Preguntas', 'Revisión'];
 
 export default function ApplyModal({ job, onClose, onSuccess }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', carrera: '', ubicacion: '' });
-  const [cvFile, setCvFile] = useState(null);
-  const [dragging, setDragging] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    nombreCandidato: '',
+    email: '',
+    telefono: '',
+    skills: [],
+    softSkills: [],
+    impactStatement: '',
+    cvFile: null,
+    screeningResponses: [],
+    availability: [],
+    consentGdpr: false,
+    consentMarketing: false,
+    attestedTruth: false,
+    attestedSignature: '',
+    startTime: Date.now(),
+    applicationSource: 'direct',
+  });
   const [errors, setErrors] = useState({});
-  const [hints, setHints] = useState({});
-  const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const fileInputRef = useRef(null);
+  const [screeningQuestions, setScreeningQuestions] = useState([]);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -46,108 +51,113 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     };
   }, [onClose]);
 
-  const setField = (field) => (e) => {
-    const value = e.target.value;
-    setForm((f) => ({ ...f, [field]: value }));
-    // Live re-validation for touched fields
-    if (touched[field]) {
-      const { err, hint } = runValidation(field, value);
-      setErrors((errs) => ({ ...errs, [field]: err }));
-      setHints((h) => ({ ...h, [field]: hint }));
+  const handleFieldChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => { const e = { ...prev }; delete e[field]; return e; });
     }
   };
 
-  const runValidation = (field, value) => {
-    let err = '';
-    let hint = '';
-    switch (field) {
-      case 'name': {
-        const res = validateName(value, 'Nombre completo', 3);
-        err = res.error;
-        break;
-      }
-      case 'email': {
-        const res = validateEmail(value);
-        err = res.error;
-        hint = res.suggestion || '';
-        break;
-      }
-      case 'phone': {
-        const res = validatePhone(value);
-        err = res.error;
-        break;
-      }
-      default:
-        break;
-    }
-    return { err, hint };
-  };
-
-  const handleBlur = (field) => () => {
-    setTouched((t) => ({ ...t, [field]: true }));
-    const { err, hint } = runValidation(field, form[field]);
-    setErrors((errs) => ({ ...errs, [field]: err }));
-    setHints((h) => ({ ...h, [field]: hint }));
-  };
-
-  const handleFile = (file) => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setErrors((e) => ({ ...e, cv: 'Solo se permiten archivos PDF, DOC o DOCX.' }));
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors((e) => ({ ...e, cv: 'El archivo no debe superar los 5MB.' }));
-      return;
-    }
-    setCvFile(file);
-    setErrors((e) => ({ ...e, cv: '' }));
-  };
-
-  const validate = () => {
-    const fields = ['name', 'email', 'phone'];
+  const validateStep = (step) => {
     const newErrors = {};
-    const newHints = {};
-    fields.forEach((f) => {
-      const { err, hint } = runValidation(f, form[f]);
-      newErrors[f] = err;
-      newHints[f] = hint;
-    });
-    if (!cvFile) newErrors.cv = 'Por favor adjunta tu CV.';
+
+    if (step === 1) {
+      const nameRes = validateName(formData.nombreCandidato, 'Nombre completo', 3);
+      if (!nameRes.valid) newErrors.nombreCandidato = nameRes.error;
+
+      const emailRes = validateEmail(formData.email);
+      if (!emailRes.valid) newErrors.email = emailRes.error;
+
+      const phoneRes = validatePhone(formData.telefono);
+      if (!phoneRes.valid) newErrors.telefono = phoneRes.error;
+    }
+
+    if (step === 2) {
+      const skillsRes = validateSkills(formData.skills);
+      if (!skillsRes.valid) newErrors.skills = skillsRes.error;
+
+      const softRes = validateSoftSkills(formData.softSkills);
+      if (!softRes.valid) newErrors.softSkills = softRes.error;
+
+      const impactRes = validateImpactStatement(formData.impactStatement);
+      if (!impactRes.valid) newErrors.impactStatement = impactRes.error;
+    }
+
+    if (step === 3 && screeningQuestions.length > 0) {
+      const screenRes = validateScreeningResponses(
+        formData.screeningResponses,
+        screeningQuestions
+      );
+      if (!screenRes.valid) newErrors.screeningResponses = screenRes.error;
+    }
+
+    if (step === 4) {
+      if (!formData.consentGdpr) newErrors.consentGdpr = 'Este consentimiento es requerido.';
+      if (!formData.attestedTruth) newErrors.attestedTruth = 'Este consentimiento es requerido.';
+
+      const sigRes = validateSignature(formData.attestedSignature, formData.nombreCandidato);
+      if (!sigRes.valid) newErrors.attestedSignature = sigRes.error;
+    }
+
     setErrors(newErrors);
-    setHints(newHints);
-    setTouched({ name: true, email: true, phone: true });
-    return Object.values(newErrors).every((e) => !e);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep((prev) => Math.min(prev + 1, STEPS.length));
+    }
+  };
+
+  const handleBack = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const buildFormData = () => {
+    const fd = new FormData();
+    fd.append('NombreCandidato', formData.nombreCandidato.trim());
+    fd.append('Email', formData.email.trim().toLowerCase());
+    if (formData.telefono) fd.append('Telefono', formData.telefono.trim());
+    fd.append('VacanteId', job.id);
+    if (formData.cvFile) fd.append('CvFile', formData.cvFile);
+
+    fd.append('SkillsJson', JSON.stringify(formData.skills));
+    fd.append('SoftSkillsJson', JSON.stringify(formData.softSkills));
+    fd.append('ImpactStatement', formData.impactStatement.trim());
+    fd.append(
+      'ScreeningResponsesJson',
+      JSON.stringify(formData.screeningResponses)
+    );
+    fd.append(
+      'AvailabilityJson',
+      JSON.stringify((formData.availability || []).filter((a) => a.isAvailable))
+    );
+
+    fd.append('ConsentGdpr', String(formData.consentGdpr));
+    fd.append('ConsentMarketing', String(formData.consentMarketing));
+    fd.append('AttestedTruth', String(formData.attestedTruth));
+    fd.append('AttestedSignature', formData.attestedSignature.trim());
+    fd.append('ApplicationSource', 'direct');
+    fd.append(
+      'CompletionTimeSeconds',
+      String(Math.round((Date.now() - formData.startTime) / 1000))
+    );
+    return fd;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateStep(currentStep)) return;
     setLoading(true);
-    setErrors((errs) => ({ ...errs, submit: '' }));
-
-    const formData = new FormData();
-    formData.append('NombreCandidato', form.name.trim());
-    formData.append('Email', form.email.trim());
-    formData.append('Telefono', form.phone.trim());
-    formData.append('VacanteId', job.id);
-    if (cvFile) formData.append('CvFile', cvFile);
-    if (form.carrera.trim()) formData.append('Carrera', form.carrera.trim());
-    if (form.ubicacion) formData.append('Ubicacion', form.ubicacion);
-
     try {
-      await createPostulacion(formData);
-      setSubmitted(true);
+      const fd = buildFormData();
+      const result = await createPostulacionStructured(fd);
+      onSuccess?.(result);
     } catch {
-      setErrors((errs) => ({ ...errs, submit: 'Hubo un error al enviar tu postulación. Intenta de nuevo.' }));
+      setErrors({ submit: 'Error al enviar la solicitud. Intenta nuevamente.' });
     } finally {
       setLoading(false);
     }
   };
-
-  const isFieldValid = (field) => touched[field] && !errors[field] && form[field].trim();
-
-  const inputClass = (field) =>
-    `form-input${errors[field] ? ' error' : isFieldValid(field) ? ' success' : ''}`;
 
   return (
     <div
@@ -156,192 +166,104 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
       aria-modal="true"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal modal--form">
+      <div className="modal modal--apply-multistep">
         <button className="modal__close" aria-label="Cerrar" onClick={onClose}>
           &times;
         </button>
 
-        {submitted ? (
-          <div className="form-success">
-            <div className="success-icon">✓</div>
-            <h3 className="success-title">¡Aplicación enviada!</h3>
-            <p className="success-text">
-              Gracias, {form.name}. Tu aplicación para &quot;{job.title}&quot; ha sido recibida.
-              Te contactaremos pronto.
+        <div className="modal__header" style={{ paddingRight: '44px' }}>
+          <div>
+            <h2 className="modal__title" style={{ fontSize: '1.2rem' }}>
+              Aplicar: {job.title}
+            </h2>
+            <p style={{ fontSize: '13px', color: 'var(--clr-muted)', margin: '4px 0 0' }}>
+              {job.location} · {job.type}
             </p>
-            <button className="btn btn--ghost" onClick={onSuccess}>Cerrar</button>
           </div>
-        ) : (
-          <>
-            <div className="form-modal__header">
-              <h2 className="modal__title">Aplicar: {job.title}</h2>
-              <p className="form-modal__subtitle">{job.location} · {job.type}</p>
-            </div>
+        </div>
 
-            <form className="apply-form" onSubmit={handleSubmit} noValidate>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="apply-name">
-                    Nombre completo *
-                  </label>
-                  <input
-                    id="apply-name"
-                    className={inputClass('name')}
-                    placeholder="Ej. Ana García López"
-                    value={form.name}
-                    onChange={setField('name')}
-                    onBlur={handleBlur('name')}
-                  />
-                  <span className="form-error">{errors.name || ''}</span>
-                </div>
+        <ApplyFormProgress currentStep={currentStep} steps={STEPS} />
 
-                <div className="form-group">
-                  <label className="form-label" htmlFor="apply-phone">Teléfono</label>
-                  <input
-                    id="apply-phone"
-                    type="tel"
-                    className={inputClass('phone')}
-                    placeholder="+503 7777-1234"
-                    value={form.phone}
-                    onChange={setField('phone')}
-                    onBlur={handleBlur('phone')}
-                  />
-                  <span className="form-error">{errors.phone || ''}</span>
-                  {!errors.phone && !form.phone && (
-                    <span className="form-hint">Opcional — mín. 10 dígitos si se ingresa</span>
-                  )}
-                </div>
-              </div>
+        <div className="modal__body" style={{ paddingTop: 0 }}>
+          {currentStep === 1 && (
+            <ApplyStep1BasicInfo
+              formData={formData}
+              onChange={handleFieldChange}
+              errors={errors}
+            />
+          )}
+          {currentStep === 2 && (
+            <ApplyStep2Skills
+              formData={formData}
+              onChange={handleFieldChange}
+              errors={errors}
+            />
+          )}
+          {currentStep === 3 && (
+            <ApplyStep3Screening
+              formData={formData}
+              onChange={handleFieldChange}
+              vacante={job}
+              errors={errors}
+              onScreeningQuestionsLoaded={setScreeningQuestions}
+            />
+          )}
+          {currentStep === 4 && (
+            <ApplyStep4Review
+              formData={formData}
+              onChange={handleFieldChange}
+              errors={errors}
+            />
+          )}
+        </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="apply-email">
-                  Correo electrónico *
-                </label>
-                <input
-                  id="apply-email"
-                  type="email"
-                  className={inputClass('email')}
-                  placeholder="tu@correo.com"
-                  value={form.email}
-                  onChange={setField('email')}
-                  onBlur={handleBlur('email')}
-                />
-                <span className="form-error">{errors.email || ''}</span>
-                {!errors.email && hints.email && (
-                  <span className="form-hint form-hint--suggestion">{hints.email}</span>
-                )}
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="apply-carrera">
-                    Habilidades técnicas (opcional)
-                  </label>
-                  <input
-                    id="apply-carrera"
-                    className="form-input"
-                    placeholder="Ej: React, TypeScript, Git"
-                    value={form.carrera}
-                    onChange={setField('carrera')}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label" htmlFor="apply-ubicacion">
-                    Departamento (opcional)
-                  </label>
-                  <select
-                    id="apply-ubicacion"
-                    className="form-input"
-                    value={form.ubicacion}
-                    onChange={setField('ubicacion')}
-                  >
-                    <option value="">Selecciona un departamento...</option>
-                    {SALVADORAN_DEPARTMENTS.map((dept) => (
-                      <option key={dept} value={dept}>
-                        {dept}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">CV / Currículum *</label>
-                {cvFile ? (
-                  <div className="file-preview">
-                    <div className="file-preview__icon">📄</div>
-                    <div className="file-preview__name">{cvFile.name}</div>
-                    <div className="file-preview__size">
-                      {(cvFile.size / (1024 * 1024)).toFixed(2)} MB
-                    </div>
-                    <button
-                      type="button"
-                      className="file-preview__remove"
-                      onClick={() => setCvFile(null)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    className={`dropzone${dragging ? ' drag-over' : ''}`}
-                    role="button"
-                    tabIndex={0}
-                    aria-label="Seleccionar o arrastrar archivo de CV"
-                    onClick={() => fileInputRef.current?.click()}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        fileInputRef.current?.click();
-                      }
-                    }}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                    onDragLeave={() => setDragging(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setDragging(false);
-                      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-                    }}
-                  >
-                    <div className="dropzone__icon">📄</div>
-                    <p className="dropzone__text">
-                      Arrastra tu CV aquí o{' '}
-                      <span className="dropzone__link">selecciona un archivo</span>
-                    </p>
-                    <p className="dropzone__hint">PDF, DOC, DOCX — máx. 5MB</p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      style={{ display: 'none' }}
-                      onChange={(e) => {
-                        if (e.target.files[0]) handleFile(e.target.files[0]);
-                      }}
-                    />
-                  </div>
-                )}
-                <span className="form-error">{errors.cv || ''}</span>
-              </div>
-
-              {errors.submit && (
-                <p className="form-error" style={{ textAlign: 'center' }}>
-                  {errors.submit}
-                </p>
-              )}
-
-              <div className="form-actions">
-                <button
-                  type="submit"
-                  className="btn btn--accent btn--lg btn--full"
-                  disabled={loading}
-                >
-                  {loading ? 'Enviando...' : 'Enviar Aplicación'}
-                </button>
-              </div>
-            </form>
-          </>
+        {errors.submit && (
+          <div
+            style={{
+              padding: '10px 14px',
+              backgroundColor: 'var(--color-danger-bg)',
+              color: 'var(--color-danger)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '13px',
+              margin: '0 0 12px',
+            }}
+          >
+            {errors.submit}
+          </div>
         )}
+
+        <div className="modal__footer" style={{ justifyContent: 'flex-end' }}>
+          {currentStep > 1 && (
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={handleBack}
+              disabled={loading}
+            >
+              ← Atrás
+            </button>
+          )}
+          {currentStep < STEPS.length && (
+            <button
+              type="button"
+              className="btn btn--accent"
+              onClick={handleNext}
+              disabled={loading}
+            >
+              Siguiente →
+            </button>
+          )}
+          {currentStep === STEPS.length && (
+            <button
+              type="button"
+              className="btn btn--accent"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? 'Enviando...' : 'Enviar Solicitud'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -70,5 +70,11 @@ public class VacanteConfiguration : IEntityTypeConfiguration<Vacante>
             .WithOne(r => r.Vacante)
             .HasForeignKey(r => r.VacanteId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Relationship: one vacante → many screening questions
+        builder.HasMany(v => v.ScreeningQuestions)
+            .WithOne(sq => sq.Vacante)
+            .HasForeignKey(sq => sq.VacanteId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using RecruitmentAPI.Data;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Models;
 using RecruitmentAPI.Repositories.Interfaces;
@@ -16,19 +17,22 @@ public class PostulacionService : IPostulacionService
     private readonly IScoringService _scoringService;
     private readonly IEmailService _emailService;
     private readonly IWebHostEnvironment _env;
+    private readonly AppDbContext _context;
 
     public PostulacionService(
         IPostulacionRepository repository,
         IVacanteRepository vacanteRepository,
         IScoringService scoringService,
         IEmailService emailService,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        AppDbContext context)
     {
         _repository = repository;
         _vacanteRepository = vacanteRepository;
         _scoringService = scoringService;
         _emailService = emailService;
         _env = env;
+        _context = context;
     }
 
     public async Task<List<PostulacionResponseDTO>> GetAllAsync()
@@ -57,17 +61,14 @@ public class PostulacionService : IPostulacionService
 
         if (dto.CvFile != null && dto.CvFile.Length > 0)
         {
-            // Validate file extension
             var extension = Path.GetExtension(dto.CvFile.FileName).ToLowerInvariant();
             if (!AllowedExtensions.Contains(extension))
                 throw new InvalidOperationException($"File type '{extension}' is not allowed. Allowed types: {string.Join(", ", AllowedExtensions)}");
 
-            // Validate file size (5 MB max)
             if (dto.CvFile.Length > MaxFileSizeBytes)
                 throw new InvalidOperationException($"File size exceeds 5 MB limit. Actual size: {dto.CvFile.Length / (1024 * 1024)} MB");
 
             cvFileName = $"{Guid.NewGuid()}{extension}";
-
             var storageDir = Path.Combine(_env.ContentRootPath, "Storage", "CVs");
             Directory.CreateDirectory(storageDir);
 
@@ -84,6 +85,14 @@ public class PostulacionService : IPostulacionService
             VacanteId = dto.VacanteId,
             CvFileName = cvFileName,
             CvFilePath = cvFilePath,
+            ImpactStatement = dto.ImpactStatement,
+            SoftSkills = dto.SoftSkillsJson,
+            ApplicationSource = dto.ApplicationSource ?? "direct",
+            ConsentGdpr = dto.ConsentGdpr,
+            ConsentMarketing = dto.ConsentMarketing,
+            AttestedTruth = dto.AttestedTruth,
+            AttestedSignature = dto.AttestedSignature,
+            CompletionTimeSeconds = dto.CompletionTimeSeconds,
         };
 
         var created = await _repository.CreateAsync(postulacion);
@@ -92,24 +101,22 @@ public class PostulacionService : IPostulacionService
         var vacante = await _vacanteRepository.GetByIdAsync(created.VacanteId);
         if (vacante != null)
         {
-            // Run scoring
             var scoreResult = _scoringService.Score(created, vacante, dto.Carrera, dto.Ubicacion);
             created.Puntaje = scoreResult.Puntaje;
             created.PuntajeDetalle = JsonSerializer.Serialize(scoreResult.Detalle);
 
-            // Determine estado: if screening active and score below threshold → Rechazado
             if (vacante.ScreeningActivo && scoreResult.Puntaje < vacante.UmbralPuntaje)
             {
                 created.Estado = EstadoPostulacion.Rechazado;
             }
 
-            // Update postulacion with scores and estado
             await _repository.UpdateAsync(created);
 
-            // Send confirmation email
-            await _emailService.SendConfirmacionAsync(created, vacante);
+            // Persist structured application data in transaction
+            await PersistStructuredDataAsync(created.Id, dto);
 
-            // Send result email only if screening is active
+            // Send emails
+            await _emailService.SendConfirmacionAsync(created, vacante);
             if (vacante.ScreeningActivo)
             {
                 bool apto = created.Estado != EstadoPostulacion.Rechazado;
@@ -117,9 +124,71 @@ public class PostulacionService : IPostulacionService
             }
         }
 
-        // Reload with Vacante included
         var withVacante = await _repository.GetByIdAsync(created.Id);
         return MapToResponseDTO(withVacante!);
+    }
+
+    private async Task PersistStructuredDataAsync(Guid postulacionId, CreatePostulacionDTO dto)
+    {
+        // Parse and persist skills
+        if (!string.IsNullOrEmpty(dto.SkillsJson))
+        {
+            var skills = JsonSerializer.Deserialize<List<SkillDTO>>(dto.SkillsJson);
+            if (skills?.Count > 0)
+            {
+                var candidateSkills = skills.Select(s => new CandidateSkill
+                {
+                    PostulacionId = postulacionId,
+                    SkillName = s.SkillName,
+                    SkillCategory = s.Category,
+                    ProficiencyLevel = s.ProficiencyLevel,
+                    YearsExperience = s.YearsExperience,
+                    IsVerified = false,
+                    Source = "self_reported",
+                }).ToList();
+
+                await _context.CandidateSkills.AddRangeAsync(candidateSkills);
+            }
+        }
+
+        // Parse and persist availability
+        if (!string.IsNullOrEmpty(dto.AvailabilityJson))
+        {
+            var availability = JsonSerializer.Deserialize<List<AvailabilityDTO>>(dto.AvailabilityJson);
+            if (availability?.Count > 0)
+            {
+                var candidateAvailability = availability
+                    .Where(a => a.IsAvailable)
+                    .Select(a => new CandidateAvailability
+                    {
+                        PostulacionId = postulacionId,
+                        DayOfWeek = a.DayOfWeek,
+                        TimeSlot = a.TimeSlot,
+                        IsAvailable = a.IsAvailable,
+                    }).ToList();
+
+                await _context.CandidateAvailabilities.AddRangeAsync(candidateAvailability);
+            }
+        }
+
+        // Parse and persist screening responses
+        if (!string.IsNullOrEmpty(dto.ScreeningResponsesJson))
+        {
+            var responses = JsonSerializer.Deserialize<List<ScreeningResponseDTO>>(dto.ScreeningResponsesJson);
+            if (responses?.Count > 0)
+            {
+                var candidateResponses = responses.Select(r => new CandidateScreeningResponse
+                {
+                    PostulacionId = postulacionId,
+                    QuestionId = r.QuestionId,
+                    ResponseText = r.ResponseText,
+                }).ToList();
+
+                await _context.CandidateScreeningResponses.AddRangeAsync(candidateResponses);
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<PostulacionResponseDTO?> UpdateEstadoAsync(Guid id, EstadoPostulacion estado)
@@ -166,7 +235,6 @@ public class PostulacionService : IPostulacionService
         return await _repository.DeleteAsync(id);
     }
 
-    // --- Private mapping helper ---
     private static PostulacionResponseDTO MapToResponseDTO(Postulacion postulacion)
     {
         return new PostulacionResponseDTO
@@ -186,4 +254,26 @@ public class PostulacionService : IPostulacionService
             UpdatedAt = postulacion.UpdatedAt,
         };
     }
+}
+
+// Helper DTOs for JSON deserialization
+public class SkillDTO
+{
+    public string SkillName { get; set; } = string.Empty;
+    public string ProficiencyLevel { get; set; } = string.Empty;
+    public decimal? YearsExperience { get; set; }
+    public string? Category { get; set; }
+}
+
+public class AvailabilityDTO
+{
+    public string DayOfWeek { get; set; } = string.Empty;
+    public string TimeSlot { get; set; } = string.Empty;
+    public bool IsAvailable { get; set; }
+}
+
+public class ScreeningResponseDTO
+{
+    public Guid QuestionId { get; set; }
+    public string? ResponseText { get; set; }
 }

@@ -25,6 +25,12 @@ public class AppDbContext : DbContext
     public DbSet<FeatureFlag> FeatureFlags => Set<FeatureFlag>();
     public DbSet<DeploymentLog> DeploymentLogs => Set<DeploymentLog>();
 
+    // Structured application data tables
+    public DbSet<CandidateSkill> CandidateSkills => Set<CandidateSkill>();
+    public DbSet<ScreeningQuestion> ScreeningQuestions => Set<ScreeningQuestion>();
+    public DbSet<CandidateAvailability> CandidateAvailabilities => Set<CandidateAvailability>();
+    public DbSet<CandidateScreeningResponse> CandidateScreeningResponses => Set<CandidateScreeningResponse>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
