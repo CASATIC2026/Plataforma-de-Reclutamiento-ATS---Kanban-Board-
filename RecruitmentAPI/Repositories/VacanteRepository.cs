@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentAPI.Data;
 using RecruitmentAPI.Models;
@@ -14,13 +15,16 @@ public class VacanteRepository : IVacanteRepository
         _context = context;
     }
 
-    public async Task<List<Vacante>> GetAllAsync()
+    public async Task<List<Vacante>> GetAllAsync(Expression<Func<Vacante, bool>>? predicate = null)
     {
-        return await _context.Vacantes
+        var query = _context.Vacantes
             .Include(v => v.Requisitos)
             .Include(v => v.Postulaciones)
-            .OrderByDescending(v => v.CreatedAt)
-            .ToListAsync();
+            .AsQueryable();
+
+        if (predicate != null) query = query.Where(predicate);
+
+        return await query.OrderByDescending(v => v.CreatedAt).ToListAsync();
     }
 
     public async Task<Vacante?> GetByIdAsync(Guid id)

@@ -64,7 +64,7 @@ export default function PlatformOverview() {
           </div>
 
           {/* Recent Companies */}
-          {data.recentEmpresas?.length > 0 && (
+          {data?.recentEmpresas?.length > 0 && (
             <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
               <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>

@@ -24,6 +24,7 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     nombreCandidato: '',
     email: '',
     telefono: '',
+    ubicacion: '',
     skills: [],
     softSkills: [],
     impactStatement: '',
@@ -118,6 +119,7 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     fd.append('NombreCandidato', formData.nombreCandidato.trim());
     fd.append('Email', formData.email.trim().toLowerCase());
     if (formData.telefono) fd.append('Telefono', formData.telefono.trim());
+    if (formData.ubicacion) fd.append('Ubicacion', formData.ubicacion);
     fd.append('VacanteId', job.id);
     if (formData.cvFile) fd.append('CvFile', formData.cvFile);
 

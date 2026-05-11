@@ -6,6 +6,7 @@ import RechazadosTray from '../components/kanban/RechazadosTray';
 import CommandBar from '../components/kanban/CommandBar';
 import { useRechazadosRestore } from '../hooks/useRechazadosRestore';
 import Breadcrumb from '../components/common/Breadcrumb';
+import { useAuth } from '../context/AuthContext';
 
 const STAGE_LABELS = ['Nuevo', 'Entrevista', 'Prueba Técnica', 'Oferta'];
 const STAGE_COLORS = [
@@ -16,6 +17,8 @@ const STAGE_COLORS = [
 ];
 
 export default function KanbanAllPage() {
+  const { selectedCompanyId } = useAuth();
+
   // Filter state
   const [filters, setFilters] = useState({
     search: '',
@@ -29,12 +32,12 @@ export default function KanbanAllPage() {
   const [visibleCards, setVisibleCards] = useState([]);
   const [rechazados, setRechazados] = useState([]);
 
-  // Fetch vacantes for dropdown
+  // Fetch vacantes for dropdown — refetch when platform admin changes the company filter
   useEffect(() => {
-    getVacantes()
+    getVacantes({ companyId: selectedCompanyId })
       .then((res) => setVacantes(res.data))
       .catch((err) => console.error('Error loading vacantes:', err));
-  }, []);
+  }, [selectedCompanyId]);
 
   // Filter function (additive AND)
   const filterFn = useCallback(

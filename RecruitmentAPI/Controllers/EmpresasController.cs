@@ -3,25 +3,35 @@ using Microsoft.AspNetCore.Mvc;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Models;
 using RecruitmentAPI.Repositories.Interfaces;
+using RecruitmentAPI.Services.Interfaces;
 
 namespace RecruitmentAPI.Controllers;
 
 [ApiController]
 [Route("api/empresas")]
-[Authorize(Roles = "Administrador")]
+[Authorize]
 public class EmpresasController : ControllerBase
 {
     private readonly IEmpresaRepository _repo;
+    private readonly ICurrentUser _current;
 
-    public EmpresasController(IEmpresaRepository repo) => _repo = repo;
+    public EmpresasController(IEmpresaRepository repo, ICurrentUser current)
+    {
+        _repo = repo;
+        _current = current;
+    }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await _repo.GetAllAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        if (!_current.HasPermission("companies:read")) return Forbid();
+        return Ok(await _repo.GetAllAsync());
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
+        if (!_current.HasPermission("companies:read")) return Forbid();
         var empresa = await _repo.GetByIdAsync(id);
         return empresa == null ? NotFound() : Ok(new EmpresaResponseDTO
         {
@@ -38,6 +48,7 @@ public class EmpresasController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateEmpresaDTO dto)
     {
+        if (!_current.HasPermission("companies:create")) return Forbid();
         var empresa = await _repo.CreateAsync(new Empresa
         {
             Nombre = dto.Nombre.Trim(),
@@ -57,12 +68,16 @@ public class EmpresasController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] CreateEmpresaDTO dto)
     {
+        if (!_current.HasPermission("companies:update")) return Forbid();
         var result = await _repo.UpdateAsync(id, dto.Nombre.Trim(), dto.Dominio?.Trim());
         if (result == null) return NotFound();
         return Ok(new EmpresaResponseDTO { Id = result.Id, Nombre = result.Nombre, Dominio = result.Dominio, Estado = result.Estado });
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Disable(Guid id) =>
-        await _repo.DisableAsync(id) ? NoContent() : NotFound();
+    public async Task<IActionResult> Disable(Guid id)
+    {
+        if (!_current.HasPermission("companies:update")) return Forbid();
+        return await _repo.DisableAsync(id) ? NoContent() : NotFound();
+    }
 }

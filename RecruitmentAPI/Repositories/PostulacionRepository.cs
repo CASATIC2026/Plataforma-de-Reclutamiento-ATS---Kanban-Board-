@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentAPI.Data;
 using RecruitmentAPI.Models;
@@ -14,12 +15,13 @@ public class PostulacionRepository : IPostulacionRepository
         _context = context;
     }
 
-    public async Task<List<Postulacion>> GetAllAsync()
+    public async Task<List<Postulacion>> GetAllAsync(Expression<Func<Postulacion, bool>>? predicate = null)
     {
-        return await _context.Postulaciones
+        var query = _context.Postulaciones
             .Include(p => p.Vacante)
-            .OrderByDescending(p => p.CreatedAt)
-            .ToListAsync();
+            .AsQueryable();
+        if (predicate != null) query = query.Where(predicate);
+        return await query.OrderByDescending(p => p.CreatedAt).ToListAsync();
     }
 
     public async Task<Postulacion?> GetByIdAsync(Guid id)
@@ -29,13 +31,13 @@ public class PostulacionRepository : IPostulacionRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<List<Postulacion>> GetByVacanteIdAsync(Guid vacanteId)
+    public async Task<List<Postulacion>> GetByVacanteIdAsync(Guid vacanteId, Expression<Func<Postulacion, bool>>? predicate = null)
     {
-        return await _context.Postulaciones
+        var query = _context.Postulaciones
             .Include(p => p.Vacante)
-            .Where(p => p.VacanteId == vacanteId)
-            .OrderByDescending(p => p.CreatedAt)
-            .ToListAsync();
+            .Where(p => p.VacanteId == vacanteId);
+        if (predicate != null) query = query.Where(predicate);
+        return await query.OrderByDescending(p => p.CreatedAt).ToListAsync();
     }
 
     public async Task<Postulacion> CreateAsync(Postulacion postulacion)

@@ -11,7 +11,11 @@ import VacanteFormModal from '../components/vacantes/VacanteFormModal';
 
 export default function AdminVacantesPage() {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, selectedCompanyId, hasPermission } = useAuth();
+  const canCreate = hasPermission('jobs:create');
+  const canEdit = hasPermission('jobs:update');
+  const canDelete = hasPermission('jobs:delete');
+  const canManage = canCreate || canEdit || canDelete;
   const [vacantes, setVacantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -36,14 +40,15 @@ export default function AdminVacantesPage() {
 
   const fetchVacantes = useCallback(async () => {
     try {
-      const response = await getVacantes();
+      // selectedCompanyId is only honored by the backend for platform-tier callers
+      const response = await getVacantes({ companyId: selectedCompanyId });
       setVacantes(response.data);
     } catch (error) {
       console.error('Error fetching vacantes:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedCompanyId]);
 
   useEffect(() => {
     fetchVacantes();
@@ -65,7 +70,9 @@ export default function AdminVacantesPage() {
       if (editingId) {
         await updateVacante(editingId, payload);
       } else {
-        await createVacante(payload);
+        // Platform admins use selectedCompanyId as the target company on POST.
+        // For regular users it's ignored (backend stamps from JWT).
+        await createVacante(payload, { companyId: selectedCompanyId });
       }
       await fetchVacantes();
       resetForm();
@@ -186,7 +193,7 @@ export default function AdminVacantesPage() {
               Gestiona y supervisa {activeCount} posiciones activas en tu organización.
             </p>
           </div>
-          {isAdmin && (
+          {canCreate && (
             <button
               onClick={() => {
                 resetForm();
@@ -320,7 +327,7 @@ export default function AdminVacantesPage() {
                     <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Postulaciones
                     </th>
-                    {isAdmin && (
+                    {canManage && (
                       <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-right">
                         Acciones
                       </th>
@@ -356,29 +363,33 @@ export default function AdminVacantesPage() {
                       <td className="px-6 py-5 text-sm font-medium text-navy">
                         {vacante.postulacionesCount || 0}
                       </td>
-                      {isAdmin && (
+                      {canManage && (
                         <td className="px-6 py-5 text-right">
                           <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(vacante);
-                              }}
-                              className="p-2 hover:bg-accent-bg rounded-lg text-navy transition-colors"
-                              title="Editar"
-                            >
-                              ✎
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(vacante.id);
-                              }}
-                              className="p-2 hover:bg-danger-bg rounded-lg text-danger transition-colors"
-                              title="Eliminar"
-                            >
-                              🗑
-                            </button>
+                            {canEdit && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(vacante);
+                                }}
+                                className="p-2 hover:bg-accent-bg rounded-lg text-navy transition-colors"
+                                title="Editar"
+                              >
+                                ✎
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(vacante.id);
+                                }}
+                                className="p-2 hover:bg-danger-bg rounded-lg text-danger transition-colors"
+                                title="Eliminar"
+                              >
+                                🗑
+                              </button>
+                            )}
                           </div>
                         </td>
                       )}

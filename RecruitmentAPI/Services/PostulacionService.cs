@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Text.Json;
 using RecruitmentAPI.Data;
 using RecruitmentAPI.DTOs;
@@ -12,12 +13,20 @@ public class PostulacionService : IPostulacionService
     private static readonly HashSet<string> AllowedExtensions = new() { ".pdf", ".doc", ".docx" };
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
 
+    // Frontend sends JSON with camelCase keys (skillName, proficiencyLevel) while the
+    // DTOs use PascalCase. System.Text.Json defaults to case-sensitive matching, so
+    // without this option deserialized properties stay at their default values and
+    // skills/availabilities/responses are silently dropped.
+    private static readonly JsonSerializerOptions JsonOpts =
+        new(JsonSerializerDefaults.Web);
+
     private readonly IPostulacionRepository _repository;
     private readonly IVacanteRepository _vacanteRepository;
     private readonly IScoringService _scoringService;
     private readonly IEmailService _emailService;
     private readonly IWebHostEnvironment _env;
     private readonly AppDbContext _context;
+    private readonly ICurrentUser _current;
 
     public PostulacionService(
         IPostulacionRepository repository,
@@ -25,7 +34,8 @@ public class PostulacionService : IPostulacionService
         IScoringService scoringService,
         IEmailService emailService,
         IWebHostEnvironment env,
-        AppDbContext context)
+        AppDbContext context,
+        ICurrentUser current)
     {
         _repository = repository;
         _vacanteRepository = vacanteRepository;
@@ -33,11 +43,27 @@ public class PostulacionService : IPostulacionService
         _emailService = emailService;
         _env = env;
         _context = context;
+        _current = current;
+    }
+
+    /// <summary>
+    /// Postulaciones inherit company scope from their parent Vacante. Anonymous reads
+    /// are blocked at the controller layer; this method assumes an authenticated caller.
+    /// </summary>
+    private Expression<Func<Postulacion, bool>>? BuildScopePredicate()
+    {
+        if (_current.UserId == null) return p => false;          // anonymous reads return nothing
+        if (_current.IsPlatformTier) return null;                // cross-tenant
+        if (_current.CanSeeAllCompanyJobs)
+            return p => p.Vacante.EmpresaId == _current.CompanyId;
+        if (_current.HasPermission("applications:read"))         // recruiter scope
+            return p => p.Vacante.EmpresaId == _current.CompanyId && p.Vacante.CreadoPor == _current.UserId;
+        return p => false;
     }
 
     public async Task<List<PostulacionResponseDTO>> GetAllAsync()
     {
-        var postulaciones = await _repository.GetAllAsync();
+        var postulaciones = await _repository.GetAllAsync(BuildScopePredicate());
         return postulaciones.Select(MapToResponseDTO).ToList();
     }
 
@@ -45,11 +71,18 @@ public class PostulacionService : IPostulacionService
     {
         var postulacion = await _repository.GetByIdAsync(id);
         if (postulacion == null) return null;
+        if (!_current.CanAccessResource(postulacion.Vacante?.EmpresaId, postulacion.Vacante?.CreadoPor))
+            return null;
         return MapToResponseDTO(postulacion);
     }
 
     public async Task<List<PostulacionResponseDTO>> GetByVacanteIdAsync(Guid vacanteId)
     {
+        // Confirm the vacante itself is in scope before exposing its applications
+        var vacante = await _vacanteRepository.GetByIdAsync(vacanteId);
+        if (vacante == null) return new();
+        if (!_current.CanAccessResource(vacante.EmpresaId, vacante.CreadoPor)) return new();
+
         var postulaciones = await _repository.GetByVacanteIdAsync(vacanteId);
         return postulaciones.Select(MapToResponseDTO).ToList();
     }
@@ -101,7 +134,8 @@ public class PostulacionService : IPostulacionService
         var vacante = await _vacanteRepository.GetByIdAsync(created.VacanteId);
         if (vacante != null)
         {
-            var scoreResult = _scoringService.Score(created, vacante, dto.Carrera, dto.Ubicacion);
+            var scoringInput = BuildScoringInput(dto);
+            var scoreResult = _scoringService.Score(created, vacante, scoringInput);
             created.Puntaje = scoreResult.Puntaje;
             created.PuntajeDetalle = JsonSerializer.Serialize(scoreResult.Detalle);
 
@@ -131,12 +165,63 @@ public class PostulacionService : IPostulacionService
         return MapToResponseDTO(withVacante!);
     }
 
+    /// <summary>
+    /// Build the scoring inputs from the apply form. The 4-step modal sends skills
+    /// and soft-skills as JSON; we parse them here so the algorithm gets real signal
+    /// instead of falling through to neutral defaults (the cause of the "everyone
+    /// scores 58" symptom).
+    /// </summary>
+    private static ScoringInput BuildScoringInput(CreatePostulacionDTO dto)
+    {
+        var skills = new List<CandidateSkillInput>();
+        if (!string.IsNullOrEmpty(dto.SkillsJson))
+        {
+            try
+            {
+                var parsed = JsonSerializer.Deserialize<List<SkillDTO>>(dto.SkillsJson, JsonOpts);
+                if (parsed != null)
+                    skills.AddRange(parsed
+                        .Where(s => !string.IsNullOrWhiteSpace(s.SkillName))
+                        .Select(s => new CandidateSkillInput(s.SkillName, s.ProficiencyLevel)));
+            }
+            catch { /* malformed JSON falls back to empty skills */ }
+        }
+
+        // Legacy fallback: a comma-separated Carrera string from the old single-step
+        // form still scores correctly via the new path.
+        if (skills.Count == 0 && !string.IsNullOrWhiteSpace(dto.Carrera))
+        {
+            skills.AddRange(dto.Carrera.Split(',')
+                .Select(s => s.Trim())
+                .Where(s => s.Length > 0)
+                .Select(s => new CandidateSkillInput(s, "Intermedio")));
+        }
+
+        int softSkillsCount = 0;
+        if (!string.IsNullOrEmpty(dto.SoftSkillsJson))
+        {
+            try
+            {
+                var soft = JsonSerializer.Deserialize<List<string>>(dto.SoftSkillsJson, JsonOpts);
+                softSkillsCount = soft?.Count ?? 0;
+            }
+            catch { }
+        }
+
+        return new ScoringInput(
+            Skills: skills,
+            Ubicacion: dto.Ubicacion,
+            SoftSkillsCount: softSkillsCount,
+            ImpactStatementLength: dto.ImpactStatement?.Length ?? 0
+        );
+    }
+
     private async Task PersistStructuredDataAsync(Guid postulacionId, CreatePostulacionDTO dto)
     {
         // Parse and persist skills
         if (!string.IsNullOrEmpty(dto.SkillsJson))
         {
-            var skills = JsonSerializer.Deserialize<List<SkillDTO>>(dto.SkillsJson);
+            var skills = JsonSerializer.Deserialize<List<SkillDTO>>(dto.SkillsJson, JsonOpts);
             if (skills?.Count > 0)
             {
                 var candidateSkills = skills.Select(s => new CandidateSkill
@@ -157,7 +242,7 @@ public class PostulacionService : IPostulacionService
         // Parse and persist availability
         if (!string.IsNullOrEmpty(dto.AvailabilityJson))
         {
-            var availability = JsonSerializer.Deserialize<List<AvailabilityDTO>>(dto.AvailabilityJson);
+            var availability = JsonSerializer.Deserialize<List<AvailabilityDTO>>(dto.AvailabilityJson, JsonOpts);
             if (availability?.Count > 0)
             {
                 var candidateAvailability = availability
@@ -177,7 +262,7 @@ public class PostulacionService : IPostulacionService
         // Parse and persist screening responses
         if (!string.IsNullOrEmpty(dto.ScreeningResponsesJson))
         {
-            var responses = JsonSerializer.Deserialize<List<ScreeningResponseDTO>>(dto.ScreeningResponsesJson);
+            var responses = JsonSerializer.Deserialize<List<ScreeningResponseDTO>>(dto.ScreeningResponsesJson, JsonOpts);
             if (responses?.Count > 0)
             {
                 var candidateResponses = responses.Select(r => new CandidateScreeningResponse
@@ -198,6 +283,8 @@ public class PostulacionService : IPostulacionService
     {
         var postulacion = await _repository.GetByIdAsync(id);
         if (postulacion == null) return null;
+        if (!_current.CanAccessResource(postulacion.Vacante?.EmpresaId, postulacion.Vacante?.CreadoPor))
+            return null;
 
         postulacion.Estado = estado;
         postulacion.UpdatedAt = DateTime.UtcNow;
@@ -210,6 +297,8 @@ public class PostulacionService : IPostulacionService
     {
         var postulacion = await _repository.GetByIdAsync(id);
         if (postulacion == null) return null;
+        if (!_current.CanAccessResource(postulacion.Vacante?.EmpresaId, postulacion.Vacante?.CreadoPor))
+            return null;
 
         postulacion.NotasInternas = notas;
         postulacion.UpdatedAt = DateTime.UtcNow;
@@ -223,6 +312,8 @@ public class PostulacionService : IPostulacionService
         var postulacion = await _repository.GetByIdAsync(id);
         if (postulacion == null || string.IsNullOrEmpty(postulacion.CvFilePath))
             return null;
+        if (!_current.CanAccessResource(postulacion.Vacante?.EmpresaId, postulacion.Vacante?.CreadoPor))
+            return null;
         return (postulacion.CvFilePath, postulacion.CvFileName);
     }
 
@@ -230,6 +321,8 @@ public class PostulacionService : IPostulacionService
     {
         var postulacion = await _repository.GetByIdAsync(id);
         if (postulacion == null) return false;
+        if (!_current.CanAccessResource(postulacion.Vacante?.EmpresaId, postulacion.Vacante?.CreadoPor))
+            return false;
 
         // Delete CV file from disk if it exists
         if (!string.IsNullOrEmpty(postulacion.CvFilePath) && File.Exists(postulacion.CvFilePath))

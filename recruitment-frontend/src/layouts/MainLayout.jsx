@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePermission } from '../hooks/usePermission';
 import { getReviewStats } from '../api/reviewApi';
+import CompanySwitcher from '../components/common/CompanySwitcher';
 
 // Import Playwrite IE font
 const fontLink = document.createElement('link');
@@ -11,10 +12,12 @@ fontLink.rel = 'stylesheet';
 document.head.appendChild(fontLink);
 
 export default function MainLayout() {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isPlatformTier } = useAuth();
   const navigate = useNavigate();
   const canViewAnalytics = usePermission('reports:read');
-  const canAccessPlatform = usePermission('platform:access');
+  // /platform/* is platform-admin territory; Manager has platform:access for limited
+  // read-only widgets but shouldn't see the full nav entry.
+  const canAccessPlatform = isPlatformTier;
   const canReview = usePermission('applications:review');
   const [pendingReviewCount, setPendingReviewCount] = useState(0);
 
@@ -199,6 +202,8 @@ export default function MainLayout() {
                 Platform
               </Link>
             )}
+
+            <CompanySwitcher />
 
             <div style={{
               borderLeft: '1.5px solid rgba(205,123,79,0.2)',

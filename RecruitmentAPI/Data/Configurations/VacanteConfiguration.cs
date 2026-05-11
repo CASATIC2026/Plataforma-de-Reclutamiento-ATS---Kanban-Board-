@@ -65,6 +65,10 @@ public class VacanteConfiguration : IEntityTypeConfiguration<Vacante>
             .HasForeignKey(v => v.CreadoPor)
             .OnDelete(DeleteBehavior.SetNull);
 
+        // Tenant scope index — accelerates the recruiter filter (empresa + creator)
+        builder.HasIndex(v => new { v.EmpresaId, v.CreadoPor })
+            .HasDatabaseName("ix_vacantes_empresa_creado_por");
+
         // Relationship: one vacante → many requisitos
         builder.HasMany(v => v.Requisitos)
             .WithOne(r => r.Vacante)

@@ -1,3 +1,9 @@
+const DEPARTAMENTOS_SV = [
+  'Ahuachapán', 'Cabañas', 'Chalatenango', 'Cuscatlán', 'La Libertad',
+  'La Paz', 'La Unión', 'Morazán', 'San Miguel', 'San Salvador',
+  'San Vicente', 'Santa Ana', 'Sonsonate', 'Usulután',
+];
+
 export default function ApplyStep1BasicInfo({ formData, onChange, errors }) {
   return (
     <div>
@@ -39,6 +45,19 @@ export default function ApplyStep1BasicInfo({ formData, onChange, errors }) {
         {!errors.telefono && !formData.telefono && (
           <span className="form-hint">Opcional — mín. 10 dígitos si se ingresa</span>
         )}
+      </div>
+
+      <div className="form-group" style={{ marginTop: '16px' }}>
+        <label className="form-label">Departamento (Opcional)</label>
+        <select
+          className={`form-input${errors.ubicacion ? ' error' : ''}`}
+          value={formData.ubicacion || ''}
+          onChange={(e) => onChange('ubicacion', e.target.value)}
+        >
+          <option value="">Selecciona tu departamento…</option>
+          {DEPARTAMENTOS_SV.map((d) => <option key={d} value={d}>{d}</option>)}
+        </select>
+        <span className="form-hint">Mejora la puntuación si coincide con la ubicación de la vacante</span>
       </div>
     </div>
   );

@@ -17,65 +17,59 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
+    // Exceptions propagate. The dispatcher catches them to mark email_status="failed"
+    // and schedule retries. Swallowing here would cause the dispatcher to mark every
+    // failed SMTP attempt as "sent".
     public async Task SendConfirmacionAsync(Postulacion postulacion, Vacante vacante)
     {
-        try
-        {
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromAddress));
-            emailMessage.To.Add(new MailboxAddress(postulacion.NombreCandidato, postulacion.Email));
-            emailMessage.Subject = $"Recibimos tu postulación — {vacante.Titulo}";
+        var emailMessage = new MimeMessage();
+        emailMessage.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromAddress));
+        emailMessage.To.Add(new MailboxAddress(postulacion.NombreCandidato, postulacion.Email));
+        emailMessage.Subject = $"Recibimos tu postulación — {vacante.Titulo}";
 
-            var bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = GetConfirmacionHtml(postulacion, vacante);
+        var bodyBuilder = new BodyBuilder { HtmlBody = GetConfirmacionHtml(postulacion, vacante) };
+        emailMessage.Body = bodyBuilder.ToMessageBody();
 
-            emailMessage.Body = bodyBuilder.ToMessageBody();
-
-            await SendEmailAsync(emailMessage);
-            _logger.LogInformation($"Confirmation email sent to {postulacion.Email} for {vacante.Titulo}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"[CONFIRMATION EMAIL] Failed to send to {postulacion.Email}: {ex.Message}");
-            // Email failure does NOT throw — candidate record is already saved
-        }
+        await SendEmailAsync(emailMessage);
+        _logger.LogInformation($"Confirmation email sent to {postulacion.Email} for {vacante.Titulo}");
     }
 
     public async Task SendResultadoAsync(Postulacion postulacion, Vacante vacante, bool apto)
     {
-        try
-        {
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromAddress));
-            emailMessage.To.Add(new MailboxAddress(postulacion.NombreCandidato, postulacion.Email));
+        var emailMessage = new MimeMessage();
+        emailMessage.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromAddress));
+        emailMessage.To.Add(new MailboxAddress(postulacion.NombreCandidato, postulacion.Email));
 
-            if (apto)
-            {
-                emailMessage.Subject = $"¡Felicitaciones! Tu postulación a {vacante.Titulo} ha sido aceptada";
-                var bodyBuilder = new BodyBuilder();
-                bodyBuilder.HtmlBody = GetResultadoAptoHtml(postulacion, vacante);
-                emailMessage.Body = bodyBuilder.ToMessageBody();
-            }
-            else
-            {
-                emailMessage.Subject = $"Actualización sobre tu postulación a {vacante.Titulo}";
-                var bodyBuilder = new BodyBuilder();
-                bodyBuilder.HtmlBody = GetResultadoRechazadoHtml(postulacion, vacante);
-                emailMessage.Body = bodyBuilder.ToMessageBody();
-            }
-
-            await SendEmailAsync(emailMessage);
-            _logger.LogInformation($"Result email ({(apto ? "approved" : "rejected")}) sent to {postulacion.Email} for {vacante.Titulo}");
-        }
-        catch (Exception ex)
+        var bodyBuilder = new BodyBuilder();
+        if (apto)
         {
-            _logger.LogError($"[RESULT EMAIL] Failed to send to {postulacion.Email}: {ex.Message}");
-            // Email failure does NOT throw — candidate record is already saved
+            emailMessage.Subject = $"¡Felicitaciones! Tu postulación a {vacante.Titulo} ha sido aceptada";
+            bodyBuilder.HtmlBody = GetResultadoAptoHtml(postulacion, vacante);
         }
+        else
+        {
+            emailMessage.Subject = $"Actualización sobre tu postulación a {vacante.Titulo}";
+            bodyBuilder.HtmlBody = GetResultadoRechazadoHtml(postulacion, vacante);
+        }
+        emailMessage.Body = bodyBuilder.ToMessageBody();
+
+        await SendEmailAsync(emailMessage);
+        _logger.LogInformation($"Result email ({(apto ? "approved" : "rejected")}) sent to {postulacion.Email} for {vacante.Titulo}");
     }
 
     private async Task SendEmailAsync(MimeMessage emailMessage)
     {
+        // Fail fast on placeholder/empty credentials so the dispatcher records a clear
+        // failure instead of attempting SMTP auth with garbage and producing a 535 error.
+        if (string.IsNullOrWhiteSpace(_emailSettings.Username)
+            || string.IsNullOrWhiteSpace(_emailSettings.Password)
+            || _emailSettings.Username.StartsWith("YOUR_", StringComparison.OrdinalIgnoreCase)
+            || _emailSettings.Password.StartsWith("YOUR_", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "SMTP credentials are not configured. Set Email__Username and Email__Password in the backend .env file.");
+        }
+
         try
         {
             _logger.LogInformation($"[EMAIL DEBUG] Attempting connection to {_emailSettings.SmtpHost}:{_emailSettings.SmtpPort}");
