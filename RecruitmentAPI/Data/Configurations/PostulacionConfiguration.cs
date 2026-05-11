@@ -52,6 +52,33 @@ public class PostulacionConfiguration : IEntityTypeConfiguration<Postulacion>
             .HasColumnName("email_resultado_enviado")
             .HasDefaultValue(false);
 
+        // Delayed email automation columns
+        builder.Property(p => p.EmailStatus)
+            .HasColumnName("email_status")
+            .HasMaxLength(20);
+
+        builder.Property(p => p.EmailScheduledFor)
+            .HasColumnName("email_scheduled_for");
+
+        builder.Property(p => p.EmailSentAt)
+            .HasColumnName("email_sent_at");
+
+        builder.Property(p => p.EmailTypeToSend)
+            .HasColumnName("email_type_to_send")
+            .HasMaxLength(40);
+
+        builder.Property(p => p.EmailRetryCount)
+            .HasColumnName("email_retry_count")
+            .HasDefaultValue(0);
+
+        builder.Property(p => p.EmailLastError)
+            .HasColumnName("email_last_error")
+            .HasColumnType("text");
+
+        // Index to make the dispatcher query (status=pending AND scheduled_for<=NOW) cheap
+        builder.HasIndex(p => new { p.EmailStatus, p.EmailScheduledFor })
+            .HasDatabaseName("ix_postulaciones_email_dispatch");
+
         builder.Property(p => p.CreatedAt)
             .HasDefaultValueSql("NOW()");
 
@@ -117,6 +144,11 @@ public class PostulacionConfiguration : IEntityTypeConfiguration<Postulacion>
         builder.HasMany(p => p.ScreeningResponses)
             .WithOne(csr => csr.Postulacion)
             .HasForeignKey(csr => csr.PostulacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.EmailLogs)
+            .WithOne(el => el.Postulacion)
+            .HasForeignKey(el => el.PostulacionId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

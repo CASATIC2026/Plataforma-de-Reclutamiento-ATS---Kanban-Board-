@@ -54,6 +54,7 @@ builder.Services.AddScoped<IScreeningQuestionService, ScreeningQuestionService>(
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 builder.Services.AddTransient<IScoringService, ScoringService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHostedService<EmailDispatcherService>();
 
 // JWT Authentication — read key from environment variable for security
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")

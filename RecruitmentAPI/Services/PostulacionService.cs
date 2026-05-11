@@ -110,18 +110,21 @@ public class PostulacionService : IPostulacionService
                 created.Estado = EstadoPostulacion.Rechazado;
             }
 
+            // Schedule the candidate-facing email for delayed dispatch so a recruiter
+            // has time to review/cancel/send-now before it goes out. Auto-rejected
+            // candidates get a rechazo email; everyone else gets a confirmation.
+            var delayMinutes = int.TryParse(Environment.GetEnvironmentVariable("EMAIL_DELAY_MINUTES"), out var d) ? d : 5;
+            created.EmailStatus = "pending";
+            created.EmailScheduledFor = DateTime.UtcNow.AddMinutes(delayMinutes);
+            created.EmailTypeToSend = vacante.ScreeningActivo && created.Estado == EstadoPostulacion.Rechazado
+                ? "rechazo_screening"
+                : "confirmacion_recepcion";
+            created.EmailRetryCount = 0;
+
             await _repository.UpdateAsync(created);
 
             // Persist structured application data in transaction
             await PersistStructuredDataAsync(created.Id, dto);
-
-            // Send emails
-            await _emailService.SendConfirmacionAsync(created, vacante);
-            if (vacante.ScreeningActivo)
-            {
-                bool apto = created.Estado != EstadoPostulacion.Rechazado;
-                await _emailService.SendResultadoAsync(created, vacante, apto);
-            }
         }
 
         var withVacante = await _repository.GetByIdAsync(created.Id);
@@ -252,6 +255,11 @@ public class PostulacionService : IPostulacionService
             PuntajeDetalle = postulacion.PuntajeDetalle,
             CreatedAt = postulacion.CreatedAt,
             UpdatedAt = postulacion.UpdatedAt,
+            EmailStatus = postulacion.EmailStatus,
+            EmailScheduledFor = postulacion.EmailScheduledFor,
+            EmailSentAt = postulacion.EmailSentAt,
+            EmailTypeToSend = postulacion.EmailTypeToSend,
+            EmailRetryCount = postulacion.EmailRetryCount,
         };
     }
 }

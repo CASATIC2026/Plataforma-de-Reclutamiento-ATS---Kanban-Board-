@@ -63,10 +63,18 @@ public class RolRepository : IRolRepository
         var rol = await _context.Roles.FirstOrDefaultAsync(r => r.Nombre == rolNombre);
         if (rol == null) return false;
 
-        var existing = await _context.UsuarioRoles
-            .FirstOrDefaultAsync(ur => ur.UsuarioId == usuarioId && ur.RolId == rol.Id && ur.EmpresaId == empresaId);
+        // A user should hold exactly one role per ambito (app_tier OR platform_tier).
+        // Remove any prior assignments in the same ambito before adding the new one,
+        // otherwise roles accumulate and "change role" silently no-ops.
+        var existingInAmbito = await _context.UsuarioRoles
+            .Include(ur => ur.Rol)
+            .Where(ur => ur.UsuarioId == usuarioId && ur.Rol.Ambito == rol.Ambito)
+            .ToListAsync();
 
-        if (existing != null) return true; // already assigned
+        if (existingInAmbito.Count == 1 && existingInAmbito[0].RolId == rol.Id)
+            return true; // already exactly this role
+
+        _context.UsuarioRoles.RemoveRange(existingInAmbito);
 
         _context.UsuarioRoles.Add(new UsuarioRol
         {
@@ -76,9 +84,27 @@ public class RolRepository : IRolRepository
             AsignadoPor = asignadoPorId,
             AsignadoEn = DateTime.UtcNow
         });
+
+        // Keep the legacy Usuario.Rol enum loosely synced so any code that still reads
+        // it (controllers using [Authorize(Roles="...")], user list display) stays consistent.
+        var usuario = await _context.Usuarios.FindAsync(usuarioId);
+        if (usuario != null)
+        {
+            usuario.Rol = MapToLegacyEnum(rolNombre, usuario.Rol);
+        }
+
         await _context.SaveChangesAsync();
         return true;
     }
+
+    private static RolUsuario MapToLegacyEnum(string rbacNombre, RolUsuario current) => rbacNombre switch
+    {
+        "Candidate" => RolUsuario.General,
+        "Recruiter" => RolUsuario.Manager,
+        "Manager"   => RolUsuario.Manager,
+        "Admin" or "Owner" or "Developer" or "DevOps" or "DBA" => RolUsuario.Administrador,
+        _ => current
+    };
 
     public async Task<List<string>> GetPermisosForUsuarioAsync(Guid usuarioId)
     {

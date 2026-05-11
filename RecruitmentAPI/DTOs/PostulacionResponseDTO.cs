@@ -17,4 +17,11 @@ public class PostulacionResponseDTO
     public string? PuntajeDetalle { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    // Delayed email automation
+    public string? EmailStatus { get; set; }
+    public DateTime? EmailScheduledFor { get; set; }
+    public DateTime? EmailSentAt { get; set; }
+    public string? EmailTypeToSend { get; set; }
+    public int EmailRetryCount { get; set; }
 }

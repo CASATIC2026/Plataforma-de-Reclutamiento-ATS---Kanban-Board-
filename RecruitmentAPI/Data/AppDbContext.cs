@@ -31,6 +31,9 @@ public class AppDbContext : DbContext
     public DbSet<CandidateAvailability> CandidateAvailabilities => Set<CandidateAvailability>();
     public DbSet<CandidateScreeningResponse> CandidateScreeningResponses => Set<CandidateScreeningResponse>();
 
+    // Email automation
+    public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

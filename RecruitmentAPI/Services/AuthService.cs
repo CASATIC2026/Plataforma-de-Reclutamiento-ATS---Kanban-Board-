@@ -27,10 +27,18 @@ public class AuthService : IAuthService
         if (await _context.Usuarios.AnyAsync(u => u.Email == dto.Email))
             throw new InvalidOperationException("Ya existe una cuenta con este correo electrónico.");
 
-        if (!Enum.TryParse<RolUsuario>(dto.Rol, ignoreCase: true, out var rol))
-            rol = RolUsuario.General;
-        if (rol != RolUsuario.General)
-            rol = RolUsuario.General;
+        // Accept either an RBAC role name ("Candidate"/"Recruiter"/"Manager") or a
+        // legacy enum value. Public registration is restricted to app-tier roles —
+        // platform-tier roles (Admin/Owner/etc.) must be assigned by a platform admin.
+        var requested = (dto.Rol ?? "Candidate").Trim();
+        var allowedPublic = new[] { "Candidate", "Recruiter", "Manager" };
+        var rbacRolName = allowedPublic.Contains(requested) ? requested : "Candidate";
+
+        var legacyRol = rbacRolName switch
+        {
+            "Recruiter" or "Manager" => RolUsuario.Manager,
+            _ => RolUsuario.General
+        };
 
         var usuario = new Usuario
         {
@@ -39,11 +47,26 @@ public class AuthService : IAuthService
             Email = dto.Email.Trim().ToLower(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             Carrera = dto.Carrera?.Trim(),
-            Rol = rol
+            Rol = legacyRol
         };
 
         _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();
+
+        // Create the matching RBAC assignment so JWT permissions come from the new
+        // system on first login (no legacy fallback for newly-registered users).
+        var rbacRol = await _context.Roles.FirstOrDefaultAsync(r => r.Nombre == rbacRolName);
+        if (rbacRol != null)
+        {
+            _context.UsuarioRoles.Add(new UsuarioRol
+            {
+                UsuarioId = usuario.Id,
+                RolId = rbacRol.Id,
+                EmpresaId = null,
+                AsignadoEn = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+        }
 
         var permissions = await LoadPermissionsAsync(usuario);
 
@@ -53,7 +76,7 @@ public class AuthService : IAuthService
             Nombre = usuario.Nombre,
             Apellido = usuario.Apellido,
             Email = usuario.Email,
-            Rol = usuario.Rol.ToString(),
+            Rol = usuario.Rol.ToString(), // legacy enum string — keeps isAdmin/isAdminOrManager checks working
             Permissions = permissions,
             CompanyId = usuario.EmpresaId?.ToString()
         };
@@ -83,6 +106,9 @@ public class AuthService : IAuthService
 
     public async Task<List<UsuarioResponseDTO>> GetAllUsersAsync()
     {
+        // Report the user's current RBAC role (most recently assigned) so the admin
+        // listing reflects what AssignRol actually changed. Fall back to the legacy
+        // enum string only when no RBAC assignment exists.
         return await _context.Usuarios
             .OrderByDescending(u => u.CreatedAt)
             .Select(u => new UsuarioResponseDTO
@@ -91,7 +117,11 @@ public class AuthService : IAuthService
                 Nombre = u.Nombre,
                 Apellido = u.Apellido,
                 Email = u.Email,
-                Rol = u.Rol.ToString(),
+                Rol = _context.UsuarioRoles
+                        .Where(ur => ur.UsuarioId == u.Id)
+                        .OrderByDescending(ur => ur.AsignadoEn)
+                        .Select(ur => ur.Rol.Nombre)
+                        .FirstOrDefault() ?? u.Rol.ToString(),
                 CreatedAt = u.CreatedAt
             })
             .ToListAsync();

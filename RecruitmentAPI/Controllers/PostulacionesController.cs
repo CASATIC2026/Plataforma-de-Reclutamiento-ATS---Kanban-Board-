@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RecruitmentAPI.Data;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Models;
 using RecruitmentAPI.Services.Interfaces;
@@ -11,11 +13,15 @@ namespace RecruitmentAPI.Controllers;
 public class PostulacionesController : ControllerBase
 {
     private readonly IPostulacionService _service;
+    private readonly AppDbContext _db;
 
-    public PostulacionesController(IPostulacionService service)
+    public PostulacionesController(IPostulacionService service, AppDbContext db)
     {
         _service = service;
+        _db = db;
     }
+
+    private string Permisos() => User.FindAll("permissions").FirstOrDefault()?.Value ?? "";
 
     [Authorize(Roles = "Administrador,Manager")]
     [HttpGet]
@@ -105,5 +111,80 @@ public class PostulacionesController : ControllerBase
         var deleted = await _service.DeleteAsync(id);
         if (!deleted) return NotFound(new { message = "Postulación no encontrada" });
         return NoContent();
+    }
+
+    // ── Email automation actions ──
+
+    [Authorize]
+    [HttpPost("{id:guid}/send-email-now")]
+    public async Task<IActionResult> SendEmailNow(Guid id)
+    {
+        if (!Permisos().Contains("applications:review")) return Forbid();
+        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null) return NotFound();
+        if (p.EmailStatus != "pending" && p.EmailStatus != "cancelled" && p.EmailStatus != "failed")
+            return BadRequest(new { message = "El email ya fue enviado." });
+
+        p.EmailStatus = "pending";
+        p.EmailScheduledFor = DateTime.UtcNow;
+        p.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Email programado para envío inmediato." });
+    }
+
+    [Authorize]
+    [HttpPost("{id:guid}/cancel-email")]
+    public async Task<IActionResult> CancelEmail(Guid id)
+    {
+        if (!Permisos().Contains("applications:review")) return Forbid();
+        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null) return NotFound();
+        if (p.EmailStatus != "pending")
+            return BadRequest(new { message = "Solo se pueden cancelar emails pendientes." });
+
+        p.EmailStatus = "cancelled";
+        p.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Email cancelado." });
+    }
+
+    [Authorize]
+    [HttpPost("{id:guid}/restart-timer")]
+    public async Task<IActionResult> RestartTimer(Guid id, [FromQuery] int? minutes)
+    {
+        if (!Permisos().Contains("applications:review")) return Forbid();
+        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null) return NotFound();
+
+        var delay = minutes ?? (int.TryParse(Environment.GetEnvironmentVariable("EMAIL_DELAY_MINUTES"), out var d) ? d : 5);
+        p.EmailStatus = "pending";
+        p.EmailScheduledFor = DateTime.UtcNow.AddMinutes(delay);
+        p.EmailRetryCount = 0;
+        p.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return Ok(new { message = $"Timer reiniciado a {delay} min." });
+    }
+
+    [Authorize]
+    [HttpGet("{id:guid}/email-log")]
+    public async Task<IActionResult> GetEmailLog(Guid id)
+    {
+        if (!Permisos().Contains("applications:review")) return Forbid();
+        var logs = await _db.EmailLogs
+            .Where(e => e.PostulacionId == id)
+            .OrderByDescending(e => e.CreatedAt)
+            .Select(e => new
+            {
+                e.Id,
+                emailType = e.EmailType,
+                e.Subject,
+                e.Status,
+                sentAt = e.SentAt,
+                attemptCount = e.AttemptCount,
+                lastError = e.LastError,
+                createdAt = e.CreatedAt,
+            })
+            .ToListAsync();
+        return Ok(logs);
     }
 }

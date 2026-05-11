@@ -23,6 +23,15 @@ public class Postulacion
     public string? PuntajeDetalle { get; set; }
     public bool EmailConfirmacionEnviado { get; set; } = false;
     public bool EmailResultadoEnviado { get; set; } = false;
+
+    // Delayed email automation
+    public string? EmailStatus { get; set; }              // pending | sending | sent | failed | cancelled
+    public DateTime? EmailScheduledFor { get; set; }
+    public DateTime? EmailSentAt { get; set; }
+    public string? EmailTypeToSend { get; set; }          // confirmacion_recepcion | rechazo_screening
+    public int EmailRetryCount { get; set; } = 0;
+    public string? EmailLastError { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
@@ -52,4 +61,5 @@ public class Postulacion
     public ICollection<CandidateSkill> CandidateSkills { get; set; } = new List<CandidateSkill>();
     public ICollection<CandidateAvailability> Availabilities { get; set; } = new List<CandidateAvailability>();
     public ICollection<CandidateScreeningResponse> ScreeningResponses { get; set; } = new List<CandidateScreeningResponse>();
+    public ICollection<EmailLog> EmailLogs { get; set; } = new List<EmailLog>();
 }

@@ -581,8 +581,6 @@ export default function AuthPage() {
     }
   };
 
-  const ROLE_LEGACY_MAP = { Candidate: 'General', Recruiter: 'Manager', Manager: 'Administrador' };
-
   const handleRegister = async (form) => {
     setError('');
     setLoading(true);
@@ -592,7 +590,7 @@ export default function AuthPage() {
         apellido: form.apellido,
         email: form.email,
         password: form.password,
-        rol: ROLE_LEGACY_MAP[form.rol] ?? 'General',
+        rol: form.rol, // RBAC role name — backend maps to legacy enum + creates UsuarioRol row
       });
       login(res.data);
       navigate('/');
