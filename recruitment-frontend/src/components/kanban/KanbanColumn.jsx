@@ -10,6 +10,7 @@ export default function KanbanColumn({
   onDragOver,
   onDrop,
   onCardClick,
+  onEmailAction,
 }) {
   return (
     <div
@@ -56,6 +57,7 @@ export default function KanbanColumn({
               postulacion={card}
               onDragStart={onDragStart}
               onCardClick={onCardClick}
+              onEmailAction={onEmailAction}
             />
           ))
         )}

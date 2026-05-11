@@ -7,7 +7,7 @@ namespace RecruitmentAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Administrador")]
+[Authorize]
 public class UsuariosController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -17,9 +17,12 @@ public class UsuariosController : ControllerBase
         _authService = authService;
     }
 
+    private string Permisos() => User.FindAll("permissions").FirstOrDefault()?.Value ?? "";
+
     [HttpGet]
     public async Task<ActionResult<List<UsuarioResponseDTO>>> GetAll()
     {
+        if (!Permisos().Contains("users:read")) return Forbid();
         var users = await _authService.GetAllUsersAsync();
         return Ok(users);
     }
@@ -27,6 +30,7 @@ public class UsuariosController : ControllerBase
     [HttpPatch("{id}/rol")]
     public async Task<ActionResult<UsuarioResponseDTO>> ChangeRol(Guid id, [FromBody] ChangeRolDTO dto)
     {
+        if (!Permisos().Contains("users:update")) return Forbid();
         try
         {
             var updated = await _authService.ChangeRolAsync(id, dto.Rol);
@@ -42,6 +46,7 @@ public class UsuariosController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {
+        if (!Permisos().Contains("users:disable")) return Forbid();
         try
         {
             var deleted = await _authService.DeleteUserAsync(id);

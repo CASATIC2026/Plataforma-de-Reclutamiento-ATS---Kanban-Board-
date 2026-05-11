@@ -352,4 +352,41 @@ catch (Exception ex)
     Console.WriteLine($">> Seed warning: {ex.Message}");
 }
 
+// Idempotent permission back-fill — runs on every startup, safe to repeat
+try
+{
+    using var scope2 = app.Services.CreateScope();
+        var db2 = scope2.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    if (!db2.Permisos.Any(p => p.Nombre == "applications:review"))
+    {
+        var reviewPerm = new Permiso
+        {
+            Nombre = "applications:review",
+            Descripcion = "Revisar candidatos antes de enviar emails automatizados",
+            Categoria = "applications"
+        };
+        db2.Permisos.Add(reviewPerm);
+        db2.SaveChanges();
+
+        var targetNombres = new[] { "Recruiter", "Manager", "Admin", "Owner" };
+        var targetRoles = db2.Roles
+            .Include(r => r.RolPermisos)
+            .Where(r => targetNombres.Contains(r.Nombre))
+            .ToList();
+
+        foreach (var rol in targetRoles)
+        {
+            if (!rol.RolPermisos.Any(rp => rp.PermisoId == reviewPerm.Id))
+                db2.RolPermisos.Add(new RolPermiso { RolId = rol.Id, PermisoId = reviewPerm.Id });
+        }
+        db2.SaveChanges();
+        Console.WriteLine(">> Back-fill: added 'applications:review' permission and linked to roles.");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($">> Back-fill warning: {ex.Message}");
+}
+
 app.Run();

@@ -1,7 +1,8 @@
 import { formatRelativeDate, getPuntajeStyle } from '../../utils/vacanteHelpers';
 import CandidateSummary from './CandidateSummary';
+import EmailTimerBadge from '../common/EmailTimerBadge';
 
-export default function CandidateCard({ postulacion, onDragStart, onCardClick }) {
+export default function CandidateCard({ postulacion, onDragStart, onCardClick, onEmailAction }) {
   const hasCv = Boolean(postulacion.cvFileName);
   const hasNotes = Boolean(postulacion.notasInternas);
   const isOferta = postulacion.estado === 3;
@@ -43,6 +44,24 @@ export default function CandidateCard({ postulacion, onDragStart, onCardClick })
           )}
         </div>
       </div>
+
+      {postulacion.emailStatus && (
+        <div
+          className="mt-2 border-t border-gray-100 pt-2"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <EmailTimerBadge
+            emailStatus={postulacion.emailStatus}
+            emailScheduledFor={postulacion.emailScheduledFor}
+            emailSentAt={postulacion.emailSentAt}
+            emailType={postulacion.emailTypeToSend}
+            emailRetryCount={postulacion.emailRetryCount}
+            onSendNow={() => onEmailAction?.(postulacion.id, 'send-now')}
+            onCancel={() => onEmailAction?.(postulacion.id, 'cancel')}
+            onRestart={(mins) => onEmailAction?.(postulacion.id, 'restart', { minutes: mins })}
+          />
+        </div>
+      )}
     </div>
   );
 }

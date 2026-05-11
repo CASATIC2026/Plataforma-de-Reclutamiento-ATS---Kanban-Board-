@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getVacanteById } from '../api/vacantesApi';
+import { sendEmailNow, cancelEmail, restartEmailTimer } from '../api/postulacionesApi';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import RechazadosTray from '../components/kanban/RechazadosTray';
 import { useRechazadosRestore } from '../hooks/useRechazadosRestore';
@@ -30,6 +31,18 @@ export default function VacanteAplicantesPage() {
   }, [id]);
 
   const { handleRestore } = useRechazadosRestore(setRechazados);
+
+  const handleTrayEmailAction = useCallback(async (id, action, opts) => {
+    try {
+      if (action === 'send-now') await sendEmailNow(id);
+      if (action === 'cancel')   await cancelEmail(id);
+      if (action === 'restart')  await restartEmailTimer(id, opts?.minutes);
+      const nextStatus = action === 'send-now' ? 'sending' : action === 'cancel' ? 'cancelled' : 'pending';
+      setRechazados((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, emailStatus: nextStatus } : p))
+      );
+    } catch {}
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg to-accent-bg">
@@ -142,7 +155,7 @@ export default function VacanteAplicantesPage() {
                 <KanbanBoard vacanteId={id} onRechazadosChange={setRechazados} />
 
                 {/* Rejected candidates tray */}
-                <RechazadosTray rechazados={rechazados} onRestore={handleRestore} />
+                <RechazadosTray rechazados={rechazados} onRestore={handleRestore} onEmailAction={handleTrayEmailAction} />
               </div>
             </>
           ) : (

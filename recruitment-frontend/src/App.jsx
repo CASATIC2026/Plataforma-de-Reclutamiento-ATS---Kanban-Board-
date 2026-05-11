@@ -11,6 +11,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 const AdminVacantesPage      = lazy(() => import('./pages/AdminVacantesPage'));
+const ReviewDashboardPage    = lazy(() => import('./pages/ReviewDashboardPage'));
 const AdminPostulacionesPage = lazy(() => import('./pages/AdminPostulacionesPage'));
 const KanbanAllPage          = lazy(() => import('./pages/KanbanAllPage'));
 const VacanteAplicantesPage  = lazy(() => import('./pages/VacanteAplicantesPage'));
@@ -75,6 +76,14 @@ export default function App() {
               <Route path="/admin/vacantes/:id/aplicantes" element={S(VacanteAplicantesPage)} />
               <Route path="/admin/postulaciones" element={S(AdminPostulacionesPage)} />
               <Route path="/admin/kanban"       element={S(KanbanAllPage)} />
+              <Route
+                path="/admin/review"
+                element={
+                  <ProtectedRoute requiredPermission="applications:review">
+                    {S(ReviewDashboardPage)}
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/admin/usuarios"     element={S(AdminUsuariosPage)} />
               <Route
                 path="/admin/analytics"

@@ -1,46 +1,46 @@
 import { useState, useEffect } from 'react';
-import { getUsuarios, changeUsuarioRol, deleteUsuario } from '../api/usuariosApi';
+import { getUsuarios, deleteUsuario } from '../api/usuariosApi';
+import { getRoles, assignRol } from '../api/rolesApi';
 import { useAuth } from '../context/AuthContext';
 
-const ROLES = ['General', 'Manager', 'Administrador'];
-
-const ROLE_COLORS = {
-  Administrador: { bg: 'var(--color-accent-bg)', text: 'var(--color-navy)' },
-  Manager: { bg: '#e0f2fe', text: '#0369a1' },
-  General: { bg: '#f3f4f6', text: '#6b7280' },
-};
+function getRolColor(rolNombre) {
+  const map = {
+    Candidate:      { bg: '#f0fdf4', text: '#16a34a' },
+    Recruiter:      { bg: 'var(--color-accent-bg)', text: 'var(--color-accent)' },
+    Manager:        { bg: '#eff6ff', text: '#1d4ed8' },
+    Administrador:  { bg: 'var(--color-accent-bg)', text: 'var(--color-navy)' },
+  };
+  return map[rolNombre] ?? { bg: '#f3f4f6', text: '#6b7280' };
+}
 
 export default function AdminUsuariosPage() {
   const { isAdmin } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const fetchUsuarios = async () => {
-    try {
-      const res = await getUsuarios();
-      setUsuarios(res.data);
-    } catch {
-      setError('Error al cargar usuarios.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUsuarios();
+    Promise.all([getUsuarios(), getRoles()])
+      .then(([usersRes, rolesRes]) => {
+        setUsuarios(usersRes.data);
+        // Only show app_tier roles in this admin view
+        setRoles((rolesRes.data ?? []).filter((r) => r.ambito === 'app_tier'));
+      })
+      .catch(() => setError('Error al cargar datos.'))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleRolChange = async (id, newRol) => {
+  const handleRolChange = async (id, newRolNombre) => {
     setSaving(id);
     setError('');
     setSuccess('');
     try {
-      const res = await changeUsuarioRol(id, newRol);
+      await assignRol({ usuarioId: id, rolNombre: newRolNombre });
       setUsuarios((prev) =>
-        prev.map((u) => (u.id === id ? res.data : u))
+        prev.map((u) => (u.id === id ? { ...u, rol: newRolNombre } : u))
       );
       setSuccess('Rol actualizado correctamente.');
       setTimeout(() => setSuccess(''), 3000);
@@ -110,13 +110,13 @@ export default function AdminUsuariosPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {ROLES.map((role) => {
-          const count = usuarios.filter((u) => u.rol === role).length;
-          const colors = ROLE_COLORS[role];
+        {roles.map((role) => {
+          const count = usuarios.filter((u) => u.rol === role.nombre).length;
+          const colors = getRolColor(role.nombre);
           return (
-            <div key={role} className="bg-white p-5 rounded-2xl shadow-sm">
+            <div key={role.id} className="bg-white p-5 rounded-2xl shadow-sm">
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.text }}>
-                {role === 'General' ? 'Generales' : role === 'Manager' ? 'Managers' : 'Administradores'}
+                {role.nombre}
               </span>
               <p className="text-3xl font-extrabold mt-1" style={{ color: colors.text }}>{count}</p>
             </div>
@@ -157,7 +157,7 @@ export default function AdminUsuariosPage() {
             </thead>
             <tbody>
               {usuarios.map((user) => {
-                const colors = ROLE_COLORS[user.rol] || ROLE_COLORS.General;
+                const colors = getRolColor(user.rol);
                 return (
                   <tr
                     key={user.id}
@@ -175,7 +175,7 @@ export default function AdminUsuariosPage() {
                       <select
                         value={user.rol}
                         onChange={(e) => handleRolChange(user.id, e.target.value)}
-                        disabled={saving === user.id}
+                        disabled={saving === user.id || roles.length === 0}
                         className="text-xs font-semibold px-3 py-1.5 rounded-full border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy"
                         style={{
                           backgroundColor: colors.bg,
@@ -183,8 +183,12 @@ export default function AdminUsuariosPage() {
                           opacity: saving === user.id ? 0.5 : 1,
                         }}
                       >
-                        {ROLES.map((r) => (
-                          <option key={r} value={r}>{r}</option>
+                        {/* Keep current role as fallback even if not in app_tier list */}
+                        {!roles.some((r) => r.nombre === user.rol) && (
+                          <option value={user.rol}>{user.rol}</option>
+                        )}
+                        {roles.map((r) => (
+                          <option key={r.id} value={r.nombre}>{r.nombre}</option>
                         ))}
                       </select>
                     </td>

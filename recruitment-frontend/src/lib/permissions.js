@@ -14,6 +14,7 @@ export const PERMISSIONS = {
   APPLICATIONS_READ_ALL:       'applications:read_all',
   APPLICATIONS_UPDATE_STATUS:  'applications:update_status',
   APPLICATIONS_ADD_NOTE:       'applications:add_note',
+  APPLICATIONS_REVIEW:         'applications:review',
   // Profile
   PROFILE_UPDATE_OWN:   'profile:update_own',
   // Users
@@ -62,12 +63,12 @@ export const LEGACY_ROLE_PERMISSIONS = {
     'jobs:approve', 'jobs:publish', 'jobs:read_all',
     'applications:create', 'applications:read_own', 'applications:read',
     'applications:read_all', 'applications:update_status', 'applications:add_note',
-    'profile:update_own', 'reports:read', 'users:read', 'companies:read', 'platform:access',
+    'applications:review', 'profile:update_own', 'reports:read', 'users:read', 'companies:read', 'platform:access',
   ],
   Profesor: [
     'jobs:read', 'jobs:create', 'jobs:update', 'jobs:delete',
     'applications:create', 'applications:read_own', 'applications:read',
-    'applications:update_status', 'applications:add_note', 'profile:update_own',
+    'applications:update_status', 'applications:add_note', 'applications:review', 'profile:update_own',
   ],
   Estudiante: [
     'jobs:read', 'applications:create', 'applications:read_own', 'profile:update_own',

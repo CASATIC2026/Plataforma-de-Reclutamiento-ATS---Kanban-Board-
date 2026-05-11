@@ -23,3 +23,15 @@ export const deletePostulacion = (id) => API.delete(`/postulaciones/${id}`);
 
 export const createPostulacionStructured = (formData) =>
   API.post('/postulaciones', formData);
+
+export const sendEmailNow = (id) =>
+  API.post(`/postulaciones/${id}/send-email-now`);
+
+export const cancelEmail = (id) =>
+  API.post(`/postulaciones/${id}/cancel-email`);
+
+export const restartEmailTimer = (id, minutes) =>
+  API.post(`/postulaciones/${id}/restart-timer${minutes ? `?minutes=${minutes}` : ''}`);
+
+export const getEmailLog = (id) =>
+  API.get(`/postulaciones/${id}/email-log`).then((r) => r.data);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getVacantes } from '../api/vacantesApi';
+import { sendEmailNow, cancelEmail, restartEmailTimer } from '../api/postulacionesApi';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import RechazadosTray from '../components/kanban/RechazadosTray';
 import CommandBar from '../components/kanban/CommandBar';
@@ -92,6 +93,18 @@ export default function KanbanAllPage() {
 
   const { handleRestore } = useRechazadosRestore(setRechazados);
 
+  const handleTrayEmailAction = useCallback(async (id, action, opts) => {
+    try {
+      if (action === 'send-now') await sendEmailNow(id);
+      if (action === 'cancel')   await cancelEmail(id);
+      if (action === 'restart')  await restartEmailTimer(id, opts?.minutes);
+      const nextStatus = action === 'send-now' ? 'sending' : action === 'cancel' ? 'cancelled' : 'pending';
+      setRechazados((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, emailStatus: nextStatus } : p))
+      );
+    } catch {}
+  }, []);
+
   // Compute stage counts from visible cards
   const stageCounts = useMemo(
     () =>
@@ -160,7 +173,7 @@ export default function KanbanAllPage() {
           />
 
           {/* Rejected candidates tray */}
-          <RechazadosTray rechazados={rechazados} onRestore={handleRestore} />
+          <RechazadosTray rechazados={rechazados} onRestore={handleRestore} onEmailAction={handleTrayEmailAction} />
         </div>
       </div>
     </div>

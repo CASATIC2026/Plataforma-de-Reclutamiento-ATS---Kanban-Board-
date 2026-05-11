@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { getPostulaciones, getPostulacionesByVacante, updateEstado } from '../../api/postulacionesApi';
+import { getPostulaciones, getPostulacionesByVacante, updateEstado, sendEmailNow, cancelEmail, restartEmailTimer } from '../../api/postulacionesApi';
 import KanbanColumn from './KanbanColumn';
 import CandidateProfileModal from './CandidateProfileModal';
 
@@ -117,6 +117,22 @@ export default function KanbanBoard({ vacanteId, filterFn, sortFn, onCardsUpdate
     [cards, showToast]
   );
 
+  const handleEmailAction = useCallback(
+    async (id, action, opts) => {
+      try {
+        if (action === 'send-now') await sendEmailNow(id);
+        if (action === 'cancel')   await cancelEmail(id);
+        if (action === 'restart')  await restartEmailTimer(id, opts?.minutes);
+        const res = await (vacanteId ? getPostulacionesByVacante(vacanteId) : getPostulaciones());
+        setCards(res.data);
+        showToast('Email actualizado', 'success');
+      } catch {
+        showToast('Error al actualizar email', 'error');
+      }
+    },
+    [vacanteId, showToast]
+  );
+
   const handleCardClick = useCallback((postulacion) => {
     setSelectedCard(postulacion);
   }, []);
@@ -162,6 +178,7 @@ export default function KanbanBoard({ vacanteId, filterFn, sortFn, onCardsUpdate
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             onCardClick={handleCardClick}
+            onEmailAction={handleEmailAction}
           />
         ))}
       </div>

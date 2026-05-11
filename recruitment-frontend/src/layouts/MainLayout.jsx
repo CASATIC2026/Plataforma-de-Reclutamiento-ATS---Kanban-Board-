@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePermission } from '../hooks/usePermission';
+import { getReviewStats } from '../api/reviewApi';
 
 // Import Playwrite IE font
 const fontLink = document.createElement('link');
@@ -13,6 +15,21 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const canViewAnalytics = usePermission('reports:read');
   const canAccessPlatform = usePermission('platform:access');
+  const canReview = usePermission('applications:review');
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
+
+  useEffect(() => {
+    if (!canReview) return;
+    const load = async () => {
+      try {
+        const stats = await getReviewStats();
+        setPendingReviewCount(stats.pendingCount ?? 0);
+      } catch {}
+    };
+    load();
+    const interval = setInterval(load, 60000);
+    return () => clearInterval(interval);
+  }, [canReview]);
 
   const handleLogout = () => {
     logout();
@@ -86,6 +103,46 @@ export default function MainLayout() {
             >
               Vacantes
             </Link>
+
+            {canReview && (
+              <Link
+                to="/admin/review"
+                style={{
+                  color: 'var(--color-navy)',
+                  fontSize: '0.95rem',
+                  fontWeight: '600',
+                  transition: 'all 0.3s',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                  e.currentTarget.style.background = 'rgba(205,123,79,0.08)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--color-navy)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Review
+                {pendingReviewCount > 0 && (
+                  <span style={{
+                    background: 'var(--color-danger)',
+                    color: '#fff',
+                    borderRadius: '999px',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    padding: '1px 6px',
+                    lineHeight: '1.4',
+                  }}>
+                    {pendingReviewCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             <Link
               to="/admin/kanban"

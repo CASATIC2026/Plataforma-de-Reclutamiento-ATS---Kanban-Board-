@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { formatRelativeDate, getPuntajeStyle } from '../../utils/vacanteHelpers';
 import CandidateSummary from './CandidateSummary';
+import EmailTimerBadge from '../common/EmailTimerBadge';
 
-export default function RechazadosTray({ rechazados, onRestore }) {
+export default function RechazadosTray({ rechazados, onRestore, onEmailAction }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (rechazados.length === 0) {
@@ -62,6 +63,21 @@ export default function RechazadosTray({ rechazados, onRestore }) {
                         Restaurar
                       </button>
                     </div>
+
+                    {postulacion.emailStatus && (
+                      <div className="mt-2 border-t border-red-100 pt-2">
+                        <EmailTimerBadge
+                          emailStatus={postulacion.emailStatus}
+                          emailScheduledFor={postulacion.emailScheduledFor}
+                          emailSentAt={postulacion.emailSentAt}
+                          emailType={postulacion.emailTypeToSend}
+                          emailRetryCount={postulacion.emailRetryCount}
+                          onSendNow={() => onEmailAction?.(postulacion.id, 'send-now')}
+                          onCancel={() => onEmailAction?.(postulacion.id, 'cancel')}
+                          onRestart={(mins) => onEmailAction?.(postulacion.id, 'restart', { minutes: mins })}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}

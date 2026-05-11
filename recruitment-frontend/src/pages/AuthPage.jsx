@@ -359,10 +359,9 @@ function RegisterForm({ onSwitch, error, loading, onSubmit }) {
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
-    carrera: '',
     email: '',
     password: '',
-    rol: '',
+    rol: 'Candidate',
   });
   const [touched, setTouched] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
@@ -481,11 +480,12 @@ function RegisterForm({ onSwitch, error, loading, onSubmit }) {
         />
       </div>
 
-      <InputField
-        icon={Icons.career}
-        label="Carrera :"
-        value={form.carrera}
-        onChange={set('carrera')}
+      <SelectField
+        icon={Icons.role}
+        label="Rol :"
+        options={['Candidate', 'Recruiter', 'Manager']}
+        value={form.rol}
+        onChange={set('rol')}
       />
 
       <InputField
@@ -581,6 +581,8 @@ export default function AuthPage() {
     }
   };
 
+  const ROLE_LEGACY_MAP = { Candidate: 'General', Recruiter: 'Manager', Manager: 'Administrador' };
+
   const handleRegister = async (form) => {
     setError('');
     setLoading(true);
@@ -590,8 +592,7 @@ export default function AuthPage() {
         apellido: form.apellido,
         email: form.email,
         password: form.password,
-        carrera: form.carrera || null,
-        rol: 'General',
+        rol: ROLE_LEGACY_MAP[form.rol] ?? 'General',
       });
       login(res.data);
       navigate('/');
