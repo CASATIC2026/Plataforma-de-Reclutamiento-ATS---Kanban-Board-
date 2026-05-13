@@ -1,7 +1,7 @@
 # Talentify sv — ATS Recruitment Platform
 
 A full-stack Applicant Tracking System (ATS) with a public-facing job board, an admin recruiter portal, and a Kanban-based candidate pipeline. Built for the Salvadoran market with Spanish UI, local departments as locations, and modern responsive design.
-
+.
 ---
 
 ## Features
