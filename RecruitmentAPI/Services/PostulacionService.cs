@@ -218,6 +218,8 @@ public class PostulacionService : IPostulacionService
 
     private async Task PersistStructuredDataAsync(Guid postulacionId, CreatePostulacionDTO dto)
     {
+        try
+        {
         // Parse and persist skills
         if (!string.IsNullOrEmpty(dto.SkillsJson))
         {
@@ -277,6 +279,11 @@ public class PostulacionService : IPostulacionService
         }
 
         await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[PersistStructuredData] postulacion {postulacionId}: {ex.Message}");
+        }
     }
 
     public async Task<PostulacionResponseDTO?> UpdateEstadoAsync(Guid id, EstadoPostulacion estado)

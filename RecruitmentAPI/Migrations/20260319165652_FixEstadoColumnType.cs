@@ -10,18 +10,29 @@ namespace RecruitmentAPI.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Drop the varchar default, convert column to integer, restore integer default.
+            // Only convert if column is still varchar (no-op on fresh DBs where it starts as integer).
             migrationBuilder.Sql(@"
-                ALTER TABLE postulaciones ALTER COLUMN ""Estado"" DROP DEFAULT;
-                ALTER TABLE postulaciones
-                    ALTER COLUMN ""Estado"" TYPE integer
-                    USING CASE ""Estado""
-                        WHEN 'Entrevista'    THEN 1
-                        WHEN 'PruebaTecnica' THEN 2
-                        WHEN 'Oferta'        THEN 3
-                        ELSE 0
-                    END;
-                ALTER TABLE postulaciones ALTER COLUMN ""Estado"" SET DEFAULT 0;
+                DO $$
+                BEGIN
+                    IF EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_name = 'postulaciones'
+                          AND column_name = 'Estado'
+                          AND data_type IN ('character varying', 'text', 'character')
+                    ) THEN
+                        ALTER TABLE postulaciones ALTER COLUMN ""Estado"" DROP DEFAULT;
+                        ALTER TABLE postulaciones
+                            ALTER COLUMN ""Estado"" TYPE integer
+                            USING CASE ""Estado""
+                                WHEN 'Entrevista'    THEN 1
+                                WHEN 'PruebaTecnica' THEN 2
+                                WHEN 'Oferta'        THEN 3
+                                ELSE 0
+                            END;
+                        ALTER TABLE postulaciones ALTER COLUMN ""Estado"" SET DEFAULT 0;
+                    END IF;
+                END
+                $$;
             ");
         }
 

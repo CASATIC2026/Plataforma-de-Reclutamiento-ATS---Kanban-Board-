@@ -123,7 +123,14 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     fd.append('VacanteId', job.id);
     if (formData.cvFile) fd.append('CvFile', formData.cvFile);
 
-    fd.append('SkillsJson', JSON.stringify(formData.skills));
+    fd.append('SkillsJson', JSON.stringify(
+      formData.skills.map((s) => ({
+        ...s,
+        yearsExperience: s.yearsExperience !== '' && s.yearsExperience != null
+          ? Number(s.yearsExperience)
+          : null,
+      }))
+    ));
     fd.append('SoftSkillsJson', JSON.stringify(formData.softSkills));
     fd.append('ImpactStatement', formData.impactStatement.trim());
     fd.append(
