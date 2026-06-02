@@ -13,6 +13,17 @@ const LOGO_COLORS = [
   { bg: '#2E1C2E', text: '#C47EC4' },
 ];
 
+const ICON_KEYWORDS = [
+  { keys: ['react', 'next', 'node', 'fullstack', 'full-stack'], icon: 'rocket_launch' },
+  { keys: ['security', 'cissp', 'cyber', 'ciber'], icon: 'shield' },
+  { keys: ['design', 'ux', 'ui', 'figma'], icon: 'brush' },
+  { keys: ['postgres', 'sql', 'database', 'data'], icon: 'database' },
+  { keys: ['mobile', 'ios', 'android', 'flutter'], icon: 'smartphone' },
+  { keys: ['analytics', 'data science', 'ml', 'ai'], icon: 'analytics' },
+  { keys: ['aws', 'cloud', 'azure', 'gcp'], icon: 'cloud' },
+  { keys: ['devops', 'kubernetes', 'docker'], icon: 'verified_user' },
+];
+
 export function getColorForId(id) {
   if (!id || typeof id !== 'string') return LOGO_COLORS[0];
   const hash = id.replace(/-/g, '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
@@ -45,7 +56,21 @@ export function formatRelativeDate(isoString) {
 }
 
 export function isRecent(isoString) {
-  return (new Date() - new Date(isoString)) < 2 * 24 * 60 * 60 * 1000;
+  return new Date(isoString) - new Date() < 2 * 24 * 60 * 60 * 1000;
+}
+
+export function deriveBadge(createdAt) {
+  if (!createdAt) return null;
+  const ageMs = Date.now() - new Date(createdAt).getTime();
+  if (ageMs < 12 * 60 * 60 * 1000) return 'urgent';
+  if (isRecent(createdAt)) return 'new';
+  return null;
+}
+
+export function deriveIconKey(requisitos = [], titulo = '') {
+  const haystack = [...requisitos, titulo].join(' ').toLowerCase();
+  const match = ICON_KEYWORDS.find(({ keys }) => keys.some((k) => haystack.includes(k)));
+  return match?.icon ?? 'code';
 }
 
 export function getPuntajeStyle(score) {
@@ -71,20 +96,38 @@ export function formatId(id, length = 8) {
 
 export function mapVacante(v) {
   const color = getColorForId(v.id);
+  const requisitos = v.requisitos ?? [];
   return {
     id: v.id,
     title: v.titulo,
-    company: 'Empresa Privada',
+    company: v.empresaNombre ?? 'Empresa Privada',
     location: v.ubicacion,
     type: v.tipoContrato,
     salary: formatSalary(v.salarioMin, v.salarioMax),
     urgent: isRecent(v.createdAt),
+    badge: deriveBadge(v.createdAt),
+    iconKey: deriveIconKey(requisitos, v.titulo),
     posted: formatRelativeDate(v.createdAt),
     logoLetters: getLogoLetters(v.titulo),
     logoBg: color.bg,
     logoColor: color.text,
     description: v.descripcion,
-    requirements: v.requisitos,
+    requirements: requisitos,
     estaActiva: v.estaActiva,
+    createdAt: v.createdAt,
+    salarioMin: v.salarioMin,
+    salarioMax: v.salarioMax,
   };
+}
+
+export function computeAverageSalary(jobs) {
+  const withSalary = jobs.filter((j) => j.salarioMin != null && j.salarioMax != null);
+  if (!withSalary.length) return null;
+  const sum = withSalary.reduce((acc, j) => acc + (Number(j.salarioMin) + Number(j.salarioMax)) / 2, 0);
+  return Math.round(sum / withSalary.length);
+}
+
+export function countNewThisWeek(jobs) {
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  return jobs.filter((j) => j.createdAt && new Date(j.createdAt).getTime() > weekAgo).length;
 }

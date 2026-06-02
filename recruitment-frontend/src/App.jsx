@@ -5,6 +5,10 @@ import PublicLayout from './layouts/PublicLayout';
 import MainLayout from './layouts/MainLayout';
 import PlatformLayout from './layouts/PlatformLayout';
 import NewLandingPage from './pages/NewLandingPage';
+import EmpresasPage from './pages/EmpresasPage';
+import RecursosPage from './pages/RecursosPage';
+import LegalTerminosPage from './pages/LegalTerminosPage';
+import LegalPrivacidadPage from './pages/LegalPrivacidadPage';
 import AuthPage from './pages/AuthPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -53,6 +57,10 @@ export default function App() {
             {/* Public routes */}
             <Route element={<PublicLayout />}>
               <Route path="/" element={<NewLandingPage />} />
+              <Route path="/empresas" element={<EmpresasPage />} />
+              <Route path="/recursos" element={<RecursosPage />} />
+              <Route path="/legal/terminos" element={<LegalTerminosPage />} />
+              <Route path="/legal/privacidad" element={<LegalPrivacidadPage />} />
             </Route>
 
             {/* Candidate dashboard (any authenticated user with the right permission) */}
