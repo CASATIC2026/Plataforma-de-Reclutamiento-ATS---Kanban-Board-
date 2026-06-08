@@ -1,7 +1,7 @@
 # Talentify sv — ATS Recruitment Platform
 
 A full-stack Applicant Tracking System (ATS) with a public-facing job board, an admin recruiter portal, and a Kanban-based candidate pipeline. Built for the Salvadoran market with Spanish UI, local departments as locations, and modern responsive design.
-
+..
 ---
 
 ## Features
@@ -495,60 +495,91 @@ GET    /api/platform/overview          # 🔒 platform:access
 
 ---
 
-## Local Development
+## Local Development (Ubuntu Server 26.04 LTS)
 
 ### Prerequisites
-- .NET 8 SDK
-- Node.js 18+
-- PostgreSQL running on `localhost:5433`
+
+```bash
+# Node.js + npm + PostgreSQL
+sudo apt update
+sudo apt install -y nodejs npm postgresql postgresql-contrib
+
+# .NET 8 via snap (Ubuntu 26.04 apt only ships .NET 10)
+sudo snap install dotnet-sdk --classic --channel=8.0
+sudo snap alias dotnet-sdk.dotnet dotnet
+
+# dotnet-ef global tool
+dotnet tool install --global dotnet-ef --version 8.0.11
+
+# Required — snap doesn't set DOTNET_ROOT automatically
+echo 'export DOTNET_ROOT=/snap/dotnet-sdk/current' >> ~/.bashrc
+echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+> Without `DOTNET_ROOT=/snap/dotnet-sdk/current`, `dotnet-ef` fails with "You must install .NET to run this application."
+
+> **Port note:** PostgreSQL on Ubuntu installs on `5432` by default. Adjust if you changed `postgresql.conf`.
+
+### Database Setup
+
+```bash
+sudo -u postgres psql -c "CREATE USER recruitment_user WITH PASSWORD 'Recruitment2025!';"
+sudo -u postgres psql -c "CREATE DATABASE recruitment_db OWNER recruitment_user;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE recruitment_db TO recruitment_user;"
+```
 
 ### Environment Variables
 
 Create `RecruitmentAPI/.env`:
 ```
-DB_CONNECTION=Host=localhost;Port=5433;Database=recruitment_db;Username=recruitment_user;Password=Recruitment2025!
+DB_CONNECTION=Host=localhost;Port=5432;Database=recruitment_db;Username=recruitment_user;Password=Recruitment2025!
 JWT_KEY=TalentBridge_SuperSecretKey_2025_MustBeAtLeast32Chars!
 SEED_ADMIN_PASSWORD=Admin123!
-ALLOWED_ORIGIN=http://localhost:5173
+ALLOWED_ORIGIN=http://localhost:5173,http://192.168.1.40:5173
 ```
 
 Create `recruitment-frontend/.env`:
 ```
-VITE_API_URL=http://localhost:5223
+# VITE_API_URL intentionally unset for LAN/dev use.
+# Unset = axios uses relative /api path, Vite proxy handles it.
+# Only set for production builds without a Vite proxy.
+# VITE_API_URL=http://your-production-api.com
 ```
 
-> `.env` files are git-ignored. Use `.env.example` in each directory as a template.
+> **LAN access:** Do NOT set `VITE_API_URL`. If set to `http://localhost:5223`, that string is baked into the JS bundle and remote browsers try to hit their own localhost.
 
-### Database Setup
+### Apply Migrations
 
-Create the database and user:
-```sql
-CREATE USER recruitment_user WITH PASSWORD 'Recruitment2025!';
-CREATE DATABASE recruitment_db OWNER recruitment_user;
-```
-
-Apply migrations:
 ```bash
-cd Plataforma-de-Reclutamiento-ATS---Kanban-Board-/RecruitmentAPI
-dotnet ef database update
+export DOTNET_ROOT=/snap/dotnet-sdk/current
+export PATH="$HOME/.dotnet/tools:$PATH"
+cd RecruitmentAPI
+dotnet-ef database update
 ```
 
-### Start Backend
+### Start Backend + Frontend
+
 ```bash
-cd Plataforma-de-Reclutamiento-ATS---Kanban-Board-/RecruitmentAPI
+# Terminal 1 — backend
+cd RecruitmentAPI
+export DOTNET_ROOT=/snap/dotnet-sdk/current
 dotnet run
-# Runs on http://localhost:5223
-# Swagger UI at http://localhost:5223/swagger
-```
+# → http://localhost:5223, Swagger at /swagger
 
-### Start Frontend
-```bash
-cd Plataforma-de-Reclutamiento-ATS---Kanban-Board-/recruitment-frontend
+# Terminal 2 — frontend
+cd recruitment-frontend
 npm install
 npm run dev
-# Runs on http://localhost:5173
-# /api requests proxied to http://localhost:5223
+# → http://localhost:5173 (LAN: http://<server-ip>:5173)
 ```
+
+### LAN Access
+
+Vite is bound to `0.0.0.0:5173`. Backend binds to `0.0.0.0:5223` via `launchSettings.json`.
+CORS allows multiple origins via comma-separated `ALLOWED_ORIGIN` env var.
+
+If devices can't connect: `sudo ufw allow 5223/tcp && sudo ufw allow 5173/tcp`.
 
 ---
 
@@ -626,6 +657,19 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 
 ---
 
+## Email System
+
+Background `EmailDispatcherService` polls every 15 seconds:
+
+1. Application saved → `EmailStatus = "pending"`, `EmailScheduledFor = now + 5 min`
+2. Dispatcher picks up due rows, flips to `"sending"` to prevent duplicate dispatch
+3. Sends via MailKit SMTP → updates status to `"sent"` or `"failed"`
+4. Max 3 retries with 2-minute backoff
+
+SMTP config lives in `appsettings.json` under the `Email` section. Credentials must be real — stubs cause silent failures (logged, not thrown).
+
+---
+
 ## Notes
 
 - **JWT Authentication** — Admin write operations (create/update/delete vacantes, update estado/notas, delete postulaciones) require a valid JWT token. Public read endpoints and candidate applications remain open. CV viewing also requires authentication. Token stored in `localStorage` (`tb_token`, `tb_user`), auto-attached via Axios interceptor, 8-hour expiry.
@@ -640,5 +684,5 @@ The landing page (`/`) implements comprehensive mobile-first responsive design u
 - Clicking a Kanban card opens `CandidateProfileModal` with candidate data, embedded CV, and internal notes
 - PDF CVs are served inline via `GET /api/postulaciones/{id}/cv`; non-PDF formats trigger a file download
 - Internal notes auto-save with a 1.5s debounce; cards show a "Notas" badge when notes exist
-- 9 EF Core migrations applied (latest: `AddStructuredApplicationData` — adds `candidate_skills`, `candidate_availability`, `screening_questions`, `candidate_screening_responses`, and 8 new columns on `postulaciones`)
+- 11 EF Core migrations applied (latest: `AddCompanyScopeIndexes` — composite index on `ix_vacantes_empresa_creado_por`; also includes `AddEmailAutomation` adding `email_logs` table and email tracking columns on `postulaciones`)
 - **Security**: All critical and high-severity patches applied — credentials moved to environment variables (`DB_CONNECTION`, `JWT_KEY`), file upload restricted to `.pdf`/`.doc`/`.docx` with 5 MB limit, DTO validation on all public inputs, CORS policy via `ALLOWED_ORIGIN`, security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`), npm dependencies patched to 0 vulnerabilities. See [PENTESTING.md](PENTESTING.md) for the original audit and `SECURITY_QUICKSTART.md` for setup instructions.

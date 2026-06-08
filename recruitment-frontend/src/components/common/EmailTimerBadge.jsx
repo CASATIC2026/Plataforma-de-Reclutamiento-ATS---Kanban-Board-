@@ -44,18 +44,18 @@ export default function EmailTimerBadge({
 
   if (emailStatus === 'sent') {
     return (
-      <div className={`${containerBase} bg-green-50 text-green-800 border-green-200`}>
+      <div className={`${containerBase} bg-[rgba(106,217,192,0.14)] text-[#6ad9c0] border-[rgba(106,217,192,0.3)]`}>
         <span>✓</span>
         <span className="font-medium">{EMAIL_TYPE_LABELS[emailType] ?? 'Email'} enviado</span>
-        {emailSentAt && <span className="text-green-600">{formatTime(emailSentAt)}</span>}
+        {emailSentAt && <span className="text-[#6ad9c0]/70">{formatTime(emailSentAt)}</span>}
       </div>
     );
   }
 
   if (emailStatus === 'sending') {
     return (
-      <div className={`${containerBase} bg-blue-50 text-blue-800 border-blue-200`}>
-        <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full" />
+      <div className={`${containerBase} bg-[rgba(96,165,250,0.14)] text-[#93c5fd] border-[rgba(96,165,250,0.3)]`}>
+        <span className="animate-spin inline-block w-3 h-3 border-2 border-[#93c5fd] border-t-transparent rounded-full" />
         <span className="font-medium">Enviando…</span>
       </div>
     );
@@ -63,13 +63,13 @@ export default function EmailTimerBadge({
 
   if (emailStatus === 'failed') {
     return (
-      <div className={`${containerBase} bg-red-50 text-red-800 border-red-200`}>
+      <div className={`${containerBase} bg-[rgba(255,180,171,0.14)] text-[#ffb4ab] border-[rgba(255,180,171,0.3)]`}>
         <span>✗</span>
         <span className="font-medium">Error al enviar</span>
-        {emailRetryCount > 0 && <span className="text-red-500">({emailRetryCount} intento{emailRetryCount > 1 ? 's' : ''})</span>}
+        {emailRetryCount > 0 && <span className="text-[#ffb4ab]/70">({emailRetryCount} intento{emailRetryCount > 1 ? 's' : ''})</span>}
         <button
           onClick={onRestart}
-          className="ml-auto text-xs font-semibold text-red-700 hover:underline"
+          className="ml-auto text-xs font-semibold text-[#ffb4ab] hover:underline"
         >
           Reintentar
         </button>
@@ -79,12 +79,12 @@ export default function EmailTimerBadge({
 
   if (emailStatus === 'cancelled') {
     return (
-      <div className={`${containerBase} bg-gray-50 text-gray-500 border-gray-200`}>
+      <div className={`${containerBase} bg-[rgba(255,255,255,0.05)] text-[#8593b3] border-[rgba(255,255,255,0.12)]`}>
         <span>⊘</span>
         <span className="font-medium">Email cancelado</span>
         <button
           onClick={() => onRestart?.(5)}
-          className="ml-auto text-xs font-semibold text-gray-600 hover:underline"
+          className="ml-auto text-xs font-semibold text-[#b8c2dc] hover:underline"
         >
           Reactivar
         </button>
@@ -97,8 +97,8 @@ export default function EmailTimerBadge({
       <div
         className={`${containerBase} ${
           isExpiring
-            ? 'bg-amber-50 text-amber-800 border-amber-300 animate-pulse'
-            : 'bg-blue-50 text-blue-800 border-blue-200'
+            ? 'bg-[rgba(240,176,122,0.16)] text-[#f0b07a] border-[rgba(240,176,122,0.4)] animate-pulse'
+            : 'bg-[rgba(96,165,250,0.14)] text-[#93c5fd] border-[rgba(96,165,250,0.3)]'
         }`}
       >
         <span>✉</span>
@@ -110,8 +110,8 @@ export default function EmailTimerBadge({
             title="Enviar ahora"
             className={`text-xs font-bold px-1.5 py-0.5 rounded transition-colors ${
               isExpiring
-                ? 'bg-amber-200 hover:bg-amber-300 text-amber-900'
-                : 'bg-blue-200 hover:bg-blue-300 text-blue-900'
+                ? 'bg-[rgba(240,176,122,0.3)] hover:bg-[rgba(240,176,122,0.45)] text-[#f0b07a]'
+                : 'bg-[rgba(96,165,250,0.3)] hover:bg-[rgba(96,165,250,0.45)] text-[#bfdbfe]'
             }`}
           >
             ⚡
@@ -119,7 +119,7 @@ export default function EmailTimerBadge({
           <button
             onClick={onCancel}
             title="Cancelar email"
-            className="text-xs font-bold px-1.5 py-0.5 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors"
+            className="text-xs font-bold px-1.5 py-0.5 rounded bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.18)] text-[#b8c2dc] transition-colors"
           >
             ✕
           </button>

@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { isCandidateUser } from '../../lib/authRoutes';
 
 const NAV_LINKS = [
   { label: 'Inicio', href: '/' },
   { label: 'Empresas', href: '/empresas' },
+  { label: 'Precios', href: '/precios' },
   { label: 'Recursos', href: '/recursos' },
 ];
 
-function MobileSheet({ open, onClose, currentPath }) {
+function MobileSheet({ open, onClose, currentPath, showCandidatePanel, isAuthenticated, isAdminOrManager }) {
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
@@ -68,20 +70,42 @@ function MobileSheet({ open, onClose, currentPath }) {
           })}
         </nav>
         <div className="mt-auto flex flex-col gap-2 sm:gap-3 px-4 sm:px-6 pb-6 sm:pb-10 flex-shrink-0">
-          <Link
-            to="/login"
-            onClick={onClose}
-            className="w-full py-2.5 sm:py-3 rounded-xl border border-outline-variant/20 text-on-surface-variant font-semibold text-xs sm:text-sm hover:border-brand-turquoise hover:text-brand-turquoise transition-all text-center"
-          >
-            Iniciar sesión
-          </Link>
-          <Link
-            to="/login?mode=register"
-            onClick={onClose}
-            className="w-full py-2.5 sm:py-3 rounded-xl bg-brand-turquoise text-on-brand-turquoise font-bold text-xs sm:text-sm shadow-lg shadow-brand-turquoise/20 hover:opacity-90 active:scale-95 transition-all text-center"
-          >
-            Registrarse
-          </Link>
+          {showCandidatePanel && (
+            <Link
+              to="/dashboard"
+              onClick={onClose}
+              className="w-full py-2.5 sm:py-3 rounded-xl bg-brand-turquoise text-on-brand-turquoise font-bold text-xs sm:text-sm shadow-lg shadow-brand-turquoise/20 text-center"
+            >
+              Mi panel
+            </Link>
+          )}
+          {isAuthenticated && isAdminOrManager && (
+            <Link
+              to="/admin/vacantes"
+              onClick={onClose}
+              className="w-full py-2.5 sm:py-3 rounded-xl border border-outline-variant/20 text-brand-turquoise font-semibold text-xs sm:text-sm text-center"
+            >
+              Panel Admin
+            </Link>
+          )}
+          {!isAuthenticated && (
+            <>
+              <Link
+                to="/login"
+                onClick={onClose}
+                className="w-full py-2.5 sm:py-3 rounded-xl border border-outline-variant/20 text-on-surface-variant font-semibold text-xs sm:text-sm hover:border-brand-turquoise hover:text-brand-turquoise transition-all text-center"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/login?mode=register"
+                onClick={onClose}
+                className="w-full py-2.5 sm:py-3 rounded-xl bg-brand-turquoise text-on-brand-turquoise font-bold text-xs sm:text-sm shadow-lg shadow-brand-turquoise/20 hover:opacity-90 active:scale-95 transition-all text-center"
+              >
+                Registrarse
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>
@@ -91,7 +115,8 @@ function MobileSheet({ open, onClose, currentPath }) {
 export default function LandingNav() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const { pathname } = useLocation();
-  const { isAuthenticated, user, logout, isAdminOrManager } = useAuth();
+  const { isAuthenticated, user, logout, isAdminOrManager, hasPermission } = useAuth();
+  const showCandidatePanel = isAuthenticated && isCandidateUser(user, hasPermission);
 
   return (
     <>
@@ -123,6 +148,14 @@ export default function LandingNav() {
                 <span className="hidden md:inline text-sm text-on-surface-variant truncate max-w-[140px]">
                   {user?.nombre}
                 </span>
+                {showCandidatePanel && (
+                  <Link
+                    to="/dashboard"
+                    className="hidden md:block text-sm text-brand-turquoise font-semibold hover:underline"
+                  >
+                    Mi panel
+                  </Link>
+                )}
                 {isAdminOrManager && (
                   <Link
                     to="/admin/vacantes"
@@ -166,7 +199,14 @@ export default function LandingNav() {
           </div>
         </div>
       </header>
-      <MobileSheet open={sheetOpen} onClose={() => setSheetOpen(false)} currentPath={pathname} />
+      <MobileSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        currentPath={pathname}
+        showCandidatePanel={showCandidatePanel}
+        isAuthenticated={isAuthenticated}
+        isAdminOrManager={isAdminOrManager}
+      />
     </>
   );
 }

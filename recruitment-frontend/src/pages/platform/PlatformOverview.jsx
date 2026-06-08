@@ -4,7 +4,7 @@ import { getPlatformOverview } from '../../api/platformApi';
 
 function StatCard({ label, value, icon, color }) {
   return (
-    <div style={{ background: 'white', borderRadius: 14, padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
+    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', gap: 16 }}>
       <div style={{ width: 48, height: 48, borderRadius: 12, background: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
         {icon}
       </div>
@@ -28,10 +28,10 @@ export default function PlatformOverview() {
   }, []);
 
   const stats = data ? [
-    { label: 'Empresas activas',     value: data.totalEmpresas,     icon: '🏢', color: 'var(--color-navy)' },
-    { label: 'Usuarios totales',     value: data.totalUsuarios,     icon: '👥', color: 'var(--color-accent)' },
-    { label: 'Vacantes publicadas',  value: data.totalVacantes,     icon: '📋', color: '#1F9DB9' },
-    { label: 'Postulaciones totales',value: data.totalPostulaciones,icon: '📄', color: '#319E85' },
+    { label: 'Empresas activas',     value: data.totalEmpresas,     icon: '🏢', color: '#40e0d0' },
+    { label: 'Usuarios totales',     value: data.totalUsuarios,     icon: '👥', color: '#6ad9c0' },
+    { label: 'Vacantes publicadas',  value: data.totalVacantes,     icon: '📋', color: '#5eb9d6' },
+    { label: 'Postulaciones totales',value: data.totalPostulaciones,icon: '📄', color: '#7fd1a8' },
   ] : [];
 
   return (
@@ -48,7 +48,7 @@ export default function PlatformOverview() {
         {data && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 10, height: 10, borderRadius: '50%', background: data.sistemaOk ? '#22c55e' : '#ef4444', display: 'inline-block' }} />
-            <span style={{ fontSize: 13, color: data.sistemaOk ? '#166534' : '#991b1b', fontWeight: 600 }}>
+            <span style={{ fontSize: 13, color: data.sistemaOk ? '#6ad9c0' : '#ffb4ab', fontWeight: 600 }}>
               Sistema {data.sistemaOk ? 'operativo' : 'con problemas'}
             </span>
           </div>
@@ -64,8 +64,8 @@ export default function PlatformOverview() {
           </div>
 
           {/* Recent Companies */}
-          {data.recentEmpresas?.length > 0 && (
-            <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+          {data?.recentEmpresas?.length > 0 && (
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
               <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>
                   Empresas Recientes
@@ -88,7 +88,7 @@ export default function PlatformOverview() {
                       <span><strong>{e.usuariosCount}</strong> usuarios</span>
                       <span><strong>{e.vacantesCount}</strong> vacantes</span>
                     </div>
-                    <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: e.estado === 'activa' ? '#dcfce7' : '#fee2e2', color: e.estado === 'activa' ? '#166534' : '#991b1b' }}>
+                    <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: e.estado === 'activa' ? 'rgba(106,217,192,0.15)' : 'rgba(255,180,171,0.15)', color: e.estado === 'activa' ? '#6ad9c0' : '#ffb4ab' }}>
                       {e.estado}
                     </span>
                   </div>

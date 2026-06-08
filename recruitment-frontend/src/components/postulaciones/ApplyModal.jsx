@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createPostulacionStructured } from '../../api/postulacionesApi';
 import {
   validateName,
@@ -24,6 +25,7 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     nombreCandidato: '',
     email: '',
     telefono: '',
+    ubicacion: '',
     skills: [],
     softSkills: [],
     impactStatement: '',
@@ -43,7 +45,9 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = '';
@@ -54,7 +58,11 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => { const e = { ...prev }; delete e[field]; return e; });
+      setErrors((prev) => {
+        const e = { ...prev };
+        delete e[field];
+        return e;
+      });
     }
   };
 
@@ -118,16 +126,25 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
     fd.append('NombreCandidato', formData.nombreCandidato.trim());
     fd.append('Email', formData.email.trim().toLowerCase());
     if (formData.telefono) fd.append('Telefono', formData.telefono.trim());
+    if (formData.ubicacion) fd.append('Ubicacion', formData.ubicacion);
     fd.append('VacanteId', job.id);
     if (formData.cvFile) fd.append('CvFile', formData.cvFile);
 
-    fd.append('SkillsJson', JSON.stringify(formData.skills));
+    fd.append(
+      'SkillsJson',
+      JSON.stringify(
+        formData.skills.map((s) => ({
+          ...s,
+          yearsExperience:
+            s.yearsExperience !== '' && s.yearsExperience != null
+              ? Number(s.yearsExperience)
+              : null,
+        }))
+      )
+    );
     fd.append('SoftSkillsJson', JSON.stringify(formData.softSkills));
     fd.append('ImpactStatement', formData.impactStatement.trim());
-    fd.append(
-      'ScreeningResponsesJson',
-      JSON.stringify(formData.screeningResponses)
-    );
+    fd.append('ScreeningResponsesJson', JSON.stringify(formData.screeningResponses));
     fd.append(
       'AvailabilityJson',
       JSON.stringify((formData.availability || []).filter((a) => a.isAvailable))
@@ -161,43 +178,44 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
 
   return (
     <div
-      className="modal-overlay is-open"
+      className="public-theme fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
-      <div className="modal modal--apply-multistep">
-        <button className="modal__close" aria-label="Cerrar" onClick={onClose}>
-          &times;
-        </button>
-
-        <div className="modal__header" style={{ paddingRight: '44px' }}>
-          <div>
-            <h2 className="modal__title" style={{ fontSize: '1.2rem' }}>
-              Aplicar: {job.title}
+      <div
+        className="w-full max-w-2xl max-h-[90vh] bg-[#0F1B28] rounded-2xl border border-outline-variant/10 flex flex-col overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="border-b border-outline-variant/10 p-6 flex items-start justify-between gap-4 shrink-0">
+          <div className="min-w-0">
+            <h2 className="text-xl sm:text-2xl font-bold text-on-surface font-display mb-1 line-clamp-2">
+              Postulación: {job.title}
             </h2>
-            <p style={{ fontSize: '13px', color: 'var(--clr-muted)', margin: '4px 0 0' }}>
-              {job.location} · {job.type}
+            <p className="text-sm text-on-surface-variant truncate">
+              {job.company} · {job.location}
             </p>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all flex-shrink-0"
+            aria-label="Cerrar"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
         <ApplyFormProgress currentStep={currentStep} steps={STEPS} />
 
-        <div className="modal__body" style={{ paddingTop: 0 }}>
+        <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
           {currentStep === 1 && (
-            <ApplyStep1BasicInfo
-              formData={formData}
-              onChange={handleFieldChange}
-              errors={errors}
-            />
+            <ApplyStep1BasicInfo formData={formData} onChange={handleFieldChange} errors={errors} />
           )}
           {currentStep === 2 && (
-            <ApplyStep2Skills
-              formData={formData}
-              onChange={handleFieldChange}
-              errors={errors}
-            />
+            <ApplyStep2Skills formData={formData} onChange={handleFieldChange} errors={errors} />
           )}
           {currentStep === 3 && (
             <ApplyStep3Screening
@@ -211,6 +229,7 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
           {currentStep === 4 && (
             <ApplyStep4Review
               formData={formData}
+              jobTitle={job.title}
               onChange={handleFieldChange}
               errors={errors}
             />
@@ -218,49 +237,40 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
         </div>
 
         {errors.submit && (
-          <div
-            style={{
-              padding: '10px 14px',
-              backgroundColor: 'var(--color-danger-bg)',
-              color: 'var(--color-danger)',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '13px',
-              margin: '0 0 12px',
-            }}
-          >
+          <div className="mx-6 mb-2 px-4 py-3 rounded-xl bg-error-container/30 border border-error/30 text-error text-sm">
             {errors.submit}
           </div>
         )}
 
-        <div className="modal__footer" style={{ justifyContent: 'flex-end' }}>
-          {currentStep > 1 && (
+        <div className="border-t border-outline-variant/10 p-6 bg-[#142033] flex items-center justify-between gap-4 shrink-0">
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={currentStep === 1 || loading}
+            className="flex items-center gap-2 px-4 sm:px-6 py-3 text-on-surface-variant font-semibold hover:text-on-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Atrás
+          </button>
+
+          {currentStep < STEPS.length ? (
             <button
               type="button"
-              className="btn btn--ghost"
-              onClick={handleBack}
-              disabled={loading}
-            >
-              ← Atrás
-            </button>
-          )}
-          {currentStep < STEPS.length && (
-            <button
-              type="button"
-              className="btn btn--accent"
               onClick={handleNext}
               disabled={loading}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-turquoise text-on-brand-turquoise font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
             >
-              Siguiente →
+              Siguiente
+              <ChevronRight className="w-5 h-5" />
             </button>
-          )}
-          {currentStep === STEPS.length && (
+          ) : (
             <button
               type="button"
-              className="btn btn--accent"
               onClick={handleSubmit}
               disabled={loading}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-turquoise text-on-brand-turquoise font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
             >
-              {loading ? 'Enviando...' : 'Enviar Solicitud'}
+              {loading ? 'Enviando...' : 'Enviar solicitud'}
             </button>
           )}
         </div>

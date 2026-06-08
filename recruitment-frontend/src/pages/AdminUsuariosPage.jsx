@@ -5,12 +5,12 @@ import { useAuth } from '../context/AuthContext';
 
 function getRolColor(rolNombre) {
   const map = {
-    Candidate:      { bg: '#f0fdf4', text: '#16a34a' },
+    Candidate:      { bg: 'rgba(106,217,192,0.15)', text: '#6ad9c0' },
     Recruiter:      { bg: 'var(--color-accent-bg)', text: 'var(--color-accent)' },
-    Manager:        { bg: '#eff6ff', text: '#1d4ed8' },
+    Manager:        { bg: 'rgba(96,165,250,0.15)', text: '#93c5fd' },
     Administrador:  { bg: 'var(--color-accent-bg)', text: 'var(--color-navy)' },
   };
-  return map[rolNombre] ?? { bg: '#f3f4f6', text: '#6b7280' };
+  return map[rolNombre] ?? { bg: 'rgba(255,255,255,0.08)', text: '#b8c2dc' };
 }
 
 export default function AdminUsuariosPage() {
@@ -98,12 +98,12 @@ export default function AdminUsuariosPage() {
 
       {/* Notifications */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+        <div className="bg-error-container/30 border border-error/30 text-error px-4 py-3 rounded-xl text-sm font-medium">
           {error}
         </div>
       )}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
+        <div className="bg-green-bg border border-green/30 text-green px-4 py-3 rounded-xl text-sm font-medium">
           {success}
         </div>
       )}
@@ -114,7 +114,7 @@ export default function AdminUsuariosPage() {
           const count = usuarios.filter((u) => u.rol === role.nombre).length;
           const colors = getRolColor(role.nombre);
           return (
-            <div key={role.id} className="bg-white p-5 rounded-2xl shadow-sm">
+            <div key={role.id} className="bg-surface border border-border p-5 rounded-2xl shadow-sm">
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.text }}>
                 {role.nombre}
               </span>
@@ -134,7 +134,7 @@ export default function AdminUsuariosPage() {
           <p className="text-lg font-bold">No hay usuarios registrados</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-surface border border-border rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">

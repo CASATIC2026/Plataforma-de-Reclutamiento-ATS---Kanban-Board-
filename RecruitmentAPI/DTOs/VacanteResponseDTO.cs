@@ -20,4 +20,8 @@ public class VacanteResponseDTO
 
     // Count of applications for this vacancy (for stats dashboard)
     public int PostulacionesCount { get; set; }
+
+    // Multi-tenant context (informational for clients)
+    public Guid? EmpresaId { get; set; }
+    public Guid? CreadoPor { get; set; }
 }

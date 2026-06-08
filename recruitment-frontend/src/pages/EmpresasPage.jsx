@@ -58,12 +58,12 @@ export default function EmpresasPage() {
               >
                 Empezar Ahora
               </Link>
-              <a
-                href="#planes"
+              <Link
+                to="/precios"
                 className="px-8 py-4 rounded-2xl border border-outline-variant/20 text-on-surface font-semibold text-center hover:border-brand-turquoise hover:text-brand-turquoise transition-all"
               >
-                Ver Planes
-              </a>
+                Ver planes
+              </Link>
             </div>
           </div>
           <div className="p-8 rounded-3xl border border-outline-variant/10 bg-[#101C2F]">
@@ -105,9 +105,17 @@ export default function EmpresasPage() {
 
       <section className="py-16 md:py-24 px-4 md:px-8" id="planes">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12">
-          <h2 className="text-2xl md:text-4xl font-extrabold text-brand-turquoise font-display">
-            Cómo transformar tu reclutamiento
-          </h2>
+          <div>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-brand-turquoise font-display mb-4">
+              Cómo transformar tu reclutamiento
+            </h2>
+            <Link
+              to="/precios"
+              className="text-brand-turquoise font-semibold text-sm hover:underline inline-flex items-center gap-1"
+            >
+              Ver planes y precios →
+            </Link>
+          </div>
           <div className="flex flex-col gap-8">
             {STEPS.map((step, idx) => (
               <div key={step.title} className="flex gap-4">

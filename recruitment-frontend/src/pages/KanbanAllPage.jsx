@@ -6,16 +6,19 @@ import RechazadosTray from '../components/kanban/RechazadosTray';
 import CommandBar from '../components/kanban/CommandBar';
 import { useRechazadosRestore } from '../hooks/useRechazadosRestore';
 import Breadcrumb from '../components/common/Breadcrumb';
+import { useAuth } from '../context/AuthContext';
 
 const STAGE_LABELS = ['Nuevo', 'Entrevista', 'Prueba Técnica', 'Oferta'];
 const STAGE_COLORS = [
-  'var(--color-teal)',
-  'var(--color-accent)',
-  'var(--color-navy)',
-  'var(--color-green)',
+  '#40e0d0',
+  '#f0b07a',
+  '#93c5fd',
+  '#6ad9c0',
 ];
 
 export default function KanbanAllPage() {
+  const { selectedCompanyId } = useAuth();
+
   // Filter state
   const [filters, setFilters] = useState({
     search: '',
@@ -29,12 +32,12 @@ export default function KanbanAllPage() {
   const [visibleCards, setVisibleCards] = useState([]);
   const [rechazados, setRechazados] = useState([]);
 
-  // Fetch vacantes for dropdown
+  // Fetch vacantes for dropdown — refetch when platform admin changes the company filter
   useEffect(() => {
-    getVacantes()
+    getVacantes({ companyId: selectedCompanyId })
       .then((res) => setVacantes(res.data))
       .catch((err) => console.error('Error loading vacantes:', err));
-  }, []);
+  }, [selectedCompanyId]);
 
   // Filter function (additive AND)
   const filterFn = useCallback(
@@ -145,7 +148,7 @@ export default function KanbanAllPage() {
           {stageCounts.map(({ estado, label, color, count }) => (
             <div
               key={estado}
-              className="bg-white rounded-xl shadow-sm p-5 border border-border/10"
+              className="bg-surface rounded-xl shadow-sm p-5 border border-border"
             >
               <div className="flex items-center gap-3">
                 <div
@@ -164,7 +167,7 @@ export default function KanbanAllPage() {
         </div>
 
         {/* Kanban Board */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="bg-surface border border-border rounded-2xl shadow-sm p-8">
           <KanbanBoard
             filterFn={filterFn}
             sortFn={sortFn}

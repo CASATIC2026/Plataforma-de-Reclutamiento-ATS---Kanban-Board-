@@ -36,16 +36,20 @@ export default function JobDetailModal({ job, onClose, onApply }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-job-title"
-          className="pointer-events-auto flex flex-col w-full md:max-w-2xl max-h-[92vh] md:max-h-[90vh] rounded-t-3xl md:rounded-3xl border border-outline-variant/10 bg-[#101C2F] shadow-2xl overflow-hidden"
+          className="public-theme pointer-events-auto flex flex-col w-full md:max-w-2xl max-h-[92vh] md:max-h-[90vh] rounded-t-3xl md:rounded-3xl border border-outline-variant/10 bg-[#101C2F] shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start justify-between p-6 md:p-8 border-b border-outline-variant/10">
             <div className="flex items-start gap-4 flex-1 min-w-0">
               <div
-                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center flex-shrink-0 font-display font-bold text-xl"
-                style={{ background: job.logoBg, color: job.logoColor }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center flex-shrink-0 font-display font-bold text-xl border border-outline-variant/10 bg-gradient-to-br from-brand-turquoise/30 to-tertiary/20 text-brand-turquoise"
+                style={
+                  job.logoBg
+                    ? { background: job.logoBg, color: job.logoColor, border: 'none' }
+                    : undefined
+                }
               >
-                {job.logoLetters}
+                {job.logoLetters || job.company?.substring(0, 2).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap gap-2 mb-2">

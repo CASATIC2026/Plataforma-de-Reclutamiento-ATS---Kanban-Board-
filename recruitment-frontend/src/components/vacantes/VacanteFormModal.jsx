@@ -46,10 +46,10 @@ export default function VacanteFormModal({
   return (
     <div className="fixed inset-0 z-40 flex items-end md:items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-navy/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white shadow-2xl flex flex-col max-w-2xl w-full max-h-screen rounded-2xl overflow-hidden">
+      <div className="relative bg-surface border border-border shadow-2xl flex flex-col max-w-2xl w-full max-h-screen rounded-2xl overflow-hidden">
         {/* Form Header */}
         <div className="p-8 border-b border-border/10 flex justify-between items-center bg-bg">
           <div>
@@ -223,7 +223,7 @@ export default function VacanteFormModal({
               <button
                 type="button"
                 onClick={addRequisito}
-                className="px-4 py-3 bg-navy text-white rounded-xl font-bold hover:bg-navy-light transition-colors"
+                className="px-4 py-3 bg-brand-turquoise text-on-brand-turquoise rounded-xl font-bold hover:bg-tertiary transition-colors"
               >
                 Agregar
               </button>
@@ -275,7 +275,7 @@ export default function VacanteFormModal({
                     }
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-navy/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-navy" />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-turquoise/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-turquoise" />
                 </label>
               </div>
 
@@ -299,7 +299,7 @@ export default function VacanteFormModal({
                       umbralPuntaje: Math.max(0, Math.min(100, Number(e.target.value))),
                     })
                   }
-                  className="w-full bg-white border border-border rounded-xl p-3 focus:ring-2 focus:ring-navy/20 focus:border-transparent outline-none transition-all"
+                  className="w-full bg-[#030e21] border border-border rounded-xl p-3 focus:ring-2 focus:ring-brand-turquoise/30 focus:border-transparent outline-none transition-all"
                   placeholder="60"
                 />
                 <p className="text-xs text-slate">
@@ -316,7 +316,7 @@ export default function VacanteFormModal({
             type="submit"
             onClick={onSubmit}
             disabled={submitLoading}
-            className="flex-1 bg-gradient-to-br from-navy to-navy-light text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-navy-light/20 transition-all disabled:opacity-50"
+            className="flex-1 bg-gradient-to-br from-brand-turquoise to-tertiary text-on-brand-turquoise py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50"
           >
             {submitLoading
               ? editingId

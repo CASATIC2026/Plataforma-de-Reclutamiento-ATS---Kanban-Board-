@@ -26,7 +26,12 @@ export default function LandingFooter() {
               </li>
               <li>
                 <Link to="/recursos" className="text-sm text-on-surface-variant hover:text-brand-turquoise transition-colors">
-                  Recursos
+                  Recursos de carrera
+                </Link>
+              </li>
+              <li>
+                <Link to="/recursos#articulos" className="text-sm text-on-surface-variant hover:text-brand-turquoise transition-colors">
+                  Guías y entrevistas
                 </Link>
               </li>
               <li>
@@ -45,14 +50,14 @@ export default function LandingFooter() {
                 </Link>
               </li>
               <li>
-                <Link to="/empresas#planes" className="text-sm text-on-surface-variant hover:text-brand-turquoise transition-colors">
-                  Planes
+                <Link to="/precios" className="text-sm text-on-surface-variant hover:text-brand-turquoise transition-colors">
+                  Planes y precios
                 </Link>
               </li>
               <li>
-                <a href="mailto:soporte@talentifysv.com" className="text-sm text-on-surface-variant hover:text-brand-turquoise transition-colors">
+                <Link to="/contacto" className="text-sm text-on-surface-variant hover:text-brand-turquoise transition-colors">
                   Contacto
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

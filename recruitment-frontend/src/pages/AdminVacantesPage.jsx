@@ -11,7 +11,11 @@ import VacanteFormModal from '../components/vacantes/VacanteFormModal';
 
 export default function AdminVacantesPage() {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, selectedCompanyId, hasPermission } = useAuth();
+  const canCreate = hasPermission('jobs:create');
+  const canEdit = hasPermission('jobs:update');
+  const canDelete = hasPermission('jobs:delete');
+  const canManage = canCreate || canEdit || canDelete;
   const [vacantes, setVacantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -36,14 +40,15 @@ export default function AdminVacantesPage() {
 
   const fetchVacantes = useCallback(async () => {
     try {
-      const response = await getVacantes();
+      // selectedCompanyId is only honored by the backend for platform-tier callers
+      const response = await getVacantes({ companyId: selectedCompanyId });
       setVacantes(response.data);
     } catch (error) {
       console.error('Error fetching vacantes:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedCompanyId]);
 
   useEffect(() => {
     fetchVacantes();
@@ -65,7 +70,9 @@ export default function AdminVacantesPage() {
       if (editingId) {
         await updateVacante(editingId, payload);
       } else {
-        await createVacante(payload);
+        // Platform admins use selectedCompanyId as the target company on POST.
+        // For regular users it's ignored (backend stamps from JWT).
+        await createVacante(payload, { companyId: selectedCompanyId });
       }
       await fetchVacantes();
       resetForm();
@@ -186,13 +193,13 @@ export default function AdminVacantesPage() {
               Gestiona y supervisa {activeCount} posiciones activas en tu organización.
             </p>
           </div>
-          {isAdmin && (
+          {canCreate && (
             <button
               onClick={() => {
                 resetForm();
                 setShowForm(true);
               }}
-              className="bg-gradient-to-br from-navy to-navy-light text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+              className="bg-gradient-to-br from-brand-turquoise to-tertiary text-on-brand-turquoise px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-[0_8px_24px_rgba(64,224,208,0.25)] hover:scale-[1.02] active:scale-95 transition-all"
             >
               <span>+</span>
               Nueva Vacante
@@ -202,29 +209,29 @@ export default function AdminVacantesPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-white p-6 rounded-2xl border-none shadow-sm flex flex-col justify-between">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
             <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Total Activas
             </span>
             <div className="flex items-baseline gap-2 mt-2">
               <span className="text-3xl font-black text-navy">{activeCount}</span>
-              <span className="text-xs text-green-600 font-bold">
+              <span className="text-xs text-green-light font-bold">
                 de {vacantes.length}
               </span>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-none shadow-sm">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
             <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Postulaciones
             </span>
             <div className="flex items-baseline gap-2 mt-2">
               <span className="text-3xl font-black text-navy">{totalApplicants}</span>
-              <span className="text-navy">↑</span>
+              <span className="text-accent">↑</span>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-none shadow-sm">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
             <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Promedio
             </span>
@@ -236,9 +243,9 @@ export default function AdminVacantesPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-navy to-navy-light text-white p-6 rounded-2xl border-none shadow-xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-brand-turquoise to-tertiary text-on-brand-turquoise p-6 rounded-2xl border-none shadow-[0_8px_24px_rgba(64,224,208,0.25)] relative overflow-hidden">
             <div className="relative z-10">
-              <span className="text-accent-bg text-xs font-semibold uppercase tracking-wider">
+              <span className="text-on-brand-turquoise/70 text-xs font-semibold uppercase tracking-wider">
                 Tasa Activas
               </span>
               <div className="flex items-baseline gap-2 mt-2">
@@ -266,7 +273,7 @@ export default function AdminVacantesPage() {
         />
 
         {/* Data Table Container */}
-        <div className="bg-white rounded-3xl overflow-hidden shadow-sm">
+        <div className="bg-surface border border-border rounded-3xl overflow-hidden shadow-sm">
           <div className="px-6 py-4 flex items-center justify-between bg-accent-bg/50 border-b border-border/10">
             <h3 className="font-bold text-navy">Listado de Vacantes</h3>
             <div className="flex items-center gap-2">
@@ -276,7 +283,7 @@ export default function AdminVacantesPage() {
                   placeholder="Buscar por título, ubicación, requisito..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full bg-white border border-border rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20 transition-all"
+                  className="w-full bg-[#030e21] text-on-surface border border-border rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-turquoise/30 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate">
                   🔍
@@ -320,7 +327,7 @@ export default function AdminVacantesPage() {
                     <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate">
                       Postulaciones
                     </th>
-                    {isAdmin && (
+                    {canManage && (
                       <th className="px-6 py-4 text-[10px] uppercase font-bold tracking-widest text-slate text-right">
                         Acciones
                       </th>
@@ -356,29 +363,33 @@ export default function AdminVacantesPage() {
                       <td className="px-6 py-5 text-sm font-medium text-navy">
                         {vacante.postulacionesCount || 0}
                       </td>
-                      {isAdmin && (
+                      {canManage && (
                         <td className="px-6 py-5 text-right">
                           <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(vacante);
-                              }}
-                              className="p-2 hover:bg-accent-bg rounded-lg text-navy transition-colors"
-                              title="Editar"
-                            >
-                              ✎
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(vacante.id);
-                              }}
-                              className="p-2 hover:bg-danger-bg rounded-lg text-danger transition-colors"
-                              title="Eliminar"
-                            >
-                              🗑
-                            </button>
+                            {canEdit && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(vacante);
+                                }}
+                                className="p-2 hover:bg-accent-bg rounded-lg text-navy transition-colors"
+                                title="Editar"
+                              >
+                                ✎
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(vacante.id);
+                                }}
+                                className="p-2 hover:bg-danger-bg rounded-lg text-danger transition-colors"
+                                title="Eliminar"
+                              >
+                                🗑
+                              </button>
+                            )}
                           </div>
                         </td>
                       )}

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RecruitmentAPI.Data;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Models;
+using RecruitmentAPI.Services.Interfaces;
 
 namespace RecruitmentAPI.Controllers;
 
@@ -13,11 +14,21 @@ namespace RecruitmentAPI.Controllers;
 public class ReviewController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly ICurrentUser _current;
 
-    public ReviewController(AppDbContext db) => _db = db;
+    public ReviewController(AppDbContext db, ICurrentUser current) { _db = db; _current = current; }
 
-    private string Permisos() => User.FindAll("permissions").FirstOrDefault()?.Value ?? "";
-    private bool CanReview() => Permisos().Contains("applications:review");
+    private bool CanReview() => _current.HasPermission("applications:review");
+
+    /// <summary>Filter the review queue to applications whose parent Vacante belongs to
+    /// the caller's tenant scope (and creator scope for recruiters).</summary>
+    private IQueryable<Postulacion> ApplyScope(IQueryable<Postulacion> query)
+    {
+        if (_current.IsPlatformTier) return query;
+        if (_current.CanSeeAllCompanyJobs)
+            return query.Where(p => p.Vacante.EmpresaId == _current.CompanyId);
+        return query.Where(p => p.Vacante.EmpresaId == _current.CompanyId && p.Vacante.CreadoPor == _current.UserId);
+    }
 
     [HttpGet("pending")]
     public async Task<IActionResult> Pending(
@@ -29,9 +40,9 @@ public class ReviewController : ControllerBase
     {
         if (!CanReview()) return Forbid();
 
-        var query = _db.Postulaciones
+        var query = ApplyScope(_db.Postulaciones
             .Include(p => p.Vacante)
-            .Where(p => p.EmailStatus == "pending");
+            .Where(p => p.EmailStatus == "pending"));
 
         if (vacanteId.HasValue) query = query.Where(p => p.VacanteId == vacanteId.Value);
         if (scoreMin.HasValue)  query = query.Where(p => p.Puntaje >= scoreMin.Value);
@@ -54,7 +65,7 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> Stats()
     {
         if (!CanReview()) return Forbid();
-        var pending = await _db.Postulaciones.CountAsync(p => p.EmailStatus == "pending");
+        var pending = await ApplyScope(_db.Postulaciones.Include(p => p.Vacante).Where(p => p.EmailStatus == "pending")).CountAsync();
         return Ok(new { pendingCount = pending });
     }
 
@@ -62,8 +73,8 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> Approve(Guid id)
     {
         if (!CanReview()) return Forbid();
-        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
-        if (p == null) return NotFound();
+        var p = await _db.Postulaciones.Include(x => x.Vacante).FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null || !_current.CanAccessResource(p.Vacante?.EmpresaId, p.Vacante?.CreadoPor)) return NotFound();
 
         // Approve = let candidate through. Reset to Nuevo if it was auto-rejected,
         // switch the email to confirmation, and dispatch immediately.
@@ -81,8 +92,8 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> Reject(Guid id, [FromBody] RejectReviewDTO? body)
     {
         if (!CanReview()) return Forbid();
-        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
-        if (p == null) return NotFound();
+        var p = await _db.Postulaciones.Include(x => x.Vacante).FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null || !_current.CanAccessResource(p.Vacante?.EmpresaId, p.Vacante?.CreadoPor)) return NotFound();
 
         p.Estado = EstadoPostulacion.Rechazado;
         p.EmailTypeToSend = "rechazo_screening";
@@ -102,7 +113,7 @@ public class ReviewController : ControllerBase
         if (!CanReview()) return Forbid();
         if (ids == null || ids.Count == 0) return BadRequest(new { message = "Lista vacía." });
 
-        var rows = await _db.Postulaciones.Where(p => ids.Contains(p.Id)).ToListAsync();
+        var rows = await ApplyScope(_db.Postulaciones.Include(p => p.Vacante).Where(p => ids.Contains(p.Id))).ToListAsync();
         var now = DateTime.UtcNow;
         foreach (var p in rows)
         {
@@ -122,7 +133,7 @@ public class ReviewController : ControllerBase
         if (!CanReview()) return Forbid();
         if (body?.Ids == null || body.Ids.Count == 0) return BadRequest(new { message = "Lista vacía." });
 
-        var rows = await _db.Postulaciones.Where(p => body.Ids.Contains(p.Id)).ToListAsync();
+        var rows = await ApplyScope(_db.Postulaciones.Include(p => p.Vacante).Where(p => body.Ids.Contains(p.Id))).ToListAsync();
         var now = DateTime.UtcNow;
         foreach (var p in rows)
         {

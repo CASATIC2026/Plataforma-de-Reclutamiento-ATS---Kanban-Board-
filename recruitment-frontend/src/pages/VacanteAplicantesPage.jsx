@@ -69,7 +69,7 @@ export default function VacanteAplicantesPage() {
               />
 
               {/* Vacancy Header Card */}
-              <div className="bg-white rounded-2xl shadow-sm p-8 mb-10">
+              <div className="bg-surface border border-border rounded-2xl shadow-sm p-8 mb-10">
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <h1 className="text-4xl font-extrabold text-navy mb-2">
@@ -117,8 +117,8 @@ export default function VacanteAplicantesPage() {
                       <span
                         className={`px-3 py-1 text-xs font-bold rounded-full ${
                           vacante.estaActiva
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
+                            ? 'bg-green-bg text-green'
+                            : 'bg-error-container/40 text-error'
                         }`}
                       >
                         {vacante.estaActiva ? 'Activa' : 'Inactiva'}
@@ -148,7 +148,7 @@ export default function VacanteAplicantesPage() {
               </div>
 
               {/* Kanban Section */}
-              <div className="bg-white rounded-2xl shadow-sm p-8">
+              <div className="bg-surface border border-border rounded-2xl shadow-sm p-8">
                 <h2 className="text-2xl font-extrabold text-navy mb-8">
                   Pipeline de Candidatos
                 </h2>
@@ -159,7 +159,7 @@ export default function VacanteAplicantesPage() {
               </div>
             </>
           ) : (
-            <div className="text-danger bg-red-50 p-6 rounded-lg">
+            <div className="text-error bg-error-container/30 p-6 rounded-lg">
               Vacante no encontrada
             </div>
           )}

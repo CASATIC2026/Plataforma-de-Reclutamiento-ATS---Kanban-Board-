@@ -14,40 +14,45 @@ public class PostulacionesController : ControllerBase
 {
     private readonly IPostulacionService _service;
     private readonly AppDbContext _db;
+    private readonly ICurrentUser _current;
 
-    public PostulacionesController(IPostulacionService service, AppDbContext db)
+    public PostulacionesController(IPostulacionService service, AppDbContext db, ICurrentUser current)
     {
         _service = service;
         _db = db;
+        _current = current;
     }
 
-    private string Permisos() => User.FindAll("permissions").FirstOrDefault()?.Value ?? "";
-
-    [Authorize(Roles = "Administrador,Manager")]
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<PostulacionResponseDTO>>> GetAll()
     {
+        if (!_current.HasPermission("applications:read") && !_current.HasPermission("applications:read_all")) return Forbid();
         var postulaciones = await _service.GetAllAsync();
         return Ok(postulaciones);
     }
 
-    [Authorize(Roles = "Administrador,Manager")]
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<PostulacionResponseDTO>> GetById(Guid id)
     {
+        if (!_current.HasPermission("applications:read") && !_current.HasPermission("applications:read_all")) return Forbid();
         var postulacion = await _service.GetByIdAsync(id);
         if (postulacion == null) return NotFound(new { message = "Postulación no encontrada" });
         return Ok(postulacion);
     }
 
-    [Authorize(Roles = "Administrador,Manager")]
+    [Authorize]
     [HttpGet("vacante/{vacanteId}")]
     public async Task<ActionResult<List<PostulacionResponseDTO>>> GetByVacante(Guid vacanteId)
     {
+        if (!_current.HasPermission("applications:read") && !_current.HasPermission("applications:read_all")) return Forbid();
         var postulaciones = await _service.GetByVacanteIdAsync(vacanteId);
         return Ok(postulaciones);
     }
 
+    // Public anonymous endpoint — candidate applies to a vacante. No tenant scope needed
+    // because the vacante itself carries the company context.
     [HttpPost]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<PostulacionResponseDTO>> Create([FromForm] CreatePostulacionDTO dto)
@@ -56,10 +61,11 @@ public class PostulacionesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [Authorize(Roles = "Administrador,Manager")]
+    [Authorize]
     [HttpGet("{id}/cv")]
     public async Task<IActionResult> GetCv(Guid id)
     {
+        if (!_current.HasPermission("applications:read") && !_current.HasPermission("applications:read_all")) return Forbid();
         var cvInfo = await _service.GetCvAsync(id);
         if (cvInfo == null) return NotFound(new { message = "CV no encontrado" });
 
@@ -82,19 +88,21 @@ public class PostulacionesController : ControllerBase
         return PhysicalFile(filePath, contentType);
     }
 
-    [Authorize(Roles = "Administrador,Manager")]
+    [Authorize]
     [HttpPatch("{id}/notas")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateNotas(Guid id, [FromBody] UpdateNotasDTO dto)
     {
+        if (!_current.HasPermission("applications:add_note")) return Forbid();
         var updated = await _service.UpdateNotasAsync(id, dto.Notas);
         if (updated == null) return NotFound(new { message = "Postulación no encontrada" });
         return Ok(updated);
     }
 
-    [Authorize(Roles = "Administrador,Manager")]
+    [Authorize]
     [HttpPatch("{id}/estado")]
     public async Task<ActionResult<PostulacionResponseDTO>> UpdateEstado(Guid id, [FromBody] UpdateEstadoDTO dto)
     {
+        if (!_current.HasPermission("applications:update_status")) return Forbid();
         if (!Enum.IsDefined(typeof(EstadoPostulacion), dto.Estado))
             return BadRequest(new { message = "Valor de estado inválido. Use 0 (Nuevo), 1 (Entrevista), 2 (PruebaTecnica) o 3 (Oferta)." });
 
@@ -104,10 +112,11 @@ public class PostulacionesController : ControllerBase
         return Ok(updated);
     }
 
-    [Authorize(Roles = "Administrador")]
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {
+        if (!_current.HasPermission("applications:add_note")) return Forbid(); // reuse closest perm
         var deleted = await _service.DeleteAsync(id);
         if (!deleted) return NotFound(new { message = "Postulación no encontrada" });
         return NoContent();
@@ -115,12 +124,22 @@ public class PostulacionesController : ControllerBase
 
     // ── Email automation actions ──
 
+    /// <summary>Loads the postulacion + parent Vacante and verifies the caller is in scope.
+    /// Returns null when out-of-scope so the caller can produce a 404 (not 403).</summary>
+    private async Task<Postulacion?> LoadInScopeAsync(Guid id)
+    {
+        var p = await _db.Postulaciones.Include(x => x.Vacante).FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null) return null;
+        if (!_current.CanAccessResource(p.Vacante?.EmpresaId, p.Vacante?.CreadoPor)) return null;
+        return p;
+    }
+
     [Authorize]
     [HttpPost("{id:guid}/send-email-now")]
     public async Task<IActionResult> SendEmailNow(Guid id)
     {
-        if (!Permisos().Contains("applications:review")) return Forbid();
-        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
+        if (!_current.HasPermission("applications:review")) return Forbid();
+        var p = await LoadInScopeAsync(id);
         if (p == null) return NotFound();
         if (p.EmailStatus != "pending" && p.EmailStatus != "cancelled" && p.EmailStatus != "failed")
             return BadRequest(new { message = "El email ya fue enviado." });
@@ -136,8 +155,8 @@ public class PostulacionesController : ControllerBase
     [HttpPost("{id:guid}/cancel-email")]
     public async Task<IActionResult> CancelEmail(Guid id)
     {
-        if (!Permisos().Contains("applications:review")) return Forbid();
-        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
+        if (!_current.HasPermission("applications:review")) return Forbid();
+        var p = await LoadInScopeAsync(id);
         if (p == null) return NotFound();
         if (p.EmailStatus != "pending")
             return BadRequest(new { message = "Solo se pueden cancelar emails pendientes." });
@@ -152,8 +171,8 @@ public class PostulacionesController : ControllerBase
     [HttpPost("{id:guid}/restart-timer")]
     public async Task<IActionResult> RestartTimer(Guid id, [FromQuery] int? minutes)
     {
-        if (!Permisos().Contains("applications:review")) return Forbid();
-        var p = await _db.Postulaciones.FirstOrDefaultAsync(x => x.Id == id);
+        if (!_current.HasPermission("applications:review")) return Forbid();
+        var p = await LoadInScopeAsync(id);
         if (p == null) return NotFound();
 
         var delay = minutes ?? (int.TryParse(Environment.GetEnvironmentVariable("EMAIL_DELAY_MINUTES"), out var d) ? d : 5);
@@ -169,7 +188,10 @@ public class PostulacionesController : ControllerBase
     [HttpGet("{id:guid}/email-log")]
     public async Task<IActionResult> GetEmailLog(Guid id)
     {
-        if (!Permisos().Contains("applications:review")) return Forbid();
+        if (!_current.HasPermission("applications:review")) return Forbid();
+        var p = await LoadInScopeAsync(id);
+        if (p == null) return NotFound();
+
         var logs = await _db.EmailLogs
             .Where(e => e.PostulacionId == id)
             .OrderByDescending(e => e.CreatedAt)

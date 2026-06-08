@@ -4,10 +4,10 @@ import KanbanCard from "./KanbanCard";
 import { updateEstado as updateEstadoPostulacion } from "../../api/postulacionesApi";
 
 const COLUMNAS = [
-  { id: "Nuevo",         label: "🆕 Nuevos",          color: "bg-blue-50   border-blue-200"   },
-  { id: "Entrevista",    label: "🎙️ Entrevista",      color: "bg-yellow-50 border-yellow-200" },
-  { id: "PruebaTecnica", label: "💻 Prueba Técnica",   color: "bg-purple-50 border-purple-200" },
-  { id: "Oferta",        label: "🎉 Oferta",           color: "bg-green-50  border-green-200"  },
+  { id: "Nuevo",         label: "🆕 Nuevos",          color: "bg-[rgba(96,165,250,0.10)]  border-[rgba(96,165,250,0.25)]"  },
+  { id: "Entrevista",    label: "🎙️ Entrevista",      color: "bg-[rgba(240,176,122,0.10)] border-[rgba(240,176,122,0.25)]" },
+  { id: "PruebaTecnica", label: "💻 Prueba Técnica",   color: "bg-[rgba(167,139,250,0.10)] border-[rgba(167,139,250,0.25)]" },
+  { id: "Oferta",        label: "🎉 Oferta",           color: "bg-[rgba(106,217,192,0.10)] border-[rgba(106,217,192,0.25)]" },
 ];
 
 const Columna = ({ id, label, color, postulaciones, onDelete, onRefresh }) => {
@@ -22,7 +22,7 @@ const Columna = ({ id, label, color, postulaciones, onDelete, onRefresh }) => {
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-bold text-gray-700 text-sm">{label}</h3>
-        <span className="text-xs bg-white rounded-full px-2 py-0.5 shadow text-gray-500">
+        <span className="text-xs bg-surface-2 rounded-full px-2 py-0.5 shadow text-gray-500">
           {postulaciones.length}
         </span>
       </div>

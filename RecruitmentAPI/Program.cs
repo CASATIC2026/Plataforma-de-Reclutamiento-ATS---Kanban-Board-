@@ -33,6 +33,10 @@ var dbConnection = Environment.GetEnvironmentVariable("DB_CONNECTION")
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(dbConnection));
 
+// Per-request JWT context — read by services for tenant scoping
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
 // Repository layer
 builder.Services.AddScoped<IVacanteRepository, VacanteRepository>();
 builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
@@ -101,10 +105,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // CORS — read allowed origin from environment variable
-var allowedOrigin = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN") ?? "http://localhost:5173";
+var allowedOrigins = (Environment.GetEnvironmentVariable("ALLOWED_ORIGIN") ?? "http://localhost:5173")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 builder.Services.AddCors(options =>
     options.AddPolicy("Default", policy =>
-        policy.WithOrigins(allowedOrigin)
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()));
 
@@ -351,6 +356,90 @@ try
 catch (Exception ex)
 {
     Console.WriteLine($">> Seed warning: {ex.Message}");
+}
+
+// Idempotent test-tenant seed — gated on SEED_TEST_PASSWORD env var so it
+// only runs when the operator explicitly opts in. Creates two empresas and
+// one Manager + two Recruiters per company so the scope filter is observable.
+try
+{
+    var testPwd = Environment.GetEnvironmentVariable("SEED_TEST_PASSWORD");
+    if (!string.IsNullOrEmpty(testPwd))
+    {
+        using var scopeT = app.Services.CreateScope();
+        var dbT = scopeT.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var recruiterRol = dbT.Roles.FirstOrDefault(r => r.Nombre == "Recruiter");
+        var managerRol   = dbT.Roles.FirstOrDefault(r => r.Nombre == "Manager");
+
+        if (recruiterRol != null && managerRol != null)
+        {
+            var tenants = new (string Empresa, string Dominio, string MgrEmail, string[] RecrEmails)[]
+            {
+                ("TechNova SV", "technova.sv", "mgr@technova.sv", new[] { "recr1@technova.sv", "recr2@technova.sv" }),
+                ("InnoSoft SV", "innosoft.sv", "mgr@innosoft.sv", new[] { "recr1@innosoft.sv", "recr2@innosoft.sv" }),
+            };
+
+            foreach (var t in tenants)
+            {
+                var empresa = dbT.Empresas.FirstOrDefault(e => e.Nombre == t.Empresa)
+                    ?? dbT.Empresas.Add(new Empresa { Nombre = t.Empresa, Dominio = t.Dominio, Estado = "activa" }).Entity;
+                dbT.SaveChanges();
+
+                void EnsureUser(string email, string rolNombre, RolUsuario legacy, Guid rolId)
+                {
+                    var u = dbT.Usuarios.FirstOrDefault(x => x.Email == email);
+                    if (u == null)
+                    {
+                        u = new Usuario
+                        {
+                            Nombre = email.Split('@')[0],
+                            Apellido = t.Empresa.Split(' ')[0],
+                            Email = email,
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword(testPwd),
+                            Rol = legacy,
+                            EmpresaId = empresa.Id,
+                        };
+                        dbT.Usuarios.Add(u);
+                        dbT.SaveChanges();
+                    }
+                    else if (u.EmpresaId != empresa.Id)
+                    {
+                        u.EmpresaId = empresa.Id;
+                        u.Rol = legacy;
+                        dbT.SaveChanges();
+                    }
+
+                    // Ensure exactly the expected RBAC role assignment in app_tier
+                    var stale = dbT.UsuarioRoles
+                        .Include(ur => ur.Rol)
+                        .Where(ur => ur.UsuarioId == u.Id && ur.Rol.Ambito == "app_tier")
+                        .ToList();
+                    foreach (var s in stale) if (s.RolId != rolId) dbT.UsuarioRoles.Remove(s);
+                    if (!stale.Any(s => s.RolId == rolId))
+                    {
+                        dbT.UsuarioRoles.Add(new UsuarioRol
+                        {
+                            UsuarioId = u.Id,
+                            RolId = rolId,
+                            EmpresaId = empresa.Id,
+                            AsignadoEn = DateTime.UtcNow
+                        });
+                    }
+                    dbT.SaveChanges();
+                }
+
+                EnsureUser(t.MgrEmail, "Manager", RolUsuario.Manager, managerRol.Id);
+                foreach (var e in t.RecrEmails)
+                    EnsureUser(e, "Recruiter", RolUsuario.Manager, recruiterRol.Id);
+            }
+            Console.WriteLine(">> Test tenants seed complete: 2 empresas, 6 users");
+        }
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($">> Test tenants seed warning: {ex.Message}");
 }
 
 // Idempotent permission back-fill — runs on every startup, safe to repeat

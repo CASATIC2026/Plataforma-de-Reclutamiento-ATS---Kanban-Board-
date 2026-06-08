@@ -47,7 +47,7 @@ export default function PlatformAudit() {
           <p style={{ color: 'var(--color-slate)', fontSize: 14 }}>Registro de acciones y autorizaciones del sistema</p>
         </div>
         <Can permission="audit:export">
-          <button onClick={exportCsv} style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid var(--color-border)', background: 'white', color: 'var(--color-navy)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+          <button onClick={exportCsv} style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
             Exportar CSV
           </button>
         </Can>
@@ -71,15 +71,15 @@ export default function PlatformAudit() {
           <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-slate)', display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hasta</label>
           <input type="date" value={filters.to} onChange={e => setFilters(p => ({ ...p, to: e.target.value }))} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--color-border)', fontSize: 13, outline: 'none' }} />
         </div>
-        <button type="submit" style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: 'var(--color-navy)', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+        <button type="submit" style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
           Filtrar
         </button>
-        <button type="button" onClick={() => { setFilters({ resultado: '', from: '', to: '' }); setPage(1); load(); }} style={{ padding: '9px 14px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'white', fontSize: 13, cursor: 'pointer' }}>
+        <button type="button" onClick={() => { setFilters({ resultado: '', from: '', to: '' }); setPage(1); load(); }} style={{ padding: '9px 14px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', fontSize: 13, cursor: 'pointer' }}>
           Limpiar
         </button>
       </form>
 
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-muted)' }}>Cargando...</div>
         ) : logs.length === 0 ? (
@@ -98,7 +98,7 @@ export default function PlatformAudit() {
                 {logs.map(l => {
                   const isAllowed = l.resultado === 'Allowed';
                   return (
-                    <tr key={l.id} style={{ borderBottom: '1px solid var(--color-border)', background: isAllowed ? '#f0fdf4' : '#fff5f5' }}>
+                    <tr key={l.id} style={{ borderBottom: '1px solid var(--color-border)', background: isAllowed ? 'rgba(106,217,192,0.07)' : 'rgba(255,180,171,0.07)' }}>
                       <td style={{ padding: '10px 14px', fontSize: 11, color: 'var(--color-muted)', whiteSpace: 'nowrap' }}>
                         {new Date(l.createdAt).toLocaleString('es-SV')}
                       </td>
@@ -108,7 +108,7 @@ export default function PlatformAudit() {
                       </td>
                       <td style={{ padding: '10px 14px', fontSize: 11, color: 'var(--color-muted)' }}>{l.recurso ?? '—'}</td>
                       <td style={{ padding: '10px 14px' }}>
-                        <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: isAllowed ? '#dcfce7' : '#fee2e2', color: isAllowed ? '#166534' : '#991b1b' }}>
+                        <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: isAllowed ? 'rgba(106,217,192,0.15)' : 'rgba(255,180,171,0.15)', color: isAllowed ? '#6ad9c0' : '#ffb4ab' }}>
                           {isAllowed ? 'Permitido' : 'Denegado'}
                         </span>
                       </td>
@@ -124,11 +124,11 @@ export default function PlatformAudit() {
 
       {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: '7px 16px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'white', cursor: 'pointer', fontSize: 13, opacity: page === 1 ? 0.5 : 1 }}>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: '7px 16px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', cursor: 'pointer', fontSize: 13, opacity: page === 1 ? 0.5 : 1 }}>
           Anterior
         </button>
         <span style={{ padding: '7px 14px', fontSize: 13, color: 'var(--color-slate)' }}>Página {page}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={logs.length < 50} style={{ padding: '7px 16px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'white', cursor: 'pointer', fontSize: 13, opacity: logs.length < 50 ? 0.5 : 1 }}>
+        <button onClick={() => setPage(p => p + 1)} disabled={logs.length < 50} style={{ padding: '7px 16px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', cursor: 'pointer', fontSize: 13, opacity: logs.length < 50 ? 0.5 : 1 }}>
           Siguiente
         </button>
       </div>

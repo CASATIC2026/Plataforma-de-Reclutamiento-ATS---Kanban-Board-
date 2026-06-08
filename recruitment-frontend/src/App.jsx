@@ -7,6 +7,8 @@ import PlatformLayout from './layouts/PlatformLayout';
 import NewLandingPage from './pages/NewLandingPage';
 import EmpresasPage from './pages/EmpresasPage';
 import RecursosPage from './pages/RecursosPage';
+import PreciosPage from './pages/PreciosPage';
+import ContactoPage from './pages/ContactoPage';
 import LegalTerminosPage from './pages/LegalTerminosPage';
 import LegalPrivacidadPage from './pages/LegalPrivacidadPage';
 import AuthPage from './pages/AuthPage';
@@ -59,6 +61,8 @@ export default function App() {
               <Route path="/" element={<NewLandingPage />} />
               <Route path="/empresas" element={<EmpresasPage />} />
               <Route path="/recursos" element={<RecursosPage />} />
+              <Route path="/precios" element={<PreciosPage />} />
+              <Route path="/contacto" element={<ContactoPage />} />
               <Route path="/legal/terminos" element={<LegalTerminosPage />} />
               <Route path="/legal/privacidad" element={<LegalPrivacidadPage />} />
             </Route>

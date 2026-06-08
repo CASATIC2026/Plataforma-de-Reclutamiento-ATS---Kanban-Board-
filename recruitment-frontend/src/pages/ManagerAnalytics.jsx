@@ -4,7 +4,7 @@ import { getPipelineFunnel, getTimeToHire, getSources, getTeamActivity } from '.
 
 function SectionCard({ title, children, loading }) {
   return (
-    <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden', marginBottom: 24 }}>
+    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden', marginBottom: 24 }}>
       <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--color-border)' }}>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>{title}</h2>
       </div>
@@ -101,11 +101,11 @@ export default function ManagerAnalytics() {
                 </p>
                 <p style={{ fontSize: 12, color: 'var(--color-slate)', margin: '4px 0 0' }}>días promedio global</p>
               </div>
-              <div style={{ background: '#dcfce7', borderRadius: 10, padding: '14px 20px' }}>
-                <p style={{ fontSize: 28, fontWeight: 800, color: '#166534', margin: 0 }}>
+              <div style={{ background: 'rgba(106,217,192,0.15)', borderRadius: 10, padding: '14px 20px' }}>
+                <p style={{ fontSize: 28, fontWeight: 800, color: '#6ad9c0', margin: 0 }}>
                   {timeToHire.items.reduce((s, i) => s + i.totalContratados, 0)}
                 </p>
-                <p style={{ fontSize: 12, color: '#166534', margin: '4px 0 0' }}>total contratados</p>
+                <p style={{ fontSize: 12, color: '#6ad9c0', margin: '4px 0 0' }}>total contratados</p>
               </div>
             </div>
             {timeToHire.items.length === 0 ? (
@@ -204,15 +204,15 @@ export default function ManagerAnalytics() {
                     <td style={{ padding: '11px 14px', fontSize: 13, color: 'var(--color-slate)' }}>{item.ubicacion}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--color-navy)', textAlign: 'center' }}>{item.totalPostulaciones}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, textAlign: 'center' }}>
-                      <span style={{ padding: '2px 10px', borderRadius: 20, background: '#dcfce7', color: '#166534', fontWeight: 600, fontSize: 12 }}>
+                      <span style={{ padding: '2px 10px', borderRadius: 20, background: 'rgba(106,217,192,0.15)', color: '#6ad9c0', fontWeight: 600, fontSize: 12 }}>
                         {item.contratados}
                       </span>
                     </td>
                     <td style={{ padding: '11px 14px', textAlign: 'center' }}>
                       <span style={{
                         padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700,
-                        background: item.tasaConversion >= 20 ? '#dcfce7' : item.tasaConversion >= 10 ? '#fef3c7' : '#fee2e2',
-                        color: item.tasaConversion >= 20 ? '#166534' : item.tasaConversion >= 10 ? '#92400e' : '#991b1b',
+                        background: item.tasaConversion >= 20 ? 'rgba(106,217,192,0.15)' : item.tasaConversion >= 10 ? 'rgba(240,176,122,0.16)' : 'rgba(255,180,171,0.15)',
+                        color: item.tasaConversion >= 20 ? '#6ad9c0' : item.tasaConversion >= 10 ? '#f0b07a' : '#ffb4ab',
                       }}>
                         {item.tasaConversion}%
                       </span>
@@ -259,7 +259,7 @@ export default function ManagerAnalytics() {
                         </span>
                       </td>
                       <td style={{ padding: '11px 14px', fontSize: 13, textAlign: 'center' }}>
-                        <span style={{ padding: '2px 10px', borderRadius: 20, background: '#dcfce7', color: '#166534', fontWeight: 600, fontSize: 12 }}>
+                        <span style={{ padding: '2px 10px', borderRadius: 20, background: 'rgba(106,217,192,0.15)', color: '#6ad9c0', fontWeight: 600, fontSize: 12 }}>
                           {item.contratados}
                         </span>
                       </td>

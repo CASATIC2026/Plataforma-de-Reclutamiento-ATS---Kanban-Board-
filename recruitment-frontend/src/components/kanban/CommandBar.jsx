@@ -15,7 +15,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
   }, [searchLocal, filters, setFilters]);
 
   return (
-    <div className="sticky top-0 z-30 bg-white rounded-xl shadow-sm p-4 mb-6 border border-border/10">
+    <div className="sticky top-0 z-30 bg-surface rounded-xl shadow-sm p-4 mb-6 border border-border">
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
         {/* Search Input */}
         <div className="flex-1 min-w-[200px]">
@@ -81,7 +81,7 @@ export default function CommandBar({ filters, setFilters, vacantes }) {
                 sort: 'reciente',
               })
             }
-            className="px-4 py-2.5 text-sm font-semibold text-danger hover:bg-red-50 rounded-lg transition-colors"
+            className="px-4 py-2.5 text-sm font-semibold text-danger hover:bg-error-container/30 rounded-lg transition-colors"
           >
             Limpiar filtros
           </button>

@@ -38,7 +38,7 @@ export default function KanbanColumn({
           Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-lg border border-gray-200 p-3 animate-pulse"
+              className="bg-surface rounded-lg border border-gray-200 p-3 animate-pulse"
             >
               <div className="h-3 bg-gray-300 rounded w-3/4 mb-2" />
               <div className="h-2 bg-gray-300 rounded w-1/2 mb-3" />

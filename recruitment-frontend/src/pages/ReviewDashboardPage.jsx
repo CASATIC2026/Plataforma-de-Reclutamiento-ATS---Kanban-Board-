@@ -173,9 +173,9 @@ export default function ReviewDashboardPage() {
             key={t.id}
             className="mb-2 px-5 py-3 rounded-lg shadow-lg text-sm font-semibold"
             style={{
-              backgroundColor: t.type === 'error' ? '#ef4444' : 'var(--color-score-high-bg)',
-              color: t.type === 'error' ? '#fff' : 'var(--color-navy)',
-              border: t.type === 'error' ? '1px solid #dc2626' : '1px solid #6ee7b7',
+              backgroundColor: t.type === 'error' ? '#3a0f0c' : '#0f2e2a',
+              color: t.type === 'error' ? '#ffb4ab' : '#6ad9c0',
+              border: t.type === 'error' ? '1px solid rgba(255,180,171,0.4)' : '1px solid rgba(106,217,192,0.4)',
               animation: 'fadeUp 0.25s ease',
             }}
           >
@@ -196,7 +196,7 @@ export default function ReviewDashboardPage() {
         </div>
 
         {/* Filters + bulk actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-border/10 p-4 mb-6 flex flex-wrap items-end gap-4">
+        <div className="bg-surface rounded-xl shadow-sm border border-border p-4 mb-6 flex flex-wrap items-end gap-4">
           {/* Vacancy filter */}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-slate uppercase tracking-wide">Vacante</label>
@@ -255,13 +255,13 @@ export default function ReviewDashboardPage() {
               <>
                 <button
                   onClick={handleBulkApprove}
-                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 transition-colors"
+                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-green-bg text-green hover:bg-tertiary/25 border border-green/30 transition-colors"
                 >
                   Aprobar {selectedIds.size}
                 </button>
                 <button
                   onClick={handleBulkReject}
-                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-red-50 text-danger hover:bg-danger-bg border border-red-200 transition-colors"
+                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-error-container/30 text-error hover:bg-error-container/50 border border-error/30 transition-colors"
                 >
                   Rechazar {selectedIds.size}
                 </button>
@@ -274,7 +274,7 @@ export default function ReviewDashboardPage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-border p-4 animate-pulse">
+              <div key={i} className="bg-surface rounded-xl border border-border p-4 animate-pulse">
                 <div className="h-3 bg-gray-200 rounded w-3/4 mb-2" />
                 <div className="h-2 bg-gray-200 rounded w-1/2 mb-4" />
                 <div className="h-8 bg-gray-200 rounded mb-2" />
@@ -316,8 +316,8 @@ export default function ReviewDashboardPage() {
       {/* Reject reason modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowRejectModal(false)} />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowRejectModal(false)} />
+          <div className="relative bg-surface border border-border rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
             <h2 className="text-lg font-bold text-navy mb-4">
               Rechazar {rejectTargetIds.length > 1 ? `${rejectTargetIds.length} candidatos` : 'candidato'}
             </h2>
@@ -333,13 +333,13 @@ export default function ReviewDashboardPage() {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setShowRejectModal(false)}
-                className="flex-1 text-sm font-semibold py-2 rounded-lg border border-border text-slate hover:bg-gray-50 transition-colors"
+                className="flex-1 text-sm font-semibold py-2 rounded-lg border border-border text-slate hover:bg-surface-2 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmReject}
-                className="flex-1 text-sm font-semibold py-2 rounded-lg bg-red-50 text-danger hover:bg-danger-bg border border-red-200 transition-colors"
+                className="flex-1 text-sm font-semibold py-2 rounded-lg bg-error-container/30 text-error hover:bg-error-container/50 border border-error/30 transition-colors"
               >
                 Confirmar rechazo
               </button>

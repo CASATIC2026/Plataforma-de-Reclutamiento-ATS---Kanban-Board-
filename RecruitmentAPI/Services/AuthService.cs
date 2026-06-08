@@ -69,16 +69,17 @@ public class AuthService : IAuthService
         }
 
         var permissions = await LoadPermissionsAsync(usuario);
+        var resolvedEmpresaId = await ResolveEmpresaIdAsync(usuario);
 
         return new AuthResponseDTO
         {
-            Token = GenerateJwtToken(usuario, permissions),
+            Token = GenerateJwtToken(usuario, permissions, resolvedEmpresaId),
             Nombre = usuario.Nombre,
             Apellido = usuario.Apellido,
             Email = usuario.Email,
             Rol = usuario.Rol.ToString(), // legacy enum string — keeps isAdmin/isAdminOrManager checks working
             Permissions = permissions,
-            CompanyId = usuario.EmpresaId?.ToString()
+            CompanyId = resolvedEmpresaId?.ToString()
         };
     }
 
@@ -91,18 +92,28 @@ public class AuthService : IAuthService
             return null;
 
         var permissions = await LoadPermissionsAsync(usuario);
+        var resolvedEmpresaId = await ResolveEmpresaIdAsync(usuario);
 
         return new AuthResponseDTO
         {
-            Token = GenerateJwtToken(usuario, permissions),
+            Token = GenerateJwtToken(usuario, permissions, resolvedEmpresaId),
             Nombre = usuario.Nombre,
             Apellido = usuario.Apellido,
             Email = usuario.Email,
             Rol = usuario.Rol.ToString(),
             Permissions = permissions,
-            CompanyId = usuario.EmpresaId?.ToString()
+            CompanyId = resolvedEmpresaId?.ToString()
         };
     }
+
+    // Reads the company scope from usuario_roles (authoritative) with fallback to usuarios.EmpresaId.
+    // Platform-tier roles have no EmpresaId in usuario_roles → returns null (correct for global access).
+    private async Task<Guid?> ResolveEmpresaIdAsync(Usuario usuario) =>
+        await _context.UsuarioRoles
+            .Where(ur => ur.UsuarioId == usuario.Id && ur.EmpresaId != null)
+            .OrderByDescending(ur => ur.AsignadoEn)
+            .Select(ur => ur.EmpresaId)
+            .FirstOrDefaultAsync() ?? usuario.EmpresaId;
 
     public async Task<List<UsuarioResponseDTO>> GetAllUsersAsync()
     {
@@ -219,7 +230,7 @@ public class AuthService : IAuthService
         }
     };
 
-    private string GenerateJwtToken(Usuario usuario, string[] permissions)
+    private string GenerateJwtToken(Usuario usuario, string[] permissions, Guid? empresaId)
     {
         var jwtKey = _config["Jwt:Key"]
             ?? throw new InvalidOperationException("Jwt:Key configuration is missing");
@@ -233,7 +244,7 @@ public class AuthService : IAuthService
             new(ClaimTypes.Name, $"{usuario.Nombre} {usuario.Apellido}"),
             new(ClaimTypes.Role, usuario.Rol.ToString()),
             new("permissions", JsonSerializer.Serialize(permissions)),
-            new("company_id", usuario.EmpresaId?.ToString() ?? "")
+            new("company_id", empresaId?.ToString() ?? "")
         };
 
         var expireMinutes = int.Parse(_config["Jwt:ExpireMinutes"] ?? "480");

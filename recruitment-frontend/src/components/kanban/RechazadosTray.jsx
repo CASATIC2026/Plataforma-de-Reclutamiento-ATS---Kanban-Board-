@@ -11,15 +11,15 @@ export default function RechazadosTray({ rechazados, onRestore, onEmailAction })
   }
 
   return (
-    <div className="mt-6 bg-white rounded-xl shadow-sm border border-red-200/50">
+    <div className="mt-6 bg-surface rounded-xl shadow-sm border border-error/20">
       {/* Header / Toggle */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-red-50/50 transition-colors"
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-error-container/20 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-lg">⊖</span>
-          <h3 className="font-semibold text-red-700">
+          <h3 className="font-semibold text-error">
             Rechazados por screening ({rechazados.length})
           </h3>
         </div>
@@ -30,14 +30,14 @@ export default function RechazadosTray({ rechazados, onRestore, onEmailAction })
 
       {/* Expanded content */}
       {isExpanded && (
-        <div className="border-t border-red-200/50 px-6 py-4 bg-red-50/30">
+        <div className="border-t border-error/20 px-6 py-4 bg-error-container/15">
           <div className="overflow-x-auto">
             <div className="flex gap-3 pb-2">
               {rechazados.map((postulacion) => {
                 return (
                   <div
                     key={postulacion.id}
-                    className="flex-shrink-0 w-80 bg-white rounded-lg border border-red-200 p-3 shadow-sm"
+                    className="flex-shrink-0 w-80 bg-surface-2 rounded-lg border border-error/20 p-3 shadow-sm"
                   >
                     <CandidateSummary postulacion={postulacion} />
 
@@ -58,14 +58,14 @@ export default function RechazadosTray({ rechazados, onRestore, onEmailAction })
                       </div>
                       <button
                         onClick={() => onRestore(postulacion.id)}
-                        className="text-xs font-semibold text-green-600 hover:bg-green-50 px-2 py-1 rounded transition-colors"
+                        className="text-xs font-semibold text-green hover:bg-green-bg px-2 py-1 rounded transition-colors"
                       >
                         Restaurar
                       </button>
                     </div>
 
                     {postulacion.emailStatus && (
-                      <div className="mt-2 border-t border-red-100 pt-2">
+                      <div className="mt-2 border-t border-error/15 pt-2">
                         <EmailTimerBadge
                           emailStatus={postulacion.emailStatus}
                           emailScheduledFor={postulacion.emailScheduledFor}

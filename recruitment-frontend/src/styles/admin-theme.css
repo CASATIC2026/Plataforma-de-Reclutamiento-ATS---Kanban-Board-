@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ============================================================
+   ADMIN / PLATFORM DARK TURQUOISE THEME (scoped wrapper)
+
+   The whole back-office shares the global light "coral" @theme
+   tokens defined in index.css. Because Tailwind v4 utilities
+   resolve to var(--color-*), re-mapping those tokens under a
+   scoped .admin-theme wrapper cascades through BOTH inline
+   var() styles and Tailwind utilities (bg-bg, text-navy,
+   text-accent, bg-accent-bg, bg-gray-*, border-border, etc.).
+
+   This converts the bulk of the admin UI to the dark turquoise
+   palette without touching the public/candidate .public-theme.
+============================================================ */
+.admin-theme {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #071326;
+  color: #d7e3fd;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  /* Surfaces */
+  --color-bg:        #071326;
+  --color-surface:   #142033;
+  --color-surface-2: #1f2a3e;
+  --color-border:    rgba(255, 255, 255, 0.08);
+
+  /* Brand text (navy was used mostly as heading/body color) */
+  --color-navy:       #e6edfb;
+  --color-navy-light: #aeb9d6;
+  --color-slate:      #b8c2dc;
+  --color-muted:      #8593b3;
+
+  /* Accent -> turquoise */
+  --color-accent:       #40e0d0;
+  --color-accent-lt:    #6ad9c0;
+  --color-accent-light: #6ad9c0;
+  --color-accent-bg:    rgba(64, 224, 208, 0.12);
+
+  /* Secondary accent (gold/teal aliases) -> turquoise family */
+  --color-gold:       #40e0d0;
+  --color-gold-bg:    rgba(64, 224, 208, 0.10);
+  --color-teal:       #40e0d0;
+  --color-teal-light: rgba(64, 224, 208, 0.10);
+
+  /* Success */
+  --color-green:       #6ad9c0;
+  --color-green-bg:    rgba(106, 217, 192, 0.15);
+  --color-green-light: rgba(106, 217, 192, 0.15);
+
+  /* Urgent / warning -> warm amber (distinct from turquoise) */
+  --color-urgent:    #f0b07a;
+  --color-urgent-bg: rgba(240, 176, 122, 0.15);
+
+  /* Gray scale: low numbers double as dark surfaces / subtle borders,
+     high numbers as light text, so bg-gray-50, border-gray-200 and
+     text-gray-500 all stay sensible on a dark background. */
+  --color-gray-50:  #0f1b2d;
+  --color-gray-100: #16243a;
+  --color-gray-200: #1f2d44;
+  --color-gray-300: #2a3a54;
+  --color-gray-400: #5b6a86;
+  --color-gray-500: #8593b3;
+  --color-gray-600: #b8c2dc;
+  --color-gray-700: #d7e3fd;
+  --color-gray-800: #e6edfb;
+  --color-gray-900: #f5f8ff;
+
+  /* Danger */
+  --color-danger:    #ffb4ab;
+  --color-danger-bg: rgba(147, 0, 10, 0.25);
+
+  /* Typography aligned with the v0 public theme */
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+}
+
+.admin-theme .font-display {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Dark, legible form fields inside the admin shell */
+.admin-theme input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.admin-theme select,
+.admin-theme textarea {
+  background-color: #030e21;
+  color: #d7e3fd;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.admin-theme input::placeholder,
+.admin-theme textarea::placeholder {
+  color: rgba(133, 147, 179, 0.7);
+}
+
+.admin-theme input:focus,
+.admin-theme select:focus,
+.admin-theme textarea:focus {
+  border-color: rgba(64, 224, 208, 0.5);
+  outline: none;
+}
+
+/* Dark-friendly scrollbars within the admin shell */
+.admin-theme *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.admin-theme *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+.admin-theme *::-webkit-scrollbar-track {
+  background: transparent;
+}

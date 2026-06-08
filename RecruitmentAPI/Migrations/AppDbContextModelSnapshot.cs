@@ -882,7 +882,8 @@ namespace RecruitmentAPI.Migrations
 
                     b.HasIndex("CreadoPor");
 
-                    b.HasIndex("EmpresaId");
+                    b.HasIndex("EmpresaId", "CreadoPor")
+                        .HasDatabaseName("ix_vacantes_empresa_creado_por");
 
                     b.ToTable("vacantes", (string)null);
                 });

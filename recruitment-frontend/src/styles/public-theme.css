@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
 
 /* Public marketing pages — turquoise dark theme (scoped wrapper) */
 .public-theme {
@@ -11,6 +11,10 @@
 
 .public-theme .font-display {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.public-theme .font-editorial {
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
 @keyframes pulse-ring {
