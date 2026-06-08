@@ -25,6 +25,11 @@ if (File.Exists(envFilePath))
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+});
+
 // --- SERVICES REGISTRATION ---
 
 // Database — read connection string from environment variable for security
