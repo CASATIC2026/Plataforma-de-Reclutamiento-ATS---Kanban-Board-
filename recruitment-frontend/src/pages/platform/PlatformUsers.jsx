@@ -26,7 +26,7 @@ function RoleAssignModal({ usuario, roles, onClose, onAssigned }) {
 
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}>
-      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 420, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 16, width: '100%', maxWidth: 420, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--color-navy)', margin: 0 }}>Asignar Rol</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--color-slate)' }}>×</button>
@@ -42,8 +42,8 @@ function RoleAssignModal({ usuario, roles, onClose, onAssigned }) {
             ))}
           </select>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-            <button type="button" onClick={onClose} style={{ padding: '9px 20px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'white', cursor: 'pointer', fontSize: 14 }}>Cancelar</button>
-            <button type="submit" disabled={saving || !selectedRol} style={{ padding: '9px 24px', borderRadius: 8, border: 'none', background: 'var(--color-navy)', color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+            <button type="button" onClick={onClose} style={{ padding: '9px 20px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', cursor: 'pointer', fontSize: 14 }}>Cancelar</button>
+            <button type="submit" disabled={saving || !selectedRol} style={{ padding: '9px 24px', borderRadius: 8, border: 'none', background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
               {saving ? 'Asignando...' : 'Asignar'}
             </button>
           </div>
@@ -87,7 +87,7 @@ export default function PlatformUsers() {
         style={{ width: '100%', maxWidth: 320, padding: '9px 14px', borderRadius: 9, border: '1.5px solid var(--color-border)', fontSize: 14, marginBottom: 18, outline: 'none', boxSizing: 'border-box' }}
       />
 
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-muted)' }}>Cargando...</div>
         ) : (
@@ -126,7 +126,7 @@ export default function PlatformUsers() {
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <Can permission="users:assign_role">
-                      <button onClick={() => setAssignModal(u)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--color-border)', background: 'white', fontSize: 12, cursor: 'pointer', color: 'var(--color-navy)' }}>
+                      <button onClick={() => setAssignModal(u)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--color-border)', background: 'var(--color-surface-2)', fontSize: 12, cursor: 'pointer', color: 'var(--color-navy)' }}>
                         Asignar Rol
                       </button>
                     </Can>

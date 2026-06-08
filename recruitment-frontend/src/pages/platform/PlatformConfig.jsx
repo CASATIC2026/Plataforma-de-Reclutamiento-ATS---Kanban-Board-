@@ -61,7 +61,7 @@ export default function PlatformConfig() {
       </div>
 
       {/* Feature Flags */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden', marginBottom: 24 }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden', marginBottom: 24 }}>
         <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--color-border)' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>
             Feature Flags
@@ -92,7 +92,7 @@ export default function PlatformConfig() {
       </div>
 
       {/* SMTP Config (display only) */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden', marginBottom: 24 }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden', marginBottom: 24 }}>
         <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--color-border)' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>Configuración SMTP</h2>
         </div>
@@ -115,7 +115,7 @@ export default function PlatformConfig() {
       </div>
 
       {/* Global Screening Threshold */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
         <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--color-border)' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>Umbral de Screening Global</h2>
         </div>

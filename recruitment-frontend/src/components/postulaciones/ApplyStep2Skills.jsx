@@ -1,9 +1,25 @@
+import {
+  applySectionTitle,
+  applyInput,
+  applyInputError,
+  applyTextarea,
+  applyLabel,
+  applyHint,
+  applyError,
+  applySoftSkillSelected,
+  applySoftSkillDefault,
+} from './applyFormStyles';
+
 const SOFT_SKILLS_OPTIONS = [
   'Comunicación', 'Liderazgo', 'Trabajo en equipo', 'Resolución de problemas',
   'Adaptabilidad', 'Creatividad', 'Gestión del tiempo', 'Empatía',
 ];
 
 const PROFICIENCY_OPTIONS = ['Básico', 'Intermedio', 'Avanzado', 'Experto'];
+
+function fieldClass(hasError) {
+  return `${applyInput}${hasError ? ` ${applyInputError}` : ''}`;
+}
 
 export default function ApplyStep2Skills({ formData, onChange, errors }) {
   const skills = formData.skills || [];
@@ -30,108 +46,106 @@ export default function ApplyStep2Skills({ formData, onChange, errors }) {
   };
 
   return (
-    <div>
-      <p className="apply-section-title">Habilidades Técnicas</p>
+    <div className="space-y-8">
+      <div>
+        <h3 className={applySectionTitle}>Habilidades técnicas</h3>
 
-      {skills.map((skill, idx) => (
-        <div key={idx} className="skill-row">
-          <input
-            className="form-input"
-            placeholder="Ej. React, Python, SQL..."
-            value={skill.skillName}
-            onChange={(e) => updateSkill(idx, 'skillName', e.target.value)}
-          />
-          <select
-            className="form-input"
-            value={skill.proficiencyLevel}
-            onChange={(e) => updateSkill(idx, 'proficiencyLevel', e.target.value)}
-          >
-            <option value="">Nivel</option>
-            {PROFICIENCY_OPTIONS.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-          <input
-            type="number"
-            className="form-input"
-            placeholder="Años"
-            min="0"
-            max="50"
-            value={skill.yearsExperience}
-            onChange={(e) => updateSkill(idx, 'yearsExperience', e.target.value)}
-          />
-          <button
-            type="button"
-            onClick={() => removeSkill(idx)}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--clr-muted)', fontSize: '20px', padding: '0', lineHeight: 1,
-            }}
-          >
-            ×
-          </button>
+        <div className="space-y-3">
+          {skills.map((skill, idx) => (
+            <div
+              key={idx}
+              className="p-4 rounded-lg bg-surface-container border border-outline-variant/10 grid grid-cols-1 sm:grid-cols-[1fr_1fr_80px_auto] gap-3 items-center"
+            >
+              <input
+                className={applyInput}
+                placeholder="Ej. React, Python..."
+                value={skill.skillName}
+                onChange={(e) => updateSkill(idx, 'skillName', e.target.value)}
+              />
+              <select
+                className={applyInput}
+                value={skill.proficiencyLevel}
+                onChange={(e) => updateSkill(idx, 'proficiencyLevel', e.target.value)}
+              >
+                <option value="">Nivel</option>
+                {PROFICIENCY_OPTIONS.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                className={applyInput}
+                placeholder="Años"
+                min="0"
+                max="50"
+                value={skill.yearsExperience}
+                onChange={(e) => updateSkill(idx, 'yearsExperience', e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => removeSkill(idx)}
+                className="text-on-surface-variant hover:text-error text-xl px-2"
+                aria-label="Quitar habilidad"
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
-      ))}
 
-      {errors.skills && (
-        <span className="form-error" style={{ display: 'block', marginBottom: '8px' }}>
-          {errors.skills}
-        </span>
-      )}
+        {errors.skills && <span className={applyError}>{errors.skills}</span>}
 
-      <button
-        type="button"
-        className="btn btn--ghost"
-        style={{ marginTop: '4px', fontSize: '13px', padding: '6px 14px' }}
-        onClick={addSkill}
-      >
-        + Agregar habilidad
-      </button>
-
-      <p className="apply-section-title" style={{ marginTop: '24px' }}>
-        Habilidades Blandas{' '}
-        <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--clr-muted)' }}>
-          (máx. 5)
-        </span>
-      </p>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-        {SOFT_SKILLS_OPTIONS.map((skill) => (
-          <button
-            key={skill}
-            type="button"
-            className={`soft-skill-pill${softSkills.includes(skill) ? ' is-selected' : ''}`}
-            onClick={() => toggleSoftSkill(skill)}
-          >
-            {skill}
-          </button>
-        ))}
+        <button
+          type="button"
+          onClick={addSkill}
+          className="mt-4 text-brand-turquoise font-semibold text-sm hover:text-brand-turquoise/80"
+        >
+          + Agregar habilidad
+        </button>
       </div>
 
-      {errors.softSkills && (
-        <span className="form-error" style={{ display: 'block', marginTop: '6px' }}>
-          {errors.softSkills}
-        </span>
-      )}
+      <div>
+        <h3 className={applySectionTitle}>
+          Habilidades blandas{' '}
+          <span className="text-xs font-normal text-on-surface-variant">(máx. 5)</span>
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          {SOFT_SKILLS_OPTIONS.map((skill) => (
+            <button
+              key={skill}
+              type="button"
+              onClick={() => toggleSoftSkill(skill)}
+              className={
+                softSkills.includes(skill) ? applySoftSkillSelected : applySoftSkillDefault
+              }
+            >
+              {skill}
+            </button>
+          ))}
+        </div>
+        {errors.softSkills && <span className={`${applyError} mt-2`}>{errors.softSkills}</span>}
+      </div>
 
-      <div className="form-group" style={{ marginTop: '24px' }}>
-        <label className="form-label">Declaración de Impacto *</label>
-        <span className="form-hint" style={{ marginBottom: '6px' }}>
+      <div>
+        <label className={applyLabel}>Declaración de impacto *</label>
+        <span className={applyHint}>
           ¿Por qué eres el candidato ideal? (30–500 caracteres)
         </span>
         <textarea
-          className={`form-textarea${errors.impactStatement ? ' error' : ''}`}
-          rows={4}
+          className={`${applyTextarea}${errors.impactStatement ? ` ${applyInputError}` : ''}`}
+          rows={6}
           value={formData.impactStatement || ''}
           onChange={(e) => onChange('impactStatement', e.target.value)}
-          placeholder="Describe tu experiencia, logros y por qué encajas perfectamente en este rol..."
+          placeholder="Cuéntanos sobre tus logros más significativos..."
           maxLength={500}
         />
-        <span className="form-hint" style={{ textAlign: 'right', display: 'block' }}>
+        <div className="text-right text-xs text-on-surface-variant mt-2">
           {(formData.impactStatement || '').length} / 500
-        </span>
+        </div>
         {errors.impactStatement && (
-          <span className="form-error">{errors.impactStatement}</span>
+          <span className={applyError}>{errors.impactStatement}</span>
         )}
       </div>
     </div>

@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+/* Public marketing pages — turquoise dark theme (scoped wrapper) */
+.public-theme {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #071326;
+  color: #d7e3fd;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.public-theme .font-display {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.public-theme .font-editorial {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.public-theme .animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.public-theme .no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.public-theme .no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

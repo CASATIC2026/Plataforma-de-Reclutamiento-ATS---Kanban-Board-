@@ -30,7 +30,7 @@ export default function CompanySwitcher() {
         padding: '6px 10px',
         borderRadius: 8,
         border: '1.5px solid var(--color-accent)',
-        background: '#fff',
+        background: 'var(--color-surface)',
         color: 'var(--color-navy)',
         fontWeight: 600,
         fontSize: '0.85rem',

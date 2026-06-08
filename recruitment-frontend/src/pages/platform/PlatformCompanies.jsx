@@ -23,7 +23,7 @@ function EmpresaModal({ empresa, onClose, onSave }) {
 
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}>
-      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 440, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 16, width: '100%', maxWidth: 440, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--color-navy)', margin: 0 }}>
             {empresa ? 'Editar Empresa' : 'Nueva Empresa'}
@@ -40,8 +40,8 @@ function EmpresaModal({ empresa, onClose, onSave }) {
             <input value={dominio} onChange={e => setDominio(e.target.value)} placeholder="empresa.com" style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--color-border)', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
           </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 8 }}>
-            <button type="button" onClick={onClose} style={{ padding: '9px 20px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'white', cursor: 'pointer', fontSize: 14 }}>Cancelar</button>
-            <button type="submit" disabled={saving} style={{ padding: '9px 24px', borderRadius: 8, border: 'none', background: 'var(--color-navy)', color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+            <button type="button" onClick={onClose} style={{ padding: '9px 20px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', cursor: 'pointer', fontSize: 14 }}>Cancelar</button>
+            <button type="submit" disabled={saving} style={{ padding: '9px 24px', borderRadius: 8, border: 'none', background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
               {saving ? 'Guardando...' : 'Guardar'}
             </button>
           </div>
@@ -87,7 +87,7 @@ export default function PlatformCompanies() {
           <p style={{ color: 'var(--color-slate)', fontSize: 14 }}>{empresas.length} empresas registradas</p>
         </div>
         <Can permission="companies:create">
-          <button onClick={() => setModal({})} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: 'var(--color-navy)', color: 'white', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+          <button onClick={() => setModal({})} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
             + Nueva Empresa
           </button>
         </Can>
@@ -100,7 +100,7 @@ export default function PlatformCompanies() {
         style={{ width: '100%', maxWidth: 320, padding: '9px 14px', borderRadius: 9, border: '1.5px solid var(--color-border)', fontSize: 14, marginBottom: 18, outline: 'none', boxSizing: 'border-box' }}
       />
 
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-muted)' }}>Cargando...</div>
         ) : filtered.length === 0 ? (
@@ -132,18 +132,18 @@ export default function PlatformCompanies() {
                   <td style={{ padding: '12px 16px', fontSize: 13, textAlign: 'center', fontWeight: 600, color: 'var(--color-navy)' }}>{e.usuariosCount}</td>
                   <td style={{ padding: '12px 16px', fontSize: 13, textAlign: 'center', fontWeight: 600, color: 'var(--color-navy)' }}>{e.vacantesCount}</td>
                   <td style={{ padding: '12px 16px' }}>
-                    <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: e.estado === 'activa' ? '#dcfce7' : '#fee2e2', color: e.estado === 'activa' ? '#166534' : '#991b1b' }}>
+                    <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: e.estado === 'activa' ? 'rgba(106,217,192,0.15)' : 'rgba(255,180,171,0.15)', color: e.estado === 'activa' ? '#6ad9c0' : '#ffb4ab' }}>
                       {e.estado}
                     </span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <Can permission="companies:update">
-                        <button onClick={() => setModal({ empresa: e })} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--color-border)', background: 'white', fontSize: 12, cursor: 'pointer', color: 'var(--color-navy)' }}>Editar</button>
+                        <button onClick={() => setModal({ empresa: e })} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--color-border)', background: 'var(--color-surface-2)', fontSize: 12, cursor: 'pointer', color: 'var(--color-navy)' }}>Editar</button>
                       </Can>
                       {e.estado === 'activa' && (
                         <Can permission="companies:update">
-                          <button onClick={() => handleDisable(e.id)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #fca5a5', background: '#fff5f5', fontSize: 12, cursor: 'pointer', color: '#991b1b' }}>Deshabilitar</button>
+                          <button onClick={() => handleDisable(e.id)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(255,180,171,0.4)', background: 'rgba(255,180,171,0.12)', fontSize: 12, cursor: 'pointer', color: '#ffb4ab' }}>Deshabilitar</button>
                         </Can>
                       )}
                     </div>

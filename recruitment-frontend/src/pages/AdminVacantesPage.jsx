@@ -199,7 +199,7 @@ export default function AdminVacantesPage() {
                 resetForm();
                 setShowForm(true);
               }}
-              className="bg-gradient-to-br from-navy to-navy-light text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+              className="bg-gradient-to-br from-brand-turquoise to-tertiary text-on-brand-turquoise px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-[0_8px_24px_rgba(64,224,208,0.25)] hover:scale-[1.02] active:scale-95 transition-all"
             >
               <span>+</span>
               Nueva Vacante
@@ -209,29 +209,29 @@ export default function AdminVacantesPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-white p-6 rounded-2xl border-none shadow-sm flex flex-col justify-between">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
             <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Total Activas
             </span>
             <div className="flex items-baseline gap-2 mt-2">
               <span className="text-3xl font-black text-navy">{activeCount}</span>
-              <span className="text-xs text-green-600 font-bold">
+              <span className="text-xs text-green-light font-bold">
                 de {vacantes.length}
               </span>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-none shadow-sm">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
             <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Postulaciones
             </span>
             <div className="flex items-baseline gap-2 mt-2">
               <span className="text-3xl font-black text-navy">{totalApplicants}</span>
-              <span className="text-navy">↑</span>
+              <span className="text-accent">↑</span>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-none shadow-sm">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
             <span className="text-slate text-xs font-semibold uppercase tracking-wider">
               Promedio
             </span>
@@ -243,9 +243,9 @@ export default function AdminVacantesPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-navy to-navy-light text-white p-6 rounded-2xl border-none shadow-xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-brand-turquoise to-tertiary text-on-brand-turquoise p-6 rounded-2xl border-none shadow-[0_8px_24px_rgba(64,224,208,0.25)] relative overflow-hidden">
             <div className="relative z-10">
-              <span className="text-accent-bg text-xs font-semibold uppercase tracking-wider">
+              <span className="text-on-brand-turquoise/70 text-xs font-semibold uppercase tracking-wider">
                 Tasa Activas
               </span>
               <div className="flex items-baseline gap-2 mt-2">
@@ -273,7 +273,7 @@ export default function AdminVacantesPage() {
         />
 
         {/* Data Table Container */}
-        <div className="bg-white rounded-3xl overflow-hidden shadow-sm">
+        <div className="bg-surface border border-border rounded-3xl overflow-hidden shadow-sm">
           <div className="px-6 py-4 flex items-center justify-between bg-accent-bg/50 border-b border-border/10">
             <h3 className="font-bold text-navy">Listado de Vacantes</h3>
             <div className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export default function AdminVacantesPage() {
                   placeholder="Buscar por título, ubicación, requisito..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full bg-white border border-border rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20 transition-all"
+                  className="w-full bg-[#030e21] text-on-surface border border-border rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-turquoise/30 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate">
                   🔍

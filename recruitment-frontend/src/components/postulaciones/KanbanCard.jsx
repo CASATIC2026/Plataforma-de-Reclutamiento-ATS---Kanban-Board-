@@ -16,13 +16,13 @@ const KanbanCard = ({ postulacion, onDelete, onRefresh }) => {
       style={style}
       {...listeners}
       {...attributes}
-      className="bg-white rounded-lg shadow p-3 mb-2 cursor-grab border border-gray-100 hover:shadow-md transition-shadow"
+      className="bg-surface rounded-lg shadow p-3 mb-2 cursor-grab border border-gray-200 hover:shadow-md transition-shadow"
     >
       <p className="font-semibold text-gray-800 text-sm">{postulacion.nombreCandidato}</p>
       <p className="text-xs text-gray-500 mt-1">{postulacion.email}</p>
       <p className="text-xs text-gray-400">{postulacion.telefono}</p>
       {postulacion.cvFileName && (
-        <span className="inline-block mt-2 text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded">
+        <span className="inline-block mt-2 text-xs bg-[rgba(96,165,250,0.12)] text-[#93c5fd] px-2 py-0.5 rounded">
           📄 {postulacion.cvFileName}
         </span>
       )}
@@ -33,7 +33,7 @@ const KanbanCard = ({ postulacion, onDelete, onRefresh }) => {
             if (window.confirm("¿Eliminar esta postulación?"))
               onDelete(postulacion.id).then(onRefresh);
           }}
-          className="mt-2 text-xs text-red-400 hover:text-red-600 block"
+          className="mt-2 text-xs text-error hover:text-error/80 block"
         >
           Eliminar
         </button>

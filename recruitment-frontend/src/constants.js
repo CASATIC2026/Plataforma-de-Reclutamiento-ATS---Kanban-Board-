@@ -22,7 +22,7 @@ export const STAGE_LABELS = {
 };
 
 export const ITEMS_PER_PAGE = {
-  LANDING: 6,
+  LANDING: 9,
   ADMIN: 10,
 };
 

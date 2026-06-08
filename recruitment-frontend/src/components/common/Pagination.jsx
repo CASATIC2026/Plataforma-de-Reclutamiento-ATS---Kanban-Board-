@@ -30,7 +30,7 @@ function AdminPagination({ currentPage, totalPages, onPageChange }) {
             }}
             className={`w-10 h-10 rounded-lg font-bold text-sm transition-colors ${
               page === currentPage
-                ? 'bg-navy text-white'
+                ? 'bg-brand-turquoise text-on-brand-turquoise'
                 : 'bg-bg text-navy hover:bg-accent-bg'
             }`}
             aria-current={page === currentPage ? 'page' : undefined}

@@ -11,7 +11,7 @@ export default function ReviewCard({
 }) {
   return (
     <div
-      className={`bg-white rounded-xl border shadow-sm p-4 transition-all ${
+      className={`bg-surface rounded-xl border shadow-sm p-4 transition-all ${
         isSelected ? 'border-accent ring-1 ring-accent' : 'border-border'
       }`}
     >
@@ -66,13 +66,13 @@ export default function ReviewCard({
       <div className="mt-3 flex gap-2">
         <button
           onClick={() => onApprove(application.id)}
-          className="flex-1 text-sm font-semibold py-1.5 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 transition-colors"
+          className="flex-1 text-sm font-semibold py-1.5 rounded-lg bg-green-bg text-green hover:bg-tertiary/25 border border-green/30 transition-colors"
         >
           Aprobar
         </button>
         <button
           onClick={() => onReject(application.id)}
-          className="flex-1 text-sm font-semibold py-1.5 rounded-lg bg-red-50 text-danger hover:bg-danger-bg border border-red-200 transition-colors"
+          className="flex-1 text-sm font-semibold py-1.5 rounded-lg bg-error-container/30 text-error hover:bg-error-container/50 border border-error/30 transition-colors"
         >
           Rechazar
         </button>

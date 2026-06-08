@@ -5,7 +5,7 @@ import { formatRelativeDate } from '../../utils/vacanteHelpers';
 const ESTADO_LABELS = {
   0: { label: 'Nuevo',          color: 'bg-teal-light text-teal' },
   1: { label: 'Entrevista',     color: 'bg-accent-bg text-accent' },
-  2: { label: 'Prueba Técnica', color: 'bg-gray-800 text-white' },
+  2: { label: 'Prueba Técnica', color: 'bg-surface-2 text-navy' },
   3: { label: 'Oferta',         color: 'bg-green-light text-green' },
 };
 
@@ -116,7 +116,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="relative bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
 
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-4 border-b border-gray-100">
@@ -198,7 +198,7 @@ export default function CandidateProfileModal({ postulacion, onClose, onNotasUpd
                   </div>
                   <button
                     onClick={handleDownload}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy-light transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-brand-turquoise text-on-brand-turquoise text-sm font-medium rounded-lg hover:bg-tertiary transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

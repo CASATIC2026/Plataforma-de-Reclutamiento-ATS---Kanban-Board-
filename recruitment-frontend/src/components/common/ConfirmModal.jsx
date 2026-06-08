@@ -24,8 +24,8 @@ export default function ConfirmModal({
 
   const confirmStyle =
     variant === 'danger'
-      ? { background: 'var(--color-danger)', color: '#fff' }
-      : { background: 'var(--color-navy)', color: '#fff' };
+      ? { background: 'var(--color-danger)', color: '#3a0a06' }
+      : { background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)' };
 
   return (
     <div
@@ -54,12 +54,13 @@ export default function ConfirmModal({
       <div
         style={{
           position: 'relative',
-          background: '#fff',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
           borderRadius: '16px',
           padding: '28px',
           width: '100%',
           maxWidth: '440px',
-          boxShadow: '0 24px 48px rgba(0,0,0,0.18)',
+          boxShadow: '0 24px 48px rgba(0,0,0,0.5)',
           fontFamily: 'sans-serif',
         }}
       >
@@ -95,14 +96,14 @@ export default function ConfirmModal({
               padding: '10px 18px',
               borderRadius: '10px',
               border: '1px solid var(--color-border)',
-              background: '#fff',
-              color: 'var(--color-slate)',
+              background: 'var(--color-surface-2)',
+              color: 'var(--color-navy)',
               fontWeight: 700,
               cursor: 'pointer',
               transition: 'background 0.15s',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-surface-2)')}
           >
             {cancelLabel}
           </button>

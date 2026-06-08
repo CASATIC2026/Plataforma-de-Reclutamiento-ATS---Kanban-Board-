@@ -68,6 +68,22 @@
   --font-maven:   'Maven Pro', sans-serif;
   --font-kaiser:  'Kaisei Decol', serif;
   --font-jersey:  'Jersey 25', sans-serif;
+
+  /* Public marketing (turquoise dark) — used under .public-theme */
+  --color-background: #071326;
+  --color-brand-turquoise: #40e0d0;
+  --color-on-brand-turquoise: #003732;
+  --color-on-surface: #d7e3fd;
+  --color-on-surface-variant: #dbc1bb;
+  --color-surface-container-low: #101c2f;
+  --color-surface-container: #142033;
+  --color-surface-container-high: #1f2a3e;
+  --color-surface-container-highest: #2a3549;
+  --color-surface-bright: #2e394e;
+  --color-outline-variant: rgba(85, 67, 62, 0.15);
+  --color-tertiary: #6ad9c0;
+  --color-error: #ffb4ab;
+  --color-error-container: rgba(147, 0, 10, 0.2);
 }
 
 @import "./styles/talentbridge.css";

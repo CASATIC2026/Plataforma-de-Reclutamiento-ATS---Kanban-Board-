@@ -7,21 +7,22 @@ import { getPostulaciones } from '../api/postulacionesApi';
 
 const ESTADO_LABELS = { '-1': 'Rechazado', 0: 'Nuevo', 1: 'Entrevista', 2: 'Prueba Técnica', 3: 'Oferta' };
 const ESTADO_COLORS = {
-  '-1': { bg: '#fee2e2', text: '#991b1b' },
-  0:    { bg: '#e0f2fe', text: '#0369a1' },
-  1:    { bg: '#FFF1EB', text: 'var(--color-accent)' },
-  2:    { bg: '#f1f5f9', text: '#334155' },
-  3:    { bg: '#dcfce7', text: '#166534' },
+  '-1': { bg: 'rgba(255,180,171,0.15)', text: '#ffb4ab' },
+  0:    { bg: 'rgba(96,165,250,0.16)',  text: '#93c5fd' },
+  1:    { bg: 'rgba(64,224,208,0.15)',  text: '#40e0d0' },
+  2:    { bg: 'rgba(255,255,255,0.08)', text: '#b8c2dc' },
+  3:    { bg: 'rgba(106,217,192,0.18)', text: '#6ad9c0' },
 };
 
 function StatCard({ label, value, icon, accent }) {
   return (
     <div
       style={{
-        background: 'white',
+        background: 'var(--color-surface)',
         borderRadius: 14,
         padding: '20px 22px',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+        border: '1px solid var(--color-border)',
         display: 'flex',
         alignItems: 'center',
         gap: 16,
@@ -77,10 +78,10 @@ export default function RecruiterDashboard() {
     .slice(0, 10);
 
   const stats = [
-    { label: 'Vacantes Activas',   value: activas.length,       icon: '📋', accent: 'var(--color-navy)' },
-    { label: 'Total Postulaciones',value: postulaciones.length,  icon: '👤', accent: 'var(--color-accent)' },
-    { label: 'En Pipeline',        value: enPipeline.length,     icon: '🔄', accent: '#1F9DB9' },
-    { label: 'Tasa de Conversión', value: `${tasa}%`,            icon: '✅', accent: '#319E85' },
+    { label: 'Vacantes Activas',   value: activas.length,       icon: '📋', accent: '#40e0d0' },
+    { label: 'Total Postulaciones',value: postulaciones.length,  icon: '👤', accent: '#6ad9c0' },
+    { label: 'En Pipeline',        value: enPipeline.length,     icon: '🔄', accent: '#5eb9d6' },
+    { label: 'Tasa de Conversión', value: `${tasa}%`,            icon: '✅', accent: '#7fd1a8' },
   ];
 
   const quickActions = [
@@ -108,7 +109,7 @@ export default function RecruiterDashboard() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, alignItems: 'start' }}>
         {/* Recent Activity */}
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--color-surface)', borderRadius: 14, border: '1px solid var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
           <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>
               Actividad Reciente
@@ -180,7 +181,7 @@ export default function RecruiterDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--color-surface)', borderRadius: 14, border: '1px solid var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
           <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--color-border)' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>
               Acciones Rápidas

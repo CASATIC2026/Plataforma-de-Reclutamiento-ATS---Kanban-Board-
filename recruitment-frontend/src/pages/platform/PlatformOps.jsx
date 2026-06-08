@@ -11,10 +11,10 @@ const TABS = [
 ];
 
 const ESTADO_DEPLOY_COLORS = {
-  Success:    { bg: '#dcfce7', text: '#166534' },
-  Failed:     { bg: '#fee2e2', text: '#991b1b' },
-  Running:    { bg: '#e0f2fe', text: '#0369a1' },
-  RolledBack: { bg: '#fef3c7', text: '#92400e' },
+  Success:    { bg: 'rgba(106,217,192,0.15)', text: '#6ad9c0' },
+  Failed:     { bg: 'rgba(255,180,171,0.15)', text: '#ffb4ab' },
+  Running:    { bg: 'rgba(96,165,250,0.15)', text: '#93c5fd' },
+  RolledBack: { bg: 'rgba(240,176,122,0.16)', text: '#f0b07a' },
 };
 
 function ToggleSwitch({ value, onChange, disabled }) {
@@ -120,12 +120,12 @@ export default function PlatformOps() {
         <div>
           {canDeploy && (
             <div style={{ marginBottom: 20 }}>
-              <button onClick={handleDeploy} disabled={triggering} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: 'var(--color-navy)', color: 'white', fontWeight: 600, fontSize: 14, cursor: triggering ? 'not-allowed' : 'pointer', opacity: triggering ? 0.7 : 1 }}>
+              <button onClick={handleDeploy} disabled={triggering} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)', fontWeight: 600, fontSize: 14, cursor: triggering ? 'not-allowed' : 'pointer', opacity: triggering ? 0.7 : 1 }}>
                 {triggering ? 'Disparando...' : '🚀 Trigger Deploy'}
               </button>
             </div>
           )}
-          <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
             {loading ? (
               <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-muted)' }}>Cargando...</div>
             ) : deployments.length === 0 ? (
@@ -158,7 +158,7 @@ export default function PlatformOps() {
                         </td>
                         <td style={{ padding: '12px 14px' }}>
                           {canRollback && d.estado === 'Success' && (
-                            <button onClick={() => handleRollback(d.id, d.version)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--color-border)', background: 'white', fontSize: 12, cursor: 'pointer', color: 'var(--color-navy)' }}>
+                            <button onClick={() => handleRollback(d.id, d.version)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--color-border)', background: 'var(--color-surface-2)', fontSize: 12, cursor: 'pointer', color: 'var(--color-navy)' }}>
                               Rollback
                             </button>
                           )}
@@ -182,8 +182,8 @@ export default function PlatformOps() {
               { name: 'Database',    ok: true,  latency: '12ms' },
               { name: 'SMTP Server', ok: false, latency: '—' },
             ].map(svc => (
-              <div key={svc.name} style={{ background: 'white', borderRadius: 12, padding: '18px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: svc.ok ? '#22c55e' : '#ef4444', display: 'inline-block', flexShrink: 0 }} />
+              <div key={svc.name} style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 12, padding: '18px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: svc.ok ? '#6ad9c0' : '#ffb4ab', display: 'inline-block', flexShrink: 0 }} />
                 <div>
                   <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--color-navy)', margin: 0 }}>{svc.name}</p>
                   <p style={{ fontSize: 12, color: 'var(--color-muted)', margin: '2px 0 0' }}>
@@ -193,7 +193,7 @@ export default function PlatformOps() {
               </div>
             ))}
           </div>
-          <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 18px', fontSize: 13, color: '#92400e' }}>
+          <div style={{ background: 'rgba(240,176,122,0.16)', border: '1px solid rgba(240,176,122,0.3)', borderRadius: 10, padding: '14px 18px', fontSize: 13, color: '#f0b07a' }}>
             ⚠️ SMTP Server no responde. Verifica las credenciales en <code>appsettings.json</code>.
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function PlatformOps() {
 
       {/* Database Logs Tab */}
       {activeTab === 'database' && canDb && (
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', padding: 32, textAlign: 'center' }}>
+        <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', padding: 32, textAlign: 'center' }}>
           <p style={{ fontSize: 32, marginBottom: 12 }}>🗄️</p>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--color-navy)', marginBottom: 8 }}>
             Logs de Base de Datos
@@ -217,7 +217,7 @@ export default function PlatformOps() {
 
       {/* Feature Flags Tab */}
       {activeTab === 'flags' && canFlags && (
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', overflow: 'hidden' }}>
           {flags.map(flag => (
             <div key={flag.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '18px 24px', borderBottom: '1px solid var(--color-border)' }}>
               <div style={{ flex: 1 }}>

@@ -18,8 +18,8 @@ const PERM_CATEGORIES = {
 };
 
 const AMBITO_COLORS = {
-  app_tier:      { bg: '#e0f2fe', text: '#0369a1' },
-  platform_tier: { bg: '#fef3c7', text: '#92400e' },
+  app_tier:      { bg: 'rgba(96,165,250,0.15)', text: '#93c5fd' },
+  platform_tier: { bg: 'rgba(240,176,122,0.16)', text: '#f0b07a' },
 };
 
 function RoleDetailModal({ rol, onClose, onUpdate }) {
@@ -51,7 +51,7 @@ function RoleDetailModal({ rol, onClose, onUpdate }) {
 
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}>
-      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 620, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.18)' }}>
+      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 16, width: '100%', maxWidth: 620, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--color-navy)', margin: 0 }}>{rol.nombre}</h2>
@@ -61,7 +61,7 @@ function RoleDetailModal({ rol, onClose, onUpdate }) {
         </div>
 
         {rol.esInmutable && (
-          <div style={{ background: '#fef3c7', borderBottom: '1px solid #fde68a', padding: '10px 24px', fontSize: 13, color: '#92400e', fontWeight: 600 }}>
+          <div style={{ background: 'rgba(240,176,122,0.16)', borderBottom: '1px solid rgba(240,176,122,0.3)', padding: '10px 24px', fontSize: 13, color: '#f0b07a', fontWeight: 600 }}>
             ⚠️ El rol Owner es inmutable — sus permisos no pueden modificarse.
           </div>
         )}
@@ -80,9 +80,9 @@ function RoleDetailModal({ rol, onClose, onUpdate }) {
                       disabled={!editable}
                       style={{
                         padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-                        border: `1.5px solid ${active ? 'var(--color-navy)' : 'var(--color-border)'}`,
-                        background: active ? 'var(--color-navy)' : 'white',
-                        color: active ? 'white' : 'var(--color-slate)',
+                        border: `1.5px solid ${active ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                        background: active ? 'var(--color-accent)' : 'var(--color-surface-2)',
+                        color: active ? 'var(--color-on-brand-turquoise)' : 'var(--color-slate)',
                         cursor: editable ? 'pointer' : 'default',
                         opacity: !editable && !active ? 0.5 : 1,
                       }}
@@ -99,8 +99,8 @@ function RoleDetailModal({ rol, onClose, onUpdate }) {
         {editable && (
           <Can permission="roles:update">
             <div style={{ padding: '14px 24px', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button onClick={onClose} style={{ padding: '9px 20px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'white', cursor: 'pointer', fontSize: 14 }}>Cancelar</button>
-              <button onClick={handleSave} disabled={saving} style={{ padding: '9px 24px', borderRadius: 8, border: 'none', background: 'var(--color-navy)', color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+              <button onClick={onClose} style={{ padding: '9px 20px', borderRadius: 8, border: '1.5px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-navy)', cursor: 'pointer', fontSize: 14 }}>Cancelar</button>
+              <button onClick={handleSave} disabled={saving} style={{ padding: '9px 24px', borderRadius: 8, border: 'none', background: 'var(--color-accent)', color: 'var(--color-on-brand-turquoise)', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
                 {saving ? 'Guardando...' : 'Guardar cambios'}
               </button>
             </div>
@@ -140,13 +140,13 @@ export default function PlatformRoles() {
                 key={r.id}
                 onClick={() => setSelectedRol(r)}
                 style={{
-                  background: 'white', borderRadius: 14, padding: '20px 22px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.06)', textAlign: 'left',
-                  border: r.esInmutable ? '2px solid #fde68a' : '1.5px solid var(--color-border)',
+                  background: 'var(--color-surface)', borderRadius: 14, padding: '20px 22px',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.25)', textAlign: 'left',
+                  border: r.esInmutable ? '2px solid rgba(240,176,122,0.4)' : '1.5px solid var(--color-border)',
                   cursor: 'pointer', transition: 'box-shadow 0.18s, transform 0.18s',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'none'; }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.4)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.25)'; e.currentTarget.style.transform = 'none'; }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                   <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--color-navy)', margin: 0 }}>

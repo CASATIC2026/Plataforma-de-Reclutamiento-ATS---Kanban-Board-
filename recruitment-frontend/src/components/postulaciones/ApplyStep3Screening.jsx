@@ -1,5 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { FileText, X } from 'lucide-react';
 import { getScreeningQuestions } from '../../api/screeningApi';
+import {
+  applySectionTitle,
+  applyInput,
+  applyTextarea,
+  applyLabel,
+  applyError,
+  applyHint,
+  applyAvailabilityOn,
+  applyAvailabilityOff,
+} from './applyFormStyles';
 
 const ALLOWED_TYPES = [
   'application/pdf',
@@ -55,8 +66,8 @@ export default function ApplyStep3Screening({
   };
 
   const getResponse = (questionId) =>
-    (formData.screeningResponses || []).find((r) => r.questionId === questionId)
-      ?.responseText || '';
+    (formData.screeningResponses || []).find((r) => r.questionId === questionId)?.responseText ||
+    '';
 
   const toggleAvailability = (day, slot) => {
     const prev = formData.availability || [];
@@ -81,102 +92,91 @@ export default function ApplyStep3Screening({
     );
 
   return (
-    <div>
-      {/* CV Upload */}
-      <p className="apply-section-title">Currículum Vitae</p>
+    <div className="space-y-8">
+      <div>
+        <h3 className={applySectionTitle}>Currículum vitae</h3>
 
-      {formData.cvFile ? (
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', gap: '12px',
-            padding: '12px 16px', border: '1px solid var(--clr-border)',
-            borderRadius: 'var(--radius-sm)', marginBottom: '24px',
-          }}
-        >
-          <div style={{ fontSize: '1.6rem' }}>📄</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: '14px' }}>{formData.cvFile.name}</div>
-            <div style={{ fontSize: '12px', color: 'var(--clr-muted)' }}>
-              {(formData.cvFile.size / (1024 * 1024)).toFixed(2)} MB
+        {formData.cvFile ? (
+          <div className="flex items-center gap-3 p-4 rounded-lg border border-outline-variant/20 bg-surface-container">
+            <FileText className="w-6 h-6 text-brand-turquoise flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-on-surface font-semibold truncate">{formData.cvFile.name}</p>
+              <p className="text-xs text-on-surface-variant">
+                {(formData.cvFile.size / (1024 * 1024)).toFixed(2)} MB
+              </p>
             </div>
+            <button
+              type="button"
+              onClick={() => onChange('cvFile', null)}
+              className="p-2 text-on-surface-variant hover:text-error"
+              aria-label="Quitar archivo"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => onChange('cvFile', null)}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--clr-muted)', fontSize: '20px',
+        ) : (
+          <label
+            onClick={() => fileInputRef.current?.click()}
+            className={`flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
+              dragging
+                ? 'border-brand-turquoise bg-brand-turquoise/5'
+                : 'border-brand-turquoise/30 hover:border-brand-turquoise/50'
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
             }}
           >
-            ✕
-          </button>
-        </div>
-      ) : (
-        <div
-          className={`dropzone${dragging ? ' drag-over' : ''}`}
-          style={{ marginBottom: '24px' }}
-          role="button"
-          tabIndex={0}
-          onClick={() => fileInputRef.current?.click()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
-          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragging(false);
-            if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-          }}
-        >
-          <div className="dropzone__icon">📄</div>
-          <p className="dropzone__text">
-            Arrastra tu CV aquí o{' '}
-            <span className="dropzone__link">selecciona un archivo</span>
-          </p>
-          <p className="dropzone__hint">PDF, DOC, DOCX — máx. 5MB</p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.doc,.docx"
-            style={{ display: 'none' }}
-            onChange={(e) => { if (e.target.files[0]) handleFile(e.target.files[0]); }}
-          />
-        </div>
-      )}
+            <FileText className="w-6 h-6 text-brand-turquoise flex-shrink-0" />
+            <div>
+              <p className="text-sm text-on-surface font-semibold">Sube tu CV</p>
+              <p className="text-xs text-on-surface-variant">PDF, DOC o DOCX (máx. 5 MB)</p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files[0]) handleFile(e.target.files[0]);
+              }}
+            />
+          </label>
+        )}
+      </div>
 
-      {/* Screening Questions */}
       {questions.length > 0 && (
-        <>
-          <p className="apply-section-title">Preguntas de Evaluación</p>
+        <div className="space-y-6">
+          <h3 className={applySectionTitle}>Preguntas de evaluación</h3>
           {questions.map((q) => (
-            <div key={q.id} className="form-group" style={{ marginBottom: '20px' }}>
-              <label className="form-label">
+            <div key={q.id}>
+              <label className={applyLabel}>
                 {q.questionText}
-                {q.required && (
-                  <span style={{ color: 'var(--color-danger)' }}> *</span>
-                )}
+                {q.required && <span className="text-error"> *</span>}
               </label>
 
               {q.questionType === 'text' && (
                 <textarea
-                  className="form-textarea"
-                  rows={3}
+                  className={applyTextarea}
+                  rows={4}
                   value={getResponse(q.id)}
                   onChange={(e) => handleResponse(q.id, e.target.value)}
-                  placeholder="Tu respuesta..."
+                  placeholder="Escribe tu respuesta aquí..."
                 />
               )}
 
               {q.questionType === 'multiple_choice' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="flex flex-col gap-2">
                   {(q.options ? JSON.parse(q.options) : []).map((opt, i) => (
                     <label
                       key={i}
-                      style={{ display: 'flex', gap: '8px', alignItems: 'center', cursor: 'pointer' }}
+                      className="flex items-center gap-2 cursor-pointer text-sm text-on-surface-variant"
                     >
                       <input
                         type="radio"
@@ -184,20 +184,20 @@ export default function ApplyStep3Screening({
                         value={opt}
                         checked={getResponse(q.id) === opt}
                         onChange={() => handleResponse(q.id, opt)}
-                        style={{ accentColor: 'var(--clr-accent)' }}
+                        className="accent-brand-turquoise"
                       />
-                      <span style={{ fontSize: '14px' }}>{opt}</span>
+                      {opt}
                     </label>
                   ))}
                 </div>
               )}
 
               {q.questionType === 'boolean' && (
-                <div style={{ display: 'flex', gap: '16px' }}>
+                <div className="flex gap-4">
                   {['Sí', 'No'].map((opt) => (
                     <label
                       key={opt}
-                      style={{ display: 'flex', gap: '8px', alignItems: 'center', cursor: 'pointer' }}
+                      className="flex items-center gap-2 cursor-pointer text-sm text-on-surface-variant"
                     >
                       <input
                         type="radio"
@@ -205,71 +205,67 @@ export default function ApplyStep3Screening({
                         value={opt}
                         checked={getResponse(q.id) === opt}
                         onChange={() => handleResponse(q.id, opt)}
-                        style={{ accentColor: 'var(--clr-accent)' }}
+                        className="accent-brand-turquoise"
                       />
-                      <span style={{ fontSize: '14px' }}>{opt}</span>
+                      {opt}
                     </label>
                   ))}
                 </div>
               )}
 
               {q.questionType === 'scale_1_5' && (
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div className="flex gap-2 items-center flex-wrap">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button
                       key={n}
                       type="button"
-                      className={`scale-dot${getResponse(q.id) === String(n) ? ' is-selected' : ''}`}
                       onClick={() => handleResponse(q.id, String(n))}
+                      className={`w-10 h-10 rounded-lg font-bold text-sm transition-all ${
+                        getResponse(q.id) === String(n)
+                          ? 'bg-brand-turquoise text-on-brand-turquoise'
+                          : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'
+                      }`}
                     >
                       {n}
                     </button>
                   ))}
-                  <span style={{ fontSize: '12px', color: 'var(--clr-muted)', marginLeft: '4px' }}>
-                    1 = Bajo · 5 = Alto
-                  </span>
+                  <span className="text-xs text-on-surface-variant">1 = Bajo · 5 = Alto</span>
                 </div>
               )}
             </div>
           ))}
           {errors.screeningResponses && (
-            <span className="form-error">{errors.screeningResponses}</span>
+            <span className={applyError}>{errors.screeningResponses}</span>
           )}
-        </>
+        </div>
       )}
 
-      {/* Availability */}
-      <p className="apply-section-title" style={{ marginTop: '8px' }}>
-        Disponibilidad{' '}
-        <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--clr-muted)' }}>
-          (opcional)
-        </span>
-      </p>
-
-      {SLOTS.map((slot) => (
-        <div key={slot} style={{ marginBottom: '12px' }}>
-          <p
-            style={{
-              fontSize: '12px', fontWeight: 600, color: 'var(--clr-muted)',
-              marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em',
-            }}
-          >
-            {slot}
-          </p>
-          <div className="availability-grid">
-            {DAYS.map((day) => (
-              <button
-                key={`${day}-${slot}`}
-                type="button"
-                className={`availability-cell${isAvailable(day, slot) ? ' is-checked' : ''}`}
-                onClick={() => toggleAvailability(day, slot)}
-              >
-                {day}
-              </button>
-            ))}
+      <div>
+        <h3 className={applySectionTitle}>
+          Disponibilidad{' '}
+          <span className="text-xs font-normal text-on-surface-variant">(opcional)</span>
+        </h3>
+        <p className={applyHint}>Selecciona tus horarios preferidos</p>
+        {SLOTS.map((slot) => (
+          <div key={slot} className="mb-4 p-4 rounded-lg bg-surface-container border border-outline-variant/10">
+            <p className="text-xs font-bold text-brand-turquoise mb-3 uppercase tracking-widest">
+              {slot}
+            </p>
+            <div className="grid grid-cols-7 gap-2">
+              {DAYS.map((day) => (
+                <button
+                  key={`${day}-${slot}`}
+                  type="button"
+                  onClick={() => toggleAvailability(day, slot)}
+                  className={isAvailable(day, slot) ? applyAvailabilityOn : applyAvailabilityOff}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

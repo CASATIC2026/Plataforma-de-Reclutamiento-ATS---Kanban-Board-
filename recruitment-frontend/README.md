@@ -92,11 +92,21 @@ src/
 | Route | Auth | Component | Description |
 |---|---|---|---|
 | `/` | Public | NewLandingPage | Modern landing with 6 jobs/page, filters, responsive |
-| `/jobs` | Public | PublicVacantesPage | Classic job board (deprecated) |
+| `/jobs` | Public | PublicVacantesPage | Classic job board (deprecated, 30s polling) |
+| `/empresas` | Public | EmpresasPage | Companies marketing page |
+| `/recursos` | Public | RecursosPage | Resources / articles |
+| `/precios` | Public | PreciosPage | Pricing plans |
+| `/contacto` | Public | ContactoPage | Contact form |
+| `/legal/terminos` | Public | LegalTerminosPage | Terms of service |
+| `/legal/privacidad` | Public | LegalPrivacidadPage | Privacy policy |
 | `/login` | Public | AuthPage | Login / Register forms |
-| `/login?mode=register` | Public | AuthPage | Register form |
+| `/dashboard` | Protected | CandidateDashboard | Candidate personal applications |
+| `/admin/dashboard` | Protected | RecruiterDashboard | Recruiter stats & activity |
 | `/admin/vacantes` | Protected | AdminVacantesPage | Create/edit/delete vacancies, stats dashboard |
+| `/admin/vacantes/:id/aplicantes` | Protected | VacanteAplicantesPage | Per-vacancy candidate Kanban |
 | `/admin/kanban` | Protected | KanbanAllPage | Full Kanban pipeline + rejected candidates |
+| `/admin/analytics` | Protected | ManagerAnalytics | Pipeline funnel, time-to-hire, sources |
+| `/platform/*` | Protected | Platform pages | Multi-tenant admin (companies, users, roles, audit, ops) |
 
 ## Key Features
 

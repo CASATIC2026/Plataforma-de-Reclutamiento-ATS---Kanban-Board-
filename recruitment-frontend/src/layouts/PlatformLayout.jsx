@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePermission } from '../hooks/usePermission';
+import '../styles/admin-theme.css';
 
 const NAV_ITEMS = [
   { to: '/platform',           label: 'Dashboard',      icon: '◉', exact: true,     permission: null },
@@ -30,16 +31,17 @@ function NavItem({ to, label, icon, exact }) {
         fontSize: 14,
         fontWeight: isActive ? 600 : 400,
         fontFamily: 'var(--font-body)',
-        color: isActive ? 'var(--color-accent)' : 'rgba(255,255,255,0.75)',
-        background: isActive ? 'rgba(205,123,79,0.15)' : 'transparent',
+        color: isActive ? 'var(--color-accent)' : 'rgba(215,227,253,0.75)',
+        background: isActive ? 'rgba(64,224,208,0.15)' : 'transparent',
         transition: 'all 0.18s ease',
       })}
       onMouseEnter={e => {
         if (!e.currentTarget.classList.contains('active'))
-          e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
       }}
       onMouseLeave={e => {
-        if (!e.currentTarget.style.background.includes('rgba(205,123,79'))
+        if (!e.currentTarget.style.background.includes('rgba(64, 224, 208') &&
+            !e.currentTarget.style.background.includes('rgba(64,224,208'))
           e.currentTarget.style.background = 'transparent';
       }}
     >
@@ -65,13 +67,13 @@ export default function PlatformLayout() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-body)' }}>
+    <div className="admin-theme" style={{ display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-body)' }}>
       {/* ── Sidebar ── */}
       <aside
         style={{
           width: 240,
           flexShrink: 0,
-          background: 'var(--color-navy)',
+          background: '#0b1424',
           display: 'flex',
           flexDirection: 'column',
           padding: '0',

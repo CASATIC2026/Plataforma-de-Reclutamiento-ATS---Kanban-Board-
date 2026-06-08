@@ -6,7 +6,7 @@ import CandidateProfileModal from './CandidateProfileModal';
 const COLUMNS = [
   { estado: 0, title: 'Nuevo',          color: 'bg-teal-light text-teal' },
   { estado: 1, title: 'Entrevista',     color: 'bg-accent-bg text-accent' },
-  { estado: 2, title: 'Prueba Técnica', color: 'bg-slate-100 text-slate-900' },
+  { estado: 2, title: 'Prueba Técnica', color: 'bg-surface-2 text-navy' },
   { estado: 3, title: 'Oferta',         color: 'bg-green-light text-green' },
 ];
 
@@ -153,9 +153,9 @@ export default function KanbanBoard({ vacanteId, filterFn, sortFn, onCardsUpdate
             key={t.id}
             className="mb-2 px-5 py-3 rounded-lg shadow-lg text-sm font-semibold"
             style={{
-              backgroundColor: t.type === 'error' ? '#ef4444' : 'var(--color-score-high-bg)',
-              color: t.type === 'error' ? '#fff' : 'var(--color-navy)',
-              border: t.type === 'error' ? '1px solid #dc2626' : '1px solid #6ee7b7',
+              backgroundColor: t.type === 'error' ? '#3a0f0c' : '#0f2e2a',
+              color: t.type === 'error' ? '#ffb4ab' : '#6ad9c0',
+              border: t.type === 'error' ? '1px solid rgba(255,180,171,0.4)' : '1px solid rgba(106,217,192,0.4)',
               animation: 'fadeUp 0.25s ease',
             }}
           >
