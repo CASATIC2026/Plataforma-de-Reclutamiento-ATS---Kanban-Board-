@@ -125,13 +125,13 @@ export default function RecursosPage() {
           <p className="text-[#DBC1BB] text-lg leading-relaxed max-w-sm">
             {FEATURED_ARTICLE.description}
           </p>
-          <button
-            type="button"
+          <Link
+            to={`/recursos/${FEATURED_ARTICLE.id}`}
             className="inline-flex items-center gap-2 w-fit px-6 py-3 rounded-xl bg-[#D97862] text-[#561406] text-sm font-bold"
           >
             Leer Artículo
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </section>
 

@@ -15,11 +15,13 @@ public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public AuthService(AppDbContext context, IConfiguration config)
+    public AuthService(AppDbContext context, IConfiguration config, IHttpClientFactory httpClientFactory)
     {
         _context = context;
         _config = config;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<AuthResponseDTO> RegisterAsync(RegisterDTO dto)
@@ -85,6 +87,30 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDTO?> LoginAsync(LoginDTO dto)
     {
+        // Verify Cloudflare Turnstile token when a secret key is configured.
+        var turnstileSecret = Environment.GetEnvironmentVariable("TURNSTILE_SECRET_KEY")
+            ?? _config["TURNSTILE_SECRET_KEY"];
+        if (!string.IsNullOrEmpty(turnstileSecret))
+        {
+            if (string.IsNullOrEmpty(dto.TurnstileToken))
+                return null;
+
+            var http = _httpClientFactory.CreateClient();
+            var form = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("secret", turnstileSecret),
+                new KeyValuePair<string, string>("response", dto.TurnstileToken),
+            });
+            var cfRes = await http.PostAsync("https://challenges.cloudflare.com/turnstile/v0/siteverify", form);
+            if (!cfRes.IsSuccessStatusCode)
+                return null;
+
+            var cfJson = await cfRes.Content.ReadAsStringAsync();
+            using var doc = System.Text.Json.JsonDocument.Parse(cfJson);
+            if (!doc.RootElement.GetProperty("success").GetBoolean())
+                return null;
+        }
+
         var usuario = await _context.Usuarios
             .FirstOrDefaultAsync(u => u.Email == dto.Email.Trim().ToLower());
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentAPI.Data;
+using RecruitmentAPI.Middleware;
 using RecruitmentAPI.Models;
 using RecruitmentAPI.Repositories;
 using RecruitmentAPI.Repositories.Interfaces;
@@ -101,6 +102,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Administrador", "Manager"));
 });
 
+builder.Services.AddHttpClient();
+
 // Controllers with request size limits (6 MB max for file uploads)
 builder.Services.AddControllers();
 builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = 6_000_000);
@@ -147,6 +150,7 @@ app.Use(async (context, next) =>
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<CloudflareAccessMiddleware>();
 app.MapControllers();
 
 // Seed default admin user

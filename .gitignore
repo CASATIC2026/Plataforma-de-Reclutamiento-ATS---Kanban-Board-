@@ -4,6 +4,9 @@ RecruitmentAPI/obj/
 RecruitmentAPI/appsettings.Development.json
 RecruitmentAPI/.env
 RecruitmentAPI/.env.local
+RecruitmentAPI/Storage/CVs/
+*.swp
+*.swo
 
 # Frontend
 recruitment-frontend/node_modules/

@@ -1,10 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { validateEmail } from '../../utils/validators';
 import AuthField from './AuthField';
-import AuthOAuthRow from './AuthOAuthRow';
-import AuthDivider from './AuthDivider';
 
 export default function LoginForm({ error, loading, onSubmit }) {
   const [email, setEmail] = useState('');
@@ -12,6 +10,44 @@ export default function LoginForm({ error, loading, onSubmit }) {
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false });
   const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' });
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef(null);
+  const widgetIdRef = useRef(null);
+
+  useEffect(() => {
+    const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+    if (!siteKey) return;
+
+    const render = () => {
+      if (!turnstileRef.current || !window.turnstile || widgetIdRef.current != null) return;
+      widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: siteKey,
+        theme: 'dark',
+        callback: (token) => setTurnstileToken(token),
+        'error-callback': () => setTurnstileToken(''),
+        'expired-callback': () => {
+          setTurnstileToken('');
+          if (widgetIdRef.current != null) window.turnstile.reset(widgetIdRef.current);
+        },
+      });
+    };
+
+    if (window.turnstile) {
+      render();
+    } else {
+      const id = setInterval(() => {
+        if (window.turnstile) { clearInterval(id); render(); }
+      }, 100);
+      return () => clearInterval(id);
+    }
+
+    return () => {
+      if (widgetIdRef.current != null && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
+      }
+    };
+  }, []);
 
   const validateFields = useCallback(() => {
     const emailRes = validateEmail(email);
@@ -27,7 +63,7 @@ export default function LoginForm({ error, loading, onSubmit }) {
     e.preventDefault();
     setTouched({ email: true, password: true });
     if (!validateFields()) return;
-    onSubmit({ email, password });
+    onSubmit({ email, password, turnstileToken });
   };
 
   return (
@@ -40,9 +76,6 @@ export default function LoginForm({ error, loading, onSubmit }) {
           Ingresa tus credenciales para acceder a tu panel.
         </p>
       </div>
-
-      <AuthOAuthRow />
-      <AuthDivider label="O continúa con correo" />
 
       {error && (
         <div className="p-3 rounded-xl text-sm text-center bg-red-500/10 text-red-300 border border-red-400/20">
@@ -108,9 +141,13 @@ export default function LoginForm({ error, loading, onSubmit }) {
           />
         </div>
 
+        {import.meta.env.VITE_TURNSTILE_SITE_KEY && (
+          <div ref={turnstileRef} className="flex justify-center" />
+        )}
+
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (!!import.meta.env.VITE_TURNSTILE_SITE_KEY && !turnstileToken)}
           className="w-full py-4 rounded-xl bg-brand-turquoise text-on-brand-turquoise font-bold text-base md:text-lg shadow-lg shadow-brand-turquoise/20 hover:opacity-90 active:scale-[0.98] transition-all font-display flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {loading ? 'Iniciando sesión...' : (

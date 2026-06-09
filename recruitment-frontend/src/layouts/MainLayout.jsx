@@ -75,11 +75,6 @@ export default function MainLayout() {
           Analíticas
         </Link>
       )}
-      {isAdmin && (
-        <Link to="/admin/usuarios" className={navLinkClass}>
-          Usuarios
-        </Link>
-      )}
       {canAccessPlatform && (
         <Link to="/platform" className={navLinkClass}>
           Platform
@@ -112,11 +107,6 @@ export default function MainLayout() {
       {canViewAnalytics && (
         <Link to="/admin/analytics" className={mobileNavLinkClass}>
           Analíticas
-        </Link>
-      )}
-      {isAdmin && (
-        <Link to="/admin/usuarios" className={mobileNavLinkClass}>
-          Usuarios
         </Link>
       )}
       {canAccessPlatform && (

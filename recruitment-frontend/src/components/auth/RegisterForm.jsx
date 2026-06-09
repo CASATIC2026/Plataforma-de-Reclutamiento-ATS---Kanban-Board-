@@ -7,8 +7,6 @@ import {
   validateName,
 } from '../../utils/validators';
 import AuthField, { AuthSelect } from './AuthField';
-import AuthOAuthRow from './AuthOAuthRow';
-import AuthDivider from './AuthDivider';
 import PasswordStrengthBar from './PasswordStrengthBar';
 
 const ROLE_OPTIONS = [
@@ -273,8 +271,6 @@ export default function RegisterForm({ error, loading, onSubmit }) {
           )}
         </button>
 
-        <AuthDivider label="O regístrate con" />
-        <AuthOAuthRow />
       </div>
     </form>
   );

@@ -44,11 +44,11 @@ export default function AuthPage() {
     setSearchParams(next === 'register' ? { mode: 'register' } : {}, { replace: true });
   };
 
-  const handleLogin = async ({ email, password }) => {
+  const handleLogin = async ({ email, password, turnstileToken }) => {
     setError('');
     setLoading(true);
     try {
-      const res = await loginUser({ email, password });
+      const res = await loginUser({ email, password, turnstileToken });
       login(res.data);
       navigate(getPostLoginPath(res.data), { replace: true });
     } catch (err) {

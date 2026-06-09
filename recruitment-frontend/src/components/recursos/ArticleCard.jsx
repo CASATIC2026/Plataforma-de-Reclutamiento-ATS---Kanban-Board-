@@ -1,10 +1,12 @@
+import { Link } from 'react-router-dom';
 import { Clock, ArrowRight } from 'lucide-react';
 
 export default function ArticleCard({ article, variant = 'grid' }) {
   const isList = variant === 'list';
 
   return (
-    <article
+    <Link
+      to={`/recursos/${article.id}`}
       className={`group flex flex-col rounded-2xl border border-outline-variant/5 bg-[#101C2F] overflow-hidden hover:border-brand-turquoise/25 transition-all ${
         isList ? 'w-full' : ''
       }`}
@@ -63,6 +65,6 @@ export default function ArticleCard({ article, variant = 'grid' }) {
           </div>
         ) : null}
       </div>
-    </article>
+    </Link>
   );
 }

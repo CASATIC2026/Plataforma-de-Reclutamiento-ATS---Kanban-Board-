@@ -8,6 +8,7 @@ import NewLandingPage from './pages/NewLandingPage';
 import PublicVacantesPage from './pages/PublicVacantesPage';
 import EmpresasPage from './pages/EmpresasPage';
 import RecursosPage from './pages/RecursosPage';
+import RecursoArticuloPage from './pages/RecursoArticuloPage';
 import PreciosPage from './pages/PreciosPage';
 import ContactoPage from './pages/ContactoPage';
 import LegalTerminosPage from './pages/LegalTerminosPage';
@@ -22,7 +23,6 @@ const ReviewDashboardPage    = lazy(() => import('./pages/ReviewDashboardPage'))
 const AdminPostulacionesPage = lazy(() => import('./pages/AdminPostulacionesPage'));
 const KanbanAllPage          = lazy(() => import('./pages/KanbanAllPage'));
 const VacanteAplicantesPage  = lazy(() => import('./pages/VacanteAplicantesPage'));
-const AdminUsuariosPage      = lazy(() => import('./pages/AdminUsuariosPage'));
 const CandidateDashboard     = lazy(() => import('./pages/CandidateDashboard'));
 const RecruiterDashboard     = lazy(() => import('./pages/RecruiterDashboard'));
 const ManagerAnalytics       = lazy(() => import('./pages/ManagerAnalytics'));
@@ -63,6 +63,7 @@ export default function App() {
               <Route path="/jobs" element={<PublicVacantesPage />} />
               <Route path="/empresas" element={<EmpresasPage />} />
               <Route path="/recursos" element={<RecursosPage />} />
+              <Route path="/recursos/:slug" element={<RecursoArticuloPage />} />
               <Route path="/precios" element={<PreciosPage />} />
               <Route path="/contacto" element={<ContactoPage />} />
               <Route path="/legal/terminos" element={<LegalTerminosPage />} />
@@ -98,7 +99,6 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/admin/usuarios"     element={S(AdminUsuariosPage)} />
               <Route
                 path="/admin/analytics"
                 element={
