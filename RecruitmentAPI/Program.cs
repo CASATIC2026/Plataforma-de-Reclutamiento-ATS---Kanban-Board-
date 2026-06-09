@@ -1,6 +1,8 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentAPI.Data;
@@ -104,6 +106,34 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddRateLimiter(options =>
+{
+    // 5 attempts per IP per minute on the login endpoint
+    options.AddPolicy("login", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+                ?? context.Connection.RemoteIpAddress?.ToString()
+                ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
+    options.OnRejected = async (ctx, token) =>
+    {
+        ctx.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        ctx.HttpContext.Response.Headers.RetryAfter = "60";
+        await ctx.HttpContext.Response.WriteAsJsonAsync(
+            new { message = "Demasiados intentos de inicio de sesión. Espera un minuto e inténtalo de nuevo." },
+            token
+        );
+    };
+});
+
 // Controllers with request size limits (6 MB max for file uploads)
 builder.Services.AddControllers();
 builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = 6_000_000);
@@ -148,6 +178,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<CloudflareAccessMiddleware>();

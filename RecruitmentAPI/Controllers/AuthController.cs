@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using RecruitmentAPI.DTOs;
 using RecruitmentAPI.Services.Interfaces;
 
@@ -30,6 +31,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> Login([FromBody] LoginDTO dto)
     {
         var result = await _authService.LoginAsync(dto);
