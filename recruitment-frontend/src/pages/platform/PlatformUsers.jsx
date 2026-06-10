@@ -3,6 +3,7 @@ import { Can } from '../../components/common/Can';
 import { usePermission } from '../../hooks/usePermission';
 import { getUsuarios, deleteUsuario } from '../../api/usuariosApi';
 import { assignRol, getRoles } from '../../api/rolesApi';
+import { getEmpresas } from '../../api/empresasApi';
 import { getAuditLogs } from '../../api/auditApi';
 import ConfirmModal from '../../components/common/ConfirmModal';
 
@@ -201,6 +202,7 @@ function UserLogsDrawer({ user, onClose }) {
 export default function PlatformUsers() {
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -212,8 +214,8 @@ export default function PlatformUsers() {
 
   const load = useCallback(() => {
     setLoading(true);
-    Promise.all([getUsuarios(), getRoles()])
-      .then(([u, r]) => { setUsuarios(u.data); setRoles(r.data); })
+    Promise.all([getUsuarios(), getRoles(), getEmpresas()])
+      .then(([u, r, e]) => { setUsuarios(u.data); setRoles(r.data); setEmpresas(e.data); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -225,10 +227,26 @@ export default function PlatformUsers() {
   const handleRolChange = async (userId, newRolNombre) => {
     setSavingRol(prev => ({ ...prev, [userId]: true }));
     try {
-      await assignRol({ usuarioId: userId, rolNombre: newRolNombre });
-      setUsuarios(prev => prev.map(u => u.id === userId ? { ...u, rol: newRolNombre } : u));
+      const u = usuarios.find(x => x.id === userId);
+      await assignRol({ usuarioId: userId, rolNombre: newRolNombre, empresaId: u?.empresaId ?? null });
+      setUsuarios(prev => prev.map(x => x.id === userId ? { ...x, rol: newRolNombre } : x));
     } catch {
       alert('Error al asignar rol. Inténtalo de nuevo.');
+    } finally {
+      setSavingRol(prev => ({ ...prev, [userId]: false }));
+    }
+  };
+
+  const handleEmpresaChange = async (userId, empresaId) => {
+    setSavingRol(prev => ({ ...prev, [userId]: true }));
+    try {
+      const u = usuarios.find(x => x.id === userId);
+      await assignRol({ usuarioId: userId, rolNombre: u.rol, empresaId: empresaId || null });
+      setUsuarios(prev => prev.map(x => x.id === userId
+        ? { ...x, empresaId: empresaId || null, empresaNombre: empresas.find(e => e.id === empresaId)?.nombre ?? null }
+        : x));
+    } catch {
+      alert('Error al asignar empresa. Inténtalo de nuevo.');
     } finally {
       setSavingRol(prev => ({ ...prev, [userId]: false }));
     }
@@ -289,7 +307,7 @@ export default function PlatformUsers() {
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
               <thead>
                 <tr style={{ background: 'var(--color-bg)', borderBottom: '2px solid var(--color-border)' }}>
-                  {['Usuario', 'Email', 'Rol', 'Registrado', 'Acciones'].map(h => (
+                  {['Usuario', 'Email', 'Rol', 'Empresa', 'Registrado', 'Acciones'].map(h => (
                     <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                       {h}
                     </th>
@@ -349,6 +367,33 @@ export default function PlatformUsers() {
                         ) : (
                           <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: rs.bg, color: rs.text, whiteSpace: 'nowrap' }}>
                             {u.rol}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Empresa — inline select or static badge */}
+                      <td style={{ padding: '12px 16px' }}>
+                        {canAssignRole && !isOwner ? (
+                          <select
+                            value={u.empresaId ?? ''}
+                            disabled={!!savingRol[u.id]}
+                            onChange={e => handleEmpresaChange(u.id, e.target.value || null)}
+                            style={{
+                              padding: '4px 8px', borderRadius: 8,
+                              border: '1.5px solid var(--color-border)', fontSize: 12,
+                              cursor: 'pointer', background: 'var(--color-surface-2)',
+                              color: 'var(--color-navy)', opacity: savingRol[u.id] ? 0.55 : 1,
+                              maxWidth: 180,
+                            }}
+                          >
+                            <option value="">— Sin empresa —</option>
+                            {empresas.map(e => (
+                              <option key={e.id} value={e.id}>{e.nombre}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>
+                            {u.empresaNombre ?? '— Sin empresa —'}
                           </span>
                         )}
                       </td>

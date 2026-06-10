@@ -144,14 +144,14 @@ export default function PlatformLayout() {
         {/* Brand */}
         <div style={{ padding: '18px 16px 14px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
-            src="/images/logotalentifysv.png"
+            src="/images/logo-icon-turquoise.png"
             alt="Logo"
-            style={{ width: 30, height: 30, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }}
+            style={{ width: 30, height: 30, objectFit: 'contain', flexShrink: 0 }}
             onError={e => { e.target.style.display = 'none'; }}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Talentify sv
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, letterSpacing: '-0.025em', fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Talentify SV
             </div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>Platform Admin</div>
           </div>

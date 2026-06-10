@@ -132,7 +132,7 @@ export default function CandidateDashboard() {
 
   return (
     <div className="public-theme min-h-screen bg-[#071326] overflow-x-hidden">
-      <DashboardHeader searchQuery={jobSearch} onSearchChange={setJobSearch} />
+      <DashboardHeader searchQuery={jobSearch} onSearchChange={setJobSearch} applications={applications} />
 
       {applySuccess && (
         <div className="mx-3 sm:mx-4 md:mx-8 mt-4 px-4 py-3 rounded-xl bg-tertiary/15 border border-tertiary/30 text-tertiary text-sm text-center">

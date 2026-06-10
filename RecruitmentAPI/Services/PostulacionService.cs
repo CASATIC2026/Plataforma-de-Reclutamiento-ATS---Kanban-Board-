@@ -115,6 +115,7 @@ public class PostulacionService : IPostulacionService
             NombreCandidato = dto.NombreCandidato,
             Email = dto.Email,
             Telefono = dto.Telefono,
+            UsuarioId = _current.UserId,
             VacanteId = dto.VacanteId,
             CvFileName = cvFileName,
             CvFilePath = cvFilePath,

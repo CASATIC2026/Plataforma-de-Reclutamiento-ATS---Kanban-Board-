@@ -1,7 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getDisplayName, getInitials, getRoleLabel } from '../../utils/dashboardHelpers';
+import { getDisplayName, getRecentNotifications, getRoleLabel } from '../../utils/dashboardHelpers';
+import UserMenu from '../common/UserMenu';
 
 const NAV_LINKS = [
   { label: 'Bolsa de empleo', to: '/' },
@@ -16,9 +18,22 @@ function profileSubtitle(user) {
   return getRoleLabel(user).toUpperCase();
 }
 
-export default function DashboardHeader({ searchQuery = '', onSearchChange }) {
+export default function DashboardHeader({ searchQuery = '', onSearchChange, applications = [] }) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef(null);
+
+  const notifications = getRecentNotifications(applications);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [notifOpen]);
 
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter' && !searchQuery.trim()) {
@@ -27,13 +42,16 @@ export default function DashboardHeader({ searchQuery = '', onSearchChange }) {
   };
 
   return (
-    <header className="border-b border-outline-variant/10 bg-surface-container-low sticky top-0 z-40 overflow-hidden">
+    <header className="border-b border-outline-variant/10 bg-surface-container-low sticky top-0 z-40">
       <div className="max-w-full px-3 sm:px-4 md:px-8 py-4 flex items-center justify-between gap-3 sm:gap-4 min-w-0">
         <Link
           to="/dashboard"
-          className="text-sm sm:text-lg md:text-xl font-bold text-on-surface shrink-0 font-display"
+          className="flex items-center gap-2 shrink-0 hover:opacity-85 transition-opacity"
         >
-          Talentify <span className="text-brand-turquoise">SV</span>
+          <img src="/images/logo-icon-turquoise.png" alt="" className="h-7 w-7 sm:h-8 sm:w-8 object-contain" />
+          <span className="text-sm sm:text-lg md:text-xl font-extrabold tracking-tighter text-slate-100 font-display">
+            Talentify SV
+          </span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8 flex-1 min-w-0">
@@ -65,18 +83,47 @@ export default function DashboardHeader({ searchQuery = '', onSearchChange }) {
             />
           </label>
 
-          <button
-            type="button"
-            className="relative p-1 flex-shrink-0 hover:opacity-80 transition-opacity"
-            aria-label="Notificaciones"
-            title="Próximamente"
-          >
-            <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-on-surface" strokeWidth={1.5} />
-            <span
-              className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#00C4B4] ring-2 ring-[#030E21]"
-              aria-hidden="true"
-            />
-          </button>
+          <div className="relative" ref={notifRef}>
+            <button
+              type="button"
+              onClick={() => setNotifOpen((v) => !v)}
+              className="relative p-1 flex-shrink-0 hover:opacity-80 transition-opacity"
+              aria-label="Notificaciones"
+              aria-expanded={notifOpen}
+            >
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-on-surface" strokeWidth={1.5} />
+              {notifications.length > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#00C4B4] ring-2 ring-[#030E21]"
+                  aria-hidden="true"
+                />
+              )}
+            </button>
+
+            {notifOpen && (
+              <div className="absolute right-0 mt-2 w-72 max-w-[80vw] rounded-xl border border-outline-variant/15 bg-surface-container-high shadow-2xl z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-outline-variant/10">
+                  <p className="text-on-surface text-sm font-bold">Notificaciones</p>
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <p className="px-4 py-6 text-center text-on-surface-variant text-sm">
+                      No tienes notificaciones nuevas.
+                    </p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div key={n.id} className="px-4 py-3 border-b border-outline-variant/5 last:border-b-0">
+                        <p className="text-on-surface text-sm leading-snug">{n.message}</p>
+                        <p className="text-on-surface-variant text-[11px] mt-1">
+                          {new Date(n.date).toLocaleDateString('es-SV', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="flex items-center gap-3 pl-3 sm:pl-4 border-l border-outline-variant/15 shrink-0">
             <div className="hidden md:flex flex-col items-end gap-0.5 min-w-0">
@@ -87,14 +134,7 @@ export default function DashboardHeader({ searchQuery = '', onSearchChange }) {
                 {profileSubtitle(user)}
               </p>
             </div>
-            <div
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-brand-turquoise/20 bg-brand-turquoise/20 flex items-center justify-center flex-shrink-0 overflow-hidden"
-              title={getDisplayName(user)}
-            >
-              <span className="text-xs sm:text-sm font-bold text-brand-turquoise">
-                {getInitials(user)}
-              </span>
-            </div>
+            <UserMenu />
           </div>
         </div>
       </div>

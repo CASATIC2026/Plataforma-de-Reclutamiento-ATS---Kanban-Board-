@@ -72,7 +72,18 @@ public class RolRepository : IRolRepository
             .ToListAsync();
 
         if (existingInAmbito.Count == 1 && existingInAmbito[0].RolId == rol.Id)
-            return true; // already exactly this role
+        {
+            // Same role — still apply an empresa change (e.g. admin links/unlinks a company).
+            var existing = existingInAmbito[0];
+            if (existing.EmpresaId != empresaId)
+            {
+                existing.EmpresaId = empresaId;
+                existing.AsignadoPor = asignadoPorId;
+                existing.AsignadoEn = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+            return true;
+        }
 
         _context.UsuarioRoles.RemoveRange(existingInAmbito);
 

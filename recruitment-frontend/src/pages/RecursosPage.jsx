@@ -193,13 +193,14 @@ export default function RecursosPage() {
                 Accede a datos reales y actualizados sobre bandas salariales, beneficios y tendencias
                 de compensación en el mercado tecnológico salvadoreño.
               </p>
-              <button
-                type="button"
+              <a
+                href="/guia-talentify.pdf"
+                download="Guia-Salarios-IT-El-Salvador-2025.pdf"
                 className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#D7E3FD] text-[#071326] font-bold hover:opacity-90 transition-opacity"
               >
                 <Download className="w-5 h-5" />
                 Descargar guía
-              </button>
+              </a>
             </div>
             <div className="relative z-10 flex justify-center lg:justify-end shrink-0">
               <div className="w-72 h-96 rounded-2xl border border-outline-variant/20 bg-[#2E394E] shadow-2xl p-6 flex flex-col gap-6">

@@ -159,6 +159,16 @@ public class AuthService : IAuthService
                         .OrderByDescending(ur => ur.AsignadoEn)
                         .Select(ur => ur.Rol.Nombre)
                         .FirstOrDefault() ?? u.Rol.ToString(),
+                EmpresaId = _context.UsuarioRoles
+                        .Where(ur => ur.UsuarioId == u.Id)
+                        .OrderByDescending(ur => ur.AsignadoEn)
+                        .Select(ur => ur.EmpresaId)
+                        .FirstOrDefault(),
+                EmpresaNombre = _context.UsuarioRoles
+                        .Where(ur => ur.UsuarioId == u.Id)
+                        .OrderByDescending(ur => ur.AsignadoEn)
+                        .Select(ur => ur.Empresa != null ? ur.Empresa.Nombre : null)
+                        .FirstOrDefault(),
                 CreatedAt = u.CreatedAt
             })
             .ToListAsync();

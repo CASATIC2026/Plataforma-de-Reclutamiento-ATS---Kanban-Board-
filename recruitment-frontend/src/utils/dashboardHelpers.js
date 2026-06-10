@@ -50,3 +50,24 @@ export function getRecommendedJobs(mappedJobs, applications, limit = 3) {
   const appliedIds = new Set(applications.map((a) => a.vacanteId).filter(Boolean));
   return mappedJobs.filter((j) => !appliedIds.has(j.id)).slice(0, limit);
 }
+
+const ESTADO_LABELS = {
+  0: 'Pendiente',
+  1: 'En Revisión',
+  2: 'Prueba Técnica',
+  3: 'Oferta',
+  '-1': 'Rechazada',
+};
+
+/** Derive a client-side notification list from status changes on the user's applications */
+export function getRecentNotifications(applications = [], maxDays = 30) {
+  const cutoff = Date.now() - maxDays * 24 * 60 * 60 * 1000;
+  return applications
+    .filter((a) => a.estado !== 0 && a.updatedAt && new Date(a.updatedAt).getTime() >= cutoff)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .map((a) => ({
+      id: a.id,
+      message: `Tu postulación a "${a.vacanteTitulo}" cambió a ${ESTADO_LABELS[a.estado] ?? 'actualizado'}`,
+      date: a.updatedAt,
+    }));
+}

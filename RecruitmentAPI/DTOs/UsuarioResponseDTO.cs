@@ -7,5 +7,7 @@ public class UsuarioResponseDTO
     public string Apellido { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Rol { get; set; } = string.Empty;
+    public Guid? EmpresaId { get; set; }
+    public string? EmpresaNombre { get; set; }
     public DateTime CreatedAt { get; set; }
 }

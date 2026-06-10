@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { isCandidateUser } from '../../lib/authRoutes';
+import UserMenu from '../common/UserMenu';
+import { getDisplayName, getInitials, getRoleLabel } from '../../utils/dashboardHelpers';
 
 const NAV_LINKS = [
   { label: 'Inicio', href: '/' },
@@ -11,7 +13,7 @@ const NAV_LINKS = [
   { label: 'Recursos', href: '/recursos' },
 ];
 
-function MobileSheet({ open, onClose, currentPath, showCandidatePanel, isAuthenticated, isAdminOrManager }) {
+function MobileSheet({ open, onClose, currentPath, showCandidatePanel, isAuthenticated, isAdminOrManager, user, logout }) {
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
@@ -38,7 +40,8 @@ function MobileSheet({ open, onClose, currentPath, showCandidatePanel, isAuthent
         }`}
       >
         <div className="flex items-center justify-between px-4 sm:px-6 h-16 border-b border-outline-variant/10 flex-shrink-0">
-          <span className="text-base sm:text-lg font-extrabold tracking-tighter text-slate-100 font-display truncate">
+          <span className="flex items-center gap-2 text-base sm:text-lg font-extrabold tracking-tighter text-slate-100 font-display truncate">
+            <img src="/images/logo-icon-turquoise.png" alt="" className="h-6 w-6 sm:h-7 sm:w-7 object-contain" />
             Talentify SV
           </span>
           <button
@@ -70,6 +73,21 @@ function MobileSheet({ open, onClose, currentPath, showCandidatePanel, isAuthent
           })}
         </nav>
         <div className="mt-auto flex flex-col gap-2 sm:gap-3 px-4 sm:px-6 pb-6 sm:pb-10 flex-shrink-0">
+          {isAuthenticated && (
+            <div className="flex items-center gap-3 px-1 pb-2">
+              <div className="w-9 h-9 rounded-full border-2 border-brand-turquoise/20 bg-brand-turquoise/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-brand-turquoise">{getInitials(user)}</span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-on-surface text-sm font-bold leading-tight truncate">
+                  {getDisplayName(user)}
+                </p>
+                <p className="text-on-surface-variant text-[10px] font-medium leading-[15px] tracking-[0.05em] uppercase truncate">
+                  {getRoleLabel(user)}
+                </p>
+              </div>
+            </div>
+          )}
           {showCandidatePanel && (
             <Link
               to="/dashboard"
@@ -87,6 +105,18 @@ function MobileSheet({ open, onClose, currentPath, showCandidatePanel, isAuthent
             >
               Panel Admin
             </Link>
+          )}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                logout();
+              }}
+              className="w-full py-2.5 sm:py-3 rounded-xl border border-outline-variant/20 text-red-300 font-semibold text-xs sm:text-sm hover:border-red-400 transition-all text-center"
+            >
+              Cerrar sesión
+            </button>
           )}
           {!isAuthenticated && (
             <>
@@ -122,7 +152,8 @@ export default function LandingNav() {
     <>
       <header className="bg-slate-950/60 backdrop-blur-md sticky top-0 z-50 w-full h-16 md:h-20 shadow-[0_12px_32px_rgba(3,14,33,0.5)]">
         <div className="flex justify-between items-center px-4 md:px-8 max-w-7xl mx-auto h-full">
-          <Link to="/" className="text-lg md:text-xl font-extrabold tracking-tighter text-slate-100 font-display">
+          <Link to="/" className="flex items-center gap-2 text-lg md:text-xl font-extrabold tracking-tighter text-slate-100 font-display">
+            <img src="/images/logo-icon-turquoise.png" alt="" className="h-7 w-7 md:h-8 md:w-8 object-contain" />
             Talentify SV
           </Link>
 
@@ -145,9 +176,6 @@ export default function LandingNav() {
           <div className="flex items-center gap-2 md:gap-4">
             {isAuthenticated ? (
               <>
-                <span className="hidden md:inline text-sm text-on-surface-variant truncate max-w-[140px]">
-                  {user?.nombre}
-                </span>
                 {showCandidatePanel && (
                   <Link
                     to="/dashboard"
@@ -164,13 +192,9 @@ export default function LandingNav() {
                     Panel Admin
                   </Link>
                 )}
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="hidden md:block text-slate-300 text-sm font-medium hover:text-brand-turquoise px-3 py-2"
-                >
-                  Cerrar sesión
-                </button>
+                <div className="hidden md:block">
+                  <UserMenu />
+                </div>
               </>
             ) : (
               <>
@@ -206,6 +230,8 @@ export default function LandingNav() {
         showCandidatePanel={showCandidatePanel}
         isAuthenticated={isAuthenticated}
         isAdminOrManager={isAdminOrManager}
+        user={user}
+        logout={logout}
       />
     </>
   );

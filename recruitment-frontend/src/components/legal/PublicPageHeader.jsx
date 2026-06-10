@@ -12,8 +12,9 @@ export default function PublicPageHeader({ title }) {
           <ChevronLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Volver al inicio</span>
         </Link>
-        <Link to="/" className="text-xl font-bold text-slate-100 font-display">
-          Talentify <span className="text-brand-turquoise">SV</span>
+        <Link to="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tighter text-slate-100 font-display">
+          <img src="/images/logo-icon-turquoise.png" alt="" className="h-7 w-7 object-contain" />
+          Talentify SV
         </Link>
         <div className="w-24 hidden sm:block" aria-hidden="true" />
         {title && (

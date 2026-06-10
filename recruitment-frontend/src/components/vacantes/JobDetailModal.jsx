@@ -126,7 +126,7 @@ export default function JobDetailModal({ job, onClose, onApply }) {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-6 border-t border-outline-variant/10 bg-[#142033]">
             <button
               type="button"
-              onClick={onApply}
+              onClick={() => onApply(job)}
               className="flex-1 px-6 py-3 rounded-2xl bg-brand-turquoise text-on-brand-turquoise font-bold text-sm shadow-lg shadow-brand-turquoise/20 hover:opacity-90 active:scale-95 transition-all"
             >
               Aplicar a esta vacante

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { createPostulacionStructured } from '../../api/postulacionesApi';
+import { getDisplayName } from '../../utils/dashboardHelpers';
 import {
   validateName,
   validateEmail,
@@ -20,10 +22,11 @@ import ApplyStep4Review from './ApplyStep4Review';
 const STEPS = ['Información', 'Habilidades', 'Preguntas', 'Revisión'];
 
 export default function ApplyModal({ job, onClose, onSuccess }) {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    nombreCandidato: '',
-    email: '',
+    nombreCandidato: user ? getDisplayName(user) : '',
+    email: user?.email ?? '',
     telefono: '',
     ubicacion: '',
     skills: [],
@@ -169,8 +172,16 @@ export default function ApplyModal({ job, onClose, onSuccess }) {
       const fd = buildFormData();
       const result = await createPostulacionStructured(fd);
       onSuccess?.(result);
-    } catch {
-      setErrors({ submit: 'Error al enviar la solicitud. Intenta nuevamente.' });
+    } catch (err) {
+      const apiErrors = err?.response?.data?.errors;
+      const detail = apiErrors
+        ? Object.values(apiErrors).flat().join(' ')
+        : err?.response?.data?.title;
+      setErrors({
+        submit: detail
+          ? `Error al enviar la solicitud: ${detail}`
+          : 'Error al enviar la solicitud. Intenta nuevamente.',
+      });
     } finally {
       setLoading(false);
     }

@@ -126,12 +126,12 @@ export default function MainLayout() {
             className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0 hover:opacity-85 transition-opacity"
           >
             <img
-              src="/images/logotalentifysv.png"
+              src="/images/logo-icon-turquoise.png"
               alt="Talentify SV"
-              className="h-9 w-auto rounded-lg shrink-0"
+              className="h-8 w-8 sm:h-9 sm:w-9 object-contain shrink-0"
             />
-            <span className="text-base sm:text-lg font-bold text-on-surface font-display truncate">
-              Talentify <span className="text-brand-turquoise">SV</span>
+            <span className="text-base sm:text-lg font-extrabold tracking-tighter text-slate-100 font-display truncate">
+              Talentify SV
             </span>
           </Link>
 
