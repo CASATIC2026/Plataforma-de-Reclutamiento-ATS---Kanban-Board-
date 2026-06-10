@@ -8,6 +8,30 @@ Sistema integral de seguimiento de candidatos (ATS) full-stack para el mercado s
 
 ## Novedades recientes
 
+### Junio 2026 — Vinculación de empresas, panel de candidato y rebranding
+
+- **Vinculación de empresa por administrador:** desde `/platform/users`, los Admin/Owner de plataforma
+  ahora pueden asignar o quitar (`null`) la empresa vinculada a cualquier usuario directamente desde un
+  selector en la tabla, sin afectar el flujo de paywall (HTTP 402) existente.
+- **Corrección del error 400 al postularse desde el dashboard:** el modal de detalle de vacante enviaba
+  el evento de clic en lugar del puesto seleccionado; ya corregido. El formulario de postulación además
+  precarga nombre y correo del usuario autenticado.
+- **"Mis postulaciones" en el dashboard:** las postulaciones realizadas con sesión iniciada quedan
+  asociadas a la cuenta del candidato y aparecen en su panel.
+- **Menú de usuario unificado:** nuevo componente `UserMenu` (avatar con iniciales → nombre, rol y
+  "Cerrar sesión") reutilizado en el dashboard y en la barra de navegación pública, incluyendo el menú
+  móvil (antes sin opción de cierre de sesión).
+- **Campana de notificaciones funcional** en el dashboard: muestra cambios de estado recientes en las
+  postulaciones del candidato.
+- **Descarga de guía en `/recursos`:** el botón "Descargar guía" ahora entrega un PDF real.
+- **Rebranding visual:** nuevo isotipo (icono turquesa) y favicon, y la marca "Talentify SV" se
+  estandarizó (tipografía, color y disposición) en todos los encabezados (dashboard, landing,
+  panel admin, panel de plataforma y páginas legales).
+- **Manual de usuario en español:** `docs/Manual_Usuario_Talentify_SV.docx`.
+- **Despliegue en producción:** backend y frontend corren como servicios `systemd --user`
+  (`recruitmentapi`, `recruitment-frontend`) con reinicio automático y arranque al iniciar el servidor,
+  igual que el túnel de Cloudflare.
+
 ### Junio 2026 — Kanban responsivo + drag-and-drop táctil + flujo paywall
 
 - **Kanban rediseñado:** una caja por fase (Nuevo → Entrevista → Prueba Técnica → Oferta). Cada caja muestra la lista completa de candidatos con scroll interno.
@@ -332,6 +356,7 @@ npm install && npm run dev
 | `PAYMENT_PROPOSALS.md` | Opciones de integración de pagos y hoja de ruta |
 | `MDs/UBUNTU_SERVER_SETUP.md` | Setup paso a paso en Ubuntu |
 | `MDs/PENTESTING.md` | Auditoría de seguridad |
+| `docs/Manual_Usuario_Talentify_SV.docx` | Manual de usuario (español) para candidatos, reclutadores y administradores |
 
 ---
 
