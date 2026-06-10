@@ -8,6 +8,7 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import Pagination from '../components/common/Pagination';
 import ConfirmModal from '../components/common/ConfirmModal';
 import VacanteFormModal from '../components/vacantes/VacanteFormModal';
+import NoPlanModal from '../components/common/NoPlanModal';
 
 export default function AdminVacantesPage() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export default function AdminVacantesPage() {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [showNoPlanModal, setShowNoPlanModal] = useState(false);
 
   const fetchVacantes = useCallback(async () => {
     try {
@@ -70,15 +72,18 @@ export default function AdminVacantesPage() {
       if (editingId) {
         await updateVacante(editingId, payload);
       } else {
-        // Platform admins use selectedCompanyId as the target company on POST.
-        // For regular users it's ignored (backend stamps from JWT).
         await createVacante(payload, { companyId: selectedCompanyId });
       }
       await fetchVacantes();
       resetForm();
       setShowForm(false);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      if (error?.response?.status === 402) {
+        setShowForm(false);
+        setShowNoPlanModal(true);
+      } else {
+        console.error('Error submitting form:', error);
+      }
     } finally {
       setSubmitLoading(false);
     }
@@ -428,6 +433,8 @@ export default function AdminVacantesPage() {
         onConfirm={confirmDelete}
         onCancel={() => setPendingDeleteId(null)}
       />
+
+      <NoPlanModal isOpen={showNoPlanModal} onClose={() => setShowNoPlanModal(false)} />
     </div>
   );
 }

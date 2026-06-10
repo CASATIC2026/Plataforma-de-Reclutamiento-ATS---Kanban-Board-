@@ -44,6 +44,11 @@ public class VacantesController : ControllerBase
     public async Task<ActionResult<VacanteResponseDTO>> Create([FromBody] CreateVacanteDTO dto, [FromQuery] Guid? companyId)
     {
         if (!_current.HasPermission("jobs:create")) return Forbid();
+
+        // Non-platform users with no company haven't been onboarded to a plan yet.
+        if (!_current.IsPlatformTier && _current.CompanyId == null)
+            return StatusCode(402, new { code = "empresa_required", message = "Tu cuenta no está vinculada a una empresa. Adquiere un plan o contacta con nosotros para activar tu acceso." });
+
         try
         {
             var created = await _service.CreateAsync(dto, companyId);

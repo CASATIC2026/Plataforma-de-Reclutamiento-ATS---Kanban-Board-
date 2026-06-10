@@ -1,64 +1,121 @@
 import CandidateCard from './CandidateCard';
 
+const PHASE_ACCENT = {
+  0: { bar: '#40e0d0', bg: 'rgba(64,224,208,0.10)',  text: '#40e0d0' },
+  1: { bar: '#f0b07a', bg: 'rgba(240,176,122,0.10)', text: '#f0b07a' },
+  2: { bar: '#93c5fd', bg: 'rgba(147,197,253,0.10)', text: '#93c5fd' },
+  3: { bar: '#6ad9c0', bg: 'rgba(106,217,192,0.10)', text: '#6ad9c0' },
+};
+
 export default function KanbanColumn({
   title,
   estado,
-  color,
   cards,
   loading,
-  onDragStart,
-  onDragOver,
-  onDrop,
+  isHover,
+  onCardPointerDown,
   onCardClick,
   onEmailAction,
 }) {
+  const accent = PHASE_ACCENT[estado] ?? PHASE_ACCENT[0];
+  const total = cards.length;
+
   return (
     <div
-      className="flex flex-col bg-gray-50 rounded-xl min-h-[500px] w-64 flex-shrink-0 border border-gray-200"
-      onDragOver={onDragOver}
-      onDrop={(e) => onDrop(e, estado)}
+      className="kb-col"
+      data-kanban-column={estado}
+      data-hover={isHover ? 'true' : 'false'}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        borderTop: `3px solid ${accent.bar}`,
+        borderRadius: 14,
+        overflow: 'hidden',
+        minWidth: 0,
+        transition: 'box-shadow 0.15s, transform 0.15s',
+      }}
     >
-      {/* Column header */}
-      <div className={`flex items-center justify-between px-3 py-2.5 rounded-t-xl ${color}`}>
-        <span className="font-semibold text-sm">{title}</span>
-        <span
-          className="text-xs font-bold px-2 py-0.5 rounded-full"
-          style={color.includes('text-white')
-            ? { backgroundColor: '#fff', color: 'var(--color-navy)' }
-            : { backgroundColor: 'rgba(255,255,255,0.3)' }
-          }
-        >
-          {loading ? '…' : cards.length}
+      {/* Phase header */}
+      <div
+        data-kanban-column={estado}
+        style={{
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: accent.bg,
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <span style={{ fontWeight: 700, fontSize: 13, color: accent.text, letterSpacing: '0.02em' }}>
+          {title}
+        </span>
+        <span style={{
+          fontSize: 11, fontWeight: 700,
+          background: accent.bar + '22',
+          color: accent.text,
+          padding: '2px 9px',
+          borderRadius: 20,
+        }}>
+          {loading ? '…' : total}
         </span>
       </div>
 
-      {/* Cards area */}
-      <div className="flex-1 p-2 space-y-2 overflow-y-auto">
+      {/* Card list — scrollable */}
+      <div
+        className="kb-col-cards"
+        data-kanban-column={estado}
+        style={{
+          flex: 1,
+          padding: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          overflowY: 'auto',
+        }}
+      >
         {loading ? (
           Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
-              className="bg-surface rounded-lg border border-gray-200 p-3 animate-pulse"
-            >
-              <div className="h-3 bg-gray-300 rounded w-3/4 mb-2" />
-              <div className="h-2 bg-gray-300 rounded w-1/2 mb-3" />
-              <div className="h-2 bg-gray-300 rounded w-5/6 mb-1" />
-              <div className="h-2 bg-gray-300 rounded w-1/3" />
-            </div>
+              style={{
+                borderRadius: 10,
+                background: 'var(--color-border)',
+                height: 96,
+                animation: 'pulse 1.5s infinite',
+                flexShrink: 0,
+              }}
+            />
           ))
-        ) : cards.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-gray-500 text-xs text-center px-4">
-            Arrastra candidatos aquí
+        ) : total === 0 ? (
+          <div
+            data-kanban-column={estado}
+            style={{
+              textAlign: 'center',
+              padding: '32px 16px',
+              color: 'var(--color-muted)',
+              fontSize: 12,
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ fontSize: 24, marginBottom: 6 }}>—</div>
+            Sin candidatos
           </div>
         ) : (
-          cards.map((card) => (
-            <CandidateCard
-              key={card.id}
-              postulacion={card}
-              onDragStart={onDragStart}
-              onCardClick={onCardClick}
-              onEmailAction={onEmailAction}
-            />
+          cards.map(card => (
+            <div key={card.id} data-kanban-column={estado} style={{ flexShrink: 0 }}>
+              <CandidateCard
+                postulacion={card}
+                onPointerDown={onCardPointerDown}
+                onCardClick={onCardClick}
+                onEmailAction={onEmailAction}
+              />
+            </div>
           ))
         )}
       </div>

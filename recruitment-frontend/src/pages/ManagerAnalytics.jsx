@@ -80,7 +80,17 @@ export default function ManagerAnalytics() {
   );
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px', fontFamily: 'var(--font-body)' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 16px', fontFamily: 'var(--font-body)' }}>
+      <style>{`
+        .ma-funnel-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+        .ma-funnel-meta { font-size: 13px; color: var(--color-slate); white-space: nowrap; }
+        .ma-tth-summary { margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .ma-tth-box { background: var(--color-accent-bg); border-radius: 10px; padding: 12px 18px; flex: 1; min-width: 120px; }
+        @media (max-width: 480px) {
+          .ma-funnel-meta { font-size: 11px; }
+          .ma-tth-box { padding: 10px 14px; }
+        }
+      `}</style>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--color-navy)', margin: '0 0 6px' }}>
           Analíticas de Reclutamiento
@@ -94,17 +104,13 @@ export default function ManagerAnalytics() {
       <SectionCard title="Tiempo Promedio de Contratación" loading={loading}>
         {timeToHire && (
           <>
-            <div style={{ marginBottom: 20, display: 'flex', gap: 16 }}>
-              <div style={{ background: 'var(--color-accent-bg)', borderRadius: 10, padding: '14px 20px' }}>
-                <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--color-accent)', margin: 0 }}>
-                  {timeToHire.promedioGlobal}
-                </p>
+            <div className="ma-tth-summary">
+              <div className="ma-tth-box">
+                <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--color-accent)', margin: 0 }}>{timeToHire.promedioGlobal}</p>
                 <p style={{ fontSize: 12, color: 'var(--color-slate)', margin: '4px 0 0' }}>días promedio global</p>
               </div>
-              <div style={{ background: 'rgba(106,217,192,0.15)', borderRadius: 10, padding: '14px 20px' }}>
-                <p style={{ fontSize: 28, fontWeight: 800, color: '#6ad9c0', margin: 0 }}>
-                  {timeToHire.items.reduce((s, i) => s + i.totalContratados, 0)}
-                </p>
+              <div style={{ background: 'rgba(106,217,192,0.15)', borderRadius: 10, padding: '12px 18px', flex: 1, minWidth: 120 }}>
+                <p style={{ fontSize: 26, fontWeight: 800, color: '#6ad9c0', margin: 0 }}>{timeToHire.items.reduce((s, i) => s + i.totalContratados, 0)}</p>
                 <p style={{ fontSize: 12, color: '#6ad9c0', margin: '4px 0 0' }}>total contratados</p>
               </div>
             </div>
@@ -140,12 +146,12 @@ export default function ManagerAnalytics() {
       {/* Section B — Pipeline Funnel */}
       <SectionCard title="Embudo del Pipeline" loading={loading}>
         {pipeline && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {pipeline.stages.map((stage, i) => (
               <div key={stage.nombre}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div className="ma-funnel-row">
                   <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-navy)' }}>{stage.nombre}</span>
-                  <span style={{ fontSize: 13, color: 'var(--color-slate)' }}>
+                  <span className="ma-funnel-meta">
                     {stage.count} candidatos &nbsp;·&nbsp;
                     <strong style={{ color: FUNNEL_COLORS[i] }}>{stage.porcentaje}%</strong>
                   </span>

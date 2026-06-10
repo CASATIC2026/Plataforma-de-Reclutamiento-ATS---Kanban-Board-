@@ -2,19 +2,19 @@ import { formatRelativeDate, getPuntajeStyle } from '../../utils/vacanteHelpers'
 import CandidateSummary from './CandidateSummary';
 import EmailTimerBadge from '../common/EmailTimerBadge';
 
-export default function CandidateCard({ postulacion, onDragStart, onCardClick, onEmailAction }) {
+export default function CandidateCard({ postulacion, onPointerDown, onCardClick, onEmailAction }) {
   const hasCv = Boolean(postulacion.cvFileName);
   const hasNotes = Boolean(postulacion.notasInternas);
   const isOferta = postulacion.estado === 3;
 
   return (
     <div
-      draggable
-      onDragStart={(e) => onDragStart(e, postulacion.id)}
+      onPointerDown={e => onPointerDown?.(postulacion, e)}
       onClick={() => onCardClick?.(postulacion)}
-      className={`bg-surface rounded-lg border border-gray-200 p-3 shadow-sm cursor-pointer hover:shadow-md hover:border-accent transition-all select-none ${
+      className={`bg-surface rounded-lg border border-gray-200 p-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:border-accent transition-all select-none ${
         isOferta ? 'border-l-4 border-l-green' : ''
       }`}
+      style={{ touchAction: 'pan-y' }}
     >
       <CandidateSummary postulacion={postulacion} />
 
@@ -49,6 +49,7 @@ export default function CandidateCard({ postulacion, onDragStart, onCardClick, o
         <div
           className="mt-2 border-t border-gray-100 pt-2"
           onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <EmailTimerBadge
             emailStatus={postulacion.emailStatus}
